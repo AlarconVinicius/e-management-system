@@ -22,6 +22,12 @@ public abstract class MainController : Controller
         }));
     }
 
+    protected ActionResult CustomResponse(string error)
+    {
+        AddProcessingError(error);
+        return CustomResponse();
+    }
+
     protected ActionResult CustomResponse(ModelStateDictionary modelState)
     {
         var errors = modelState.Values.SelectMany(e => e.Errors);
