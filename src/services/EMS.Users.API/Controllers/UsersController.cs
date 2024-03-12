@@ -2,6 +2,7 @@
 using EMS.Users.API.Application.DTO;
 using EMS.Users.API.Models;
 using EMS.WebAPI.Core.Controllers;
+using EMS.WebAPI.Core.Services;
 using EMS.WebAPI.Core.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ public class UsersController : MainController
     private readonly IUserRepository _userRepository;
     private readonly IAspNetUser _user;
 
-    public UsersController(IUserRepository userRepository, IAspNetUser user)
+    public UsersController(IUserRepository userRepository, IAspNetUser user, INotifier notifier) : base(notifier)
     {
         _userRepository = userRepository;
         _user = user;
@@ -63,7 +64,7 @@ public class UsersController : MainController
     {
         if (!await uow.Commit())
         {
-            AddProcessingError("There was an error persisting the data");
+            NotifyError("There was an error persisting the data");
             return false;
         }
         return true;

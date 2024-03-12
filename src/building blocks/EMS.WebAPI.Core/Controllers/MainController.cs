@@ -1,4 +1,6 @@
-﻿using FluentValidation.Results;
+﻿using EMS.WebAPI.Core.Services;
+using EMS.WebAPI.Core.Services.Notifications;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -7,33 +9,38 @@ namespace EMS.WebAPI.Core.Controllers;
 [ApiController]
 public abstract class MainController : Controller
 {
-    protected ICollection<string> Errors = new List<string>();
+    private readonly INotifier _notifier;
 
+    protected MainController(INotifier notifier)
+    {
+        _notifier = notifier;
+    }
     protected ActionResult CustomResponse(object result = null!)
     {
-        if (OperationValid())
+        if (IsOperationValid())
         {
             return Ok(result);
         }
 
         return BadRequest(new ValidationProblemDetails(new Dictionary<string, string[]>
         {
-            { "Messages", Errors.ToArray() }
+            { "Messages", _notifier.GetNotifications().Select(n => n.Message.ToString()).ToArray() }
         }));
     }
 
     protected ActionResult CustomResponse(string error)
     {
-        AddProcessingError(error);
+        NotifyError(error);
         return CustomResponse();
     }
 
     protected ActionResult CustomResponse(ModelStateDictionary modelState)
     {
-        var errors = modelState.Values.SelectMany(e => e.Errors);
-        foreach (var error in errors)
+        var erros = modelState.Values.SelectMany(e => e.Errors);
+        foreach (var erro in erros)
         {
-            AddProcessingError(error.ErrorMessage);
+            var errorMsg = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
+            NotifyError(errorMsg);
         }
 
         return CustomResponse();
@@ -43,7 +50,7 @@ public abstract class MainController : Controller
     {
         foreach (var error in validationResult.Errors)
         {
-            AddProcessingError(error.ErrorMessage);
+            NotifyError(error.ErrorMessage);
         }
 
         return CustomResponse();
@@ -67,18 +74,13 @@ public abstract class MainController : Controller
     //    return true;
     //}
 
-    protected bool OperationValid()
+    protected void NotifyError(string message)
     {
-        return !Errors.Any();
+        _notifier.Handle(new Notification(message));
     }
 
-    protected void AddProcessingError(string error)
+    protected bool IsOperationValid()
     {
-        Errors.Add(error);
-    }
-
-    protected void ClearProcessingErrors()
-    {
-        Errors.Clear();
+        return !_notifier.HasNotification();
     }
 }

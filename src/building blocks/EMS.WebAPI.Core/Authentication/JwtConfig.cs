@@ -25,7 +25,7 @@ public static class JwtConfig
             x.RequireHttpsMetadata = false;
             x.BackchannelHttpHandler = new HttpClientHandler { ServerCertificateCustomValidationCallback = delegate { return true; } };
             x.SaveToken = true;
-            x.SetJwksOptions(new JwkOptions(appSettings.AutenticacaoJwksUrl));
+            x.SetJwksOptions(new JwkOptions(appSettings.AuthenticationJwksUrl));
         });
     }
 
