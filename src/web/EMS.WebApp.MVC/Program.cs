@@ -15,12 +15,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.SignIn.RequireConfirmedAccount = false
 ).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/Identity/Account/Login";
-                    options.AccessDeniedPath = "/erro/403";
-                });
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//                .AddCookie(options =>
+//                {
+//                    options.LoginPath = "/Identity/Account/Login";
+//                    options.AccessDeniedPath = "/erro/403";
+//                });
 builder.Services.AddDbContext<EMSDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
