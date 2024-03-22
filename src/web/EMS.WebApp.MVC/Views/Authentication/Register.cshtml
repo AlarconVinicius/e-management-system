@@ -1,0 +1,89 @@
+﻿@* @using EMS.WebApp.MVC.Extensions
+@model EMS.WebApp.MVC.Business.Models.ViewModels.RegisterUser
+@{
+    ViewData["Title"] = Model.Plan.Title;
+}
+<section class="section-content padding-y container">
+    <div class="card">
+        <div class="row no-gutters align-items-center">
+            <aside class="col-md-6">
+                <article class="content-body">
+                    <div class="card mx-auto border-0" style="max-width: 380px;">
+                        <div class="card-body text-center">
+                            <h2 class="title">@Model.Plan.Title</h2>
+                            <p class="card-text">@Model.Plan.SubTitle</p>
+                        </div>
+
+                        <div class="card-body text-center">
+                            <div class="">
+                                @foreach (var benefit in this.SplitBenefits(@Model.Plan.Benefits))
+                                {
+                                    <p class="font-weight-bold"><i class="far fa-check-circle" style="color: #f06f11;"></i> @benefit</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-body mb-3 text-center">
+                            <var class="price h4">@this.FormatCurrency(Model.Plan.Price)</var>
+                        </div>
+                    </div>
+                </article>
+            </aside>
+            <main class="col-md-6 border-left">
+                <article class="content-body">
+                    <vc:Summary></vc:Summary>
+                    <div class="card mx-auto border-0" style="max-width: 380px;">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Seja bem vindo!</h4>
+
+                            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+
+                                <input type="hidden" asp-for="@Model.RegisterUser.PlanId" value="@Model.Plan.Id" />
+                                <input type="hidden" asp-for="@Model.RegisterUser.Role" value="@ERole.Admin" />
+                                <div class="form-group">
+                                    <label asp-for="@Model.RegisterUser.Name"></label>
+                                    <input asp-for="@Model.RegisterUser.Name" class="form-control" />
+                                    <span asp-validation-for="@Model.RegisterUser.Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="@Model.RegisterUser.Cpf"></label>
+                                    <input asp-for="@Model.RegisterUser.Cpf" class="form-control" />
+                                    <span asp-validation-for="@Model.RegisterUser.Cpf" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="@Model.RegisterUser.Email"></label>
+                                    <input asp-for="@Model.RegisterUser.Email" class="form-control" />
+                                    <span asp-validation-for="@Model.RegisterUser.Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="@Model.RegisterUser.Password"></label>
+                                    <input type="password" asp-for="@Model.RegisterUser.Password" class="form-control" />
+                                    <span asp-validation-for="@Model.RegisterUser.Password" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="@Model.RegisterUser.ConfirmPassword"></label>
+                                    <input type="password" asp-for="@Model.RegisterUser.ConfirmPassword" class="form-control" />
+                                    <span asp-validation-for="@Model.RegisterUser.ConfirmPassword" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-block btn-auth">Registrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="text-center">Já tem uma conta?<a asp-controller="Authentication" asp-action="Login"> Entrar</a></div>
+                </article>
+            </main>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+ *@

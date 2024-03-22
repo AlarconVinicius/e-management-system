@@ -2,4 +2,8 @@
 
 public class Subscriber : User
 {
+    //public Subscriber(Guid id, string name, string email, string cpf) : base(id, name, email, cpf)
+    //{
+        
+    //}
 }

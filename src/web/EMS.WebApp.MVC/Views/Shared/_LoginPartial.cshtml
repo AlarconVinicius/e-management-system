@@ -1,27 +1,28 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using EMS.WebApp.MVC.Business.Utils.User;
+@using EMS.WebApp.MVC.Extensions;
+@inject IAspNetUser AppUser
 
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+@if (AppUser.IsAuthenticated())
 {
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
-        </form>
-    </li>
+    <div class="dropdown d-inline-block">
+        <a href="#" class="icontext dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <img class="icon icon-sm rounded-circle" src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(AppUser.GetUserEmail())?d=mm&s=45">
+        </a> <!-- iconbox // -->
+        <div class="dropdown-menu dropdown-menu-left" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 12px; left: 91px; transform: translate3d(150px, 32px, 0px);">
+            <a class="dropdown-item" href="#">Meu Perfil</a>
+            <a class="dropdown-item" href="#">Dashboard</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" asp-controller="Authentication" asp-action="Logout">Sair</a>
+        </div>
+    </div>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
+    <div class="widget-header">
+        <small class="title text-muted">Bem vindo!</small>
+        <div>
+            <a asp-controller="Home" asp-action="Index">Crie sua conta</a> <span> | </span>
+            <a asp-controller="Authentication" asp-action="Login"> Login</a>
+        </div>
+    </div>
 }
-</ul>

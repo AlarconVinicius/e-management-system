@@ -1,4 +1,5 @@
 ﻿using EMS.WebApp.MVC.Data;
+using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ public static class WebAppConfig
 
     public static void UseMvcConfiguration(this IApplicationBuilder app, IWebHostEnvironment env, WebApplication webApp)
     {
-        app.UseForwardedHeaders();
+        //app.UseForwardedHeaders();
 
         if (env.IsDevelopment())
         {
@@ -62,7 +63,7 @@ public static class WebAppConfig
             SupportedUICultures = supportedCultures
         });
 
-        //app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.UseEndpoints(endpoints =>
         {
