@@ -1,27 +1,25 @@
-﻿using EMS.WebApp.MVC.Business.Models.ViewModels;
+﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
-using EMS.WebApp.MVC.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 namespace EMS.WebApp.MVC.Controllers;
 
 public class HomeController : Controller
 {
     private readonly IAspNetUser _appUser;
-    private readonly EMSDbContext _context;
+    private readonly IPlanRepository _iPlanRepository;
 
-    public HomeController(EMSDbContext context, IAspNetUser appUser)
+    public HomeController(IAspNetUser appUser, IPlanRepository iPlanRepository)
     {
-        _context = context;
         _appUser = appUser;
+        _iPlanRepository = iPlanRepository;
     }
 
     public async Task<IActionResult> Index()
     {
-        //if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Home");
-        var plans = await _context.Subscribers.ToListAsync();
+        if (_appUser.IsAuthenticated()) return RedirectToAction("Privacy", "Home");
+        var plans = (await _iPlanRepository.GetAll()).Select(new PlanViewModel().ToViewModel);
         return View(plans);
     }
 

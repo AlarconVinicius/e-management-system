@@ -1,5 +1,5 @@
-﻿@* @using EMS.WebApp.MVC.Extensions
-@model EMS.WebApp.MVC.Business.Models.ViewModels.RegisterUser
+﻿@using EMS.WebApp.MVC.Extensions
+@model EMS.WebApp.MVC.Business.Models.ViewModels.PlanUserViewModel
 @{
     ViewData["Title"] = Model.Plan.Title;
 }
@@ -39,7 +39,7 @@
                             <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
 
                                 <input type="hidden" asp-for="@Model.RegisterUser.PlanId" value="@Model.Plan.Id" />
-                                <input type="hidden" asp-for="@Model.RegisterUser.Role" value="@ERole.Admin" />
+                                @* <input type="hidden" asp-for="@Model.RegisterUser.Role" value="@ERole.Admin" /> *@
                                 <div class="form-group">
                                     <label asp-for="@Model.RegisterUser.Name"></label>
                                     <input asp-for="@Model.RegisterUser.Name" class="form-control" />
@@ -86,4 +86,3 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
- *@

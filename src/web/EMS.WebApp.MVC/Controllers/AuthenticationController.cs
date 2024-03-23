@@ -1,48 +1,65 @@
-﻿using EMS.WebApp.MVC.Business.Models.ViewModels;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+using EMS.WebApp.MVC.Business.Interfaces.Services;
+using EMS.WebApp.MVC.Business.Models.ViewModels;
+using EMS.WebApp.MVC.Business.Services;
+using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Text.Encodings.Web;
-using System.Text;
 
 namespace EMS.WebApp.MVC.Controllers;
-public class AuthenticationController : Controller
+public class AuthenticationController : MainController
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly IAspNetUser _appUser;
+    private readonly IPlanRepository _planRepository;
+    private readonly ISubscriberService _subscriberService;
+    private readonly IPlanSubscriberService _planSubscriberService;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ISubscriberService subscriberService, IPlanSubscriberService planSubscriberService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _appUser = appUser;
+        _planRepository = planRepository;
+        _subscriberService = subscriberService;
+        _planSubscriberService = planSubscriberService;
     }
 
     [HttpGet]
-    [Route("nova-conta/{id}")]
-    public async Task<IActionResult> Register(Guid id)
+    [Route("nova-conta/{planId}")]
+    public async Task<IActionResult> Register(Guid planId)
     {
-        //if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Home");
-        //var plan = await _subscriptionService.GetById(id);
-        //var registerUser = new RegisterUser();
+        if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Home");
 
-        //var viewModel = new PlanUserViewModel
-        //{
-        //    Plan = plan,
-        //    RegisterUser = registerUser
-        //};
+        var plan = await _planRepository.GetById(planId);
+        if (plan is null)
+            return NotFound();
 
-        return View();
+        var registerUser = new RegisterUser();
+
+        var viewModel = new PlanUserViewModel
+        {
+            Plan = new PlanViewModel().ToViewModel(plan),
+            RegisterUser = registerUser
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]
-    [Route("nova-conta/{id}")]
-    public async Task<IActionResult> Register(Guid id, RegisterUser registerUser, string? returnUrl = null)
+    [Route("nova-conta/{planId}")]
+    public async Task<IActionResult> Register(Guid planId, RegisterUser registerUser, string returnUrl = null)
     {
+        var plan = await _planRepository.GetById(planId);
+        if (plan is null)
+            return NotFound();
+
+        var viewModel = new PlanUserViewModel
+        {
+            Plan = new PlanViewModel().ToViewModel(plan),
+            RegisterUser = registerUser
+        };
         if (ModelState.IsValid)
         {
             var user = new IdentityUser
@@ -56,6 +73,17 @@ public class AuthenticationController : Controller
 
             if (result.Succeeded)
             {
+                await AddSubscriber(registerUser, user);
+
+                await AddPlanSubscriber(registerUser, user);
+
+                if (HasErrorsInResponse(ModelState))
+                {
+                    await _userManager.DeleteAsync(user);
+                    return View(viewModel);
+                }
+
+                await _planRepository.UnitOfWork.Commit();
                 await _signInManager.SignInAsync(user, false);
 
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
@@ -65,10 +93,11 @@ public class AuthenticationController : Controller
 
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                AddError(error.Description);
             }
         }
-        return View(registerUser);
+
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -119,7 +148,22 @@ public class AuthenticationController : Controller
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
-
+    private async Task AddSubscriber(RegisterUser registerUser, IdentityUser user)
+    {
+        var subscriberResult = await _subscriberService.AddSubscriber(Guid.Parse(user.Id), registerUser);
+        if (!subscriberResult.IsValid)
+        {
+            AddError(subscriberResult);
+        }
+    }
+    private async Task AddPlanSubscriber(RegisterUser registerUser, IdentityUser user)
+    {
+        var planSubscriberResult = await _planSubscriberService.AddPlanSubscriber(Guid.Parse(user.Id), registerUser);
+        if (!planSubscriberResult.IsValid)
+        {
+            AddError(planSubscriberResult);
+        }
+    }
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
     //    IdentityResult result;
