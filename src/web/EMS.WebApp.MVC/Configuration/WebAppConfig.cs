@@ -18,8 +18,9 @@ public static class WebAppConfig
         );
 
         services.AddDefaultIdentity<IdentityUser>(options =>
-            options.SignIn.RequireConfirmedAccount = false
-        ).AddEntityFrameworkStores<ApplicationDbContext>();
+            options.SignIn.RequireConfirmedAccount = false)
+            .AddErrorDescriber<IdentityMensagensPortugues>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
         //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         //                .AddCookie(options =>

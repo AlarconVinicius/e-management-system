@@ -129,11 +129,12 @@ public class AuthenticationController : MainController
             }
             if (result.IsLockedOut)
             {
+                AddError("Usuário temporariamente bloqueado devido às tentativas inválidas.");
                 return View(loginUser);
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Usuário ou senha inválidos.");
+                AddError("Usuário ou senha inválidos.");
                 return View(loginUser);
             }
         }
