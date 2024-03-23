@@ -1,32 +1,62 @@
-﻿using EMS.WebApp.MVC.Models;
+﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+using EMS.WebApp.MVC.Business.Models.ViewModels;
+using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
-namespace EMS.WebApp.MVC.Controllers
+namespace EMS.WebApp.MVC.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IAspNetUser _appUser;
+    private readonly IPlanRepository _iPlanRepository;
+
+    public HomeController(IAspNetUser appUser, IPlanRepository iPlanRepository)
     {
-        private readonly ILogger<HomeController> _logger;
+        _appUser = appUser;
+        _iPlanRepository = iPlanRepository;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
+    public async Task<IActionResult> Index()
+    {
+        if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Dashboard");
+        var plans = (await _iPlanRepository.GetAll()).Select(new PlanViewModel().ToViewModel);
+        return View(plans);
+    }
+
+    public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    [Route("erro/{id:length(3,3)}")]
+    public IActionResult Error(int id)
+    {
+        var modelErro = new ErrorViewModel();
+
+        if (id == 500)
         {
-            _logger = logger;
+            modelErro.Message = "Ocorreu um erro! Tente novamente mais tarde ou contate nosso suporte.";
+            modelErro.Title = "Ocorreu um erro!";
+            modelErro.ErrorCode = id;
+        }
+        else if (id == 404)
+        {
+            modelErro.Message =
+                "A página que está procurando não existe! <br />Em caso de dúvidas entre em contato com nosso suporte";
+            modelErro.Title = "Ops! Página não encontrada.";
+            modelErro.ErrorCode = id;
+        }
+        else if (id == 403)
+        {
+            modelErro.Message = "Você não tem permissão para fazer isto.";
+            modelErro.Title = "Acesso Negado";
+            modelErro.ErrorCode = id;
+        }
+        else
+        {
+            return StatusCode(404);
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        return View("Error", modelErro);
     }
 }
