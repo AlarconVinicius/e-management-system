@@ -18,7 +18,7 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        if (_appUser.IsAuthenticated()) return RedirectToAction("Privacy", "Home");
+        if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Dashboard");
         var plans = (await _iPlanRepository.GetAll()).Select(new PlanViewModel().ToViewModel);
         return View(plans);
     }
