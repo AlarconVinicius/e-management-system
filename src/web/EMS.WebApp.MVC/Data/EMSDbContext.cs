@@ -1,4 +1,5 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces;
+using EMS.WebApp.MVC.Business.Models.Subscription;
 using EMS.WebApp.MVC.Business.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,8 @@ public class EMSDbContext : DbContext, IUnitOfWork
 
     public DbSet<Subscriber> Subscribers { get; set; }
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<Plan> Plans { get; set; }
+    public DbSet<PlanSubscriber> PlanSubscribers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

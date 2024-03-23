@@ -10,7 +10,7 @@ public class CpfAttribute : ValidationAttribute
 {
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
-        if(value is null) return null!;
+        //if(value is null) return null!;
         return Cpf.Validate(value.ToString()!) ? ValidationResult.Success! : new ValidationResult("CPF em formato inválido")!;
     }
 }
