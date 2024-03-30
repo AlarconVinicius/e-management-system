@@ -6,4 +6,5 @@ namespace EMS.WebApp.MVC.Business.Interfaces.Services;
 public interface ISubscriberService
 {
     Task<ValidationResult> AddSubscriber(Guid id, RegisterUser subscriber);
+    Task<ValidationResult> UpdateSubscriber(Guid id, UpdateUserViewModel subscriber);
 }

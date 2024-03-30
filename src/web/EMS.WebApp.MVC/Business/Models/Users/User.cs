@@ -22,11 +22,14 @@ public abstract class User : Entity
         Deleted = false;
     }
 
+    public void ChangeName(string name)
+    {
+        Name = name;
+    }
     public void ChangeEmail(string email)
     {
         Email = new Email(email);
     }
-
     public void AssignAddress(Address address)
     {
         Address = address;

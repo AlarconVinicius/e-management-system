@@ -23,6 +23,19 @@ public class SubscriberService : MainService, ISubscriberService
         return _validationResult;
     }
 
+    public async Task<ValidationResult> UpdateSubscriber(Guid id, UpdateUserViewModel subscriber)
+    {
+        //if (!ExecuteValidation(new UserValidation(), subscriber)) return _validationResult;
+
+        var subscriberDb = await _subscriberRepository.GetById(subscriber.Id);
+
+        subscriberDb.ChangeName(subscriber.Name);
+        subscriberDb.ChangeEmail(subscriber.Email);
+
+        _subscriberRepository.UpdateSubscriber(subscriberDb);
+        return _validationResult;
+    }
+
     private async Task<bool> SubscriberExists(string cpf)
     {
         var userExist = await _subscriberRepository.GetByCpf(cpf);
