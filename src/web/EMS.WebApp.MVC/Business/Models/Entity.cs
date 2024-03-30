@@ -2,13 +2,25 @@
 
 public abstract class Entity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
 
     protected Entity()
     {
         Id = Guid.NewGuid();
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 
+    protected void UpdateEntityDate()
+    {
+        UpdatedAt = DateTime.UtcNow;
+    }
+    protected void ChangeId(Guid id)
+    {
+        Id = id;
+    }
     #region Comparações
 
     public override bool Equals(object obj)

@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.Models.Subscription;
+﻿using EMS.WebApp.MVC.Business.Models;
 
 namespace EMS.WebApp.MVC.Business.Interfaces.Repository;
 

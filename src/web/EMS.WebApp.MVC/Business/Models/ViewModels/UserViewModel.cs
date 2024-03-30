@@ -1,5 +1,4 @@
 ﻿using EMS.WebApp.MVC.Business.DomainObjects;
-using EMS.WebApp.MVC.Business.Models.Users;
 using EMS.WebApp.MVC.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;

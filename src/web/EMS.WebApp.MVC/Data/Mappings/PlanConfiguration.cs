@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.Models.Subscription;
+﻿using EMS.WebApp.MVC.Business.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,7 +16,7 @@ public class PlanConfiguration : IEntityTypeConfiguration<Plan>
             .IsRequired()
             .HasColumnType("varchar(250)");
 
-        builder.Property(p => p.SubTitle)
+        builder.Property(p => p.Subtitle)
             .IsRequired()
             .HasColumnType("varchar(400)");
 
@@ -28,10 +28,13 @@ public class PlanConfiguration : IEntityTypeConfiguration<Plan>
             .HasColumnType("Text");
 
         builder.Property(p => p.IsActive)
-        .IsRequired();
+            .IsRequired();
 
-        builder.HasMany(p => p.PlanSubscribers)
-        .WithOne(pu => pu.Plan)
-        .HasForeignKey(pu => pu.PlanId);
+        builder.Property(p => p.CreatedAt).IsRequired();
+        builder.Property(p => p.UpdatedAt).IsRequired();
+
+        builder.HasMany(p => p.Companies)
+        .WithOne(c => c.Plan)
+        .HasForeignKey(c => c.PlanId);
     }
 }

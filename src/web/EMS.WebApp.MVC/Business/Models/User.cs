@@ -1,30 +1,38 @@
 ﻿using EMS.WebApp.MVC.Business.DomainObjects;
 
-namespace EMS.WebApp.MVC.Business.Models.Users;
+namespace EMS.WebApp.MVC.Business.Models;
 
-public abstract class User : Entity
+public class User : Entity
 {
+    public Guid CompanyId { get; private set; }
     public string Name { get; private set; }
+    public string LastName { get; private set; }
     public Email Email { get; private set; }
+    public string PhoneNumber { get; private set; }
     public Cpf Cpf { get; private set; }
-    public bool Deleted { get; private set; }
     public Address Address { get; private set; }
+    public bool IsActive { get; private set; }
 
-    // EF Relation
     protected User() { }
 
-    public User(Guid id, string name, string email, string cpf)
+    public User(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
     {
-        Id = id;
+        ChangeId(id);
         Name = name;
+        LastName = lastName;
         Email = new Email(email);
+        PhoneNumber = phoneNumber;
         Cpf = new Cpf(cpf);
-        Deleted = false;
+        IsActive = true;
     }
 
     public void ChangeName(string name)
     {
         Name = name;
+    }
+    public void ChangeLastName(string lastName)
+    {
+        LastName = lastName;
     }
     public void ChangeEmail(string email)
     {
