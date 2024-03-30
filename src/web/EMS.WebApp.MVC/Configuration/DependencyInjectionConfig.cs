@@ -20,12 +20,10 @@ public static class DependencyInjectionConfig
         services.AddScoped<IAspNetUser, AspNetUser>();
         services.AddScoped<INotifier, Notifier>();
 
-        services.AddScoped<ISubscriberService, SubscriberService>();
-        services.AddScoped<IPlanSubscriberService, PlanSubscriberService>();
+        services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<IPlanRepository, PlanRepository>();
-        services.AddScoped<ISubscriberRepository, SubscriberRepository>();
-        services.AddScoped<IPlanSubscriberRepository, PlanSubscriberRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<EMSDbContext>();
     }
 }

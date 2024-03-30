@@ -17,7 +17,7 @@ public static class RazorHelpers
         }
         return sBuilder.ToString();
     }
-    public static string FormatCurrency(this RazorPage page, double value)
+    public static string FormatCurrency(this RazorPage page, decimal value)
     {
         return value > 0 ? string.Format(Thread.CurrentThread.CurrentCulture, "{0:C}", value) : "Gratuito";
     }
