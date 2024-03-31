@@ -33,12 +33,12 @@ public class AuthenticationController : MainController
         if (plan is null)
             return NotFound();
 
-        var registerUser = new RegisterUser();
+        var registerCompany = new RegisterCompanyViewModel();
 
-        var viewModel = new PlanUserViewModel
+        var viewModel = new PlanCompanyViewModel
         {
             Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterUser = registerUser
+            RegisterCompany = registerCompany
         };
 
         return View(viewModel);
@@ -46,31 +46,31 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("nova-conta/{planId}")]
-    public async Task<IActionResult> Register(Guid planId, RegisterUser registerUser, string returnUrl = null)
+    public async Task<IActionResult> Register(Guid planId, RegisterCompanyViewModel registerCompany, string returnUrl = null)
     {
         var plan = await _planRepository.GetById(planId);
         if (plan is null)
             return NotFound();
 
-        var viewModel = new PlanUserViewModel
+        var viewModel = new PlanCompanyViewModel
         {
             Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterUser = registerUser
+            RegisterCompany = registerCompany
         };
         if (ModelState.IsValid)
         {
             var user = new IdentityUser
             {
-                UserName = registerUser.Email,
-                Email = registerUser.Email,
+                UserName = registerCompany.Email,
+                Email = registerCompany.Email,
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, registerUser.Password);
+            var result = await _userManager.CreateAsync(user, registerCompany.Password);
 
             if (result.Succeeded)
             {
-                //await AddSubscriber(registerUser, user);
+                //await AddCompany(registerCompany, user);
 
                 //await AddPlanSubscriber(registerUser, user);
 
@@ -146,7 +146,7 @@ public class AuthenticationController : MainController
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
-    //private async Task AddSubscriber(RegisterUser registerUser, IdentityUser user)
+    //private async Task AddCompany(RegisterUser registerUser, IdentityUser user)
     //{
     //    var subscriberResult = await _subscriberService.AddSubscriber(Guid.Parse(user.Id), registerUser);
     //    if (!subscriberResult.IsValid)
