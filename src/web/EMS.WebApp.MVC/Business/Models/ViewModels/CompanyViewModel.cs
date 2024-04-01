@@ -5,6 +5,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace EMS.WebApp.MVC.Business.Models.ViewModels;
 
+public class CompanyViewModel
+{
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id")]
+    public Guid Id { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id do Plano")]
+    public Guid PlanId { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Nome da Empresa")]
+    public string CompanyName { get; set; }
+
+    [Cpf]
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("CPF/CNPJ")]
+    public string CpfOrCnpj { get; set; }
+
+    public CompanyViewModel() { }
+
+    public CompanyViewModel(Guid id, Guid planId, string companyName, string cpfOrCnpj)
+    {
+        Id = id;
+        PlanId = planId;
+        CompanyName = companyName;
+        CpfOrCnpj = cpfOrCnpj;
+    }
+}
+
 public class RegisterCompanyViewModel
 {
 

@@ -72,9 +72,10 @@ public class AuthenticationController : MainController
 
             if (result.Succeeded)
             {
-                await AddCompany(registerCompany);
-
-                await AddUser(Guid.Parse(user.Id), registerCompany);
+                var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
+                await AddCompany(companyVM);
+                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
+                await AddUser(userVM);
 
                 if (HasErrorsInResponse(ModelState))
                 {
@@ -148,7 +149,7 @@ public class AuthenticationController : MainController
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
-    private async Task AddCompany(RegisterCompanyViewModel registerCompany)
+    private async Task AddCompany(CompanyViewModel registerCompany)
     {
         var companyResult = await _companyService.AddCompany(registerCompany);
         if (!companyResult.IsValid)
@@ -156,9 +157,9 @@ public class AuthenticationController : MainController
             AddError(companyResult);
         }
     }
-    private async Task AddUser(Guid id, RegisterCompanyViewModel registerCompany)
+    private async Task AddUser(UserViewModel registerUser)
     {
-        var planSubscriberResult = await _userService.AddUser(id, registerCompany);
+        var planSubscriberResult = await _userService.AddUser(registerUser);
         if (!planSubscriberResult.IsValid)
         {
             AddError(planSubscriberResult);

@@ -1,7 +1,7 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Services.Notifications;
 using FluentValidation.Results;
 
@@ -16,10 +16,10 @@ public class CompanyService : MainService, ICompanyService
         _companyRepository = companyRepository;
     }
 
-    public async Task<ValidationResult> AddCompany(RegisterCompanyViewModel company)
+    public async Task<ValidationResult> AddCompany(CompanyViewModel company)
     {
-        if (await CompanyExists(company.Cpf)) return _validationResult;
-        _companyRepository.AddCompany(new Company(company.PlanId, company.CompanyName, company.CpfOrCnpj, true));
+        if (await CompanyExists(company.CpfOrCnpj)) return _validationResult;
+        _companyRepository.AddCompany(new Company(company.Id, company.PlanId, company.CompanyName, company.CpfOrCnpj, true));
         return _validationResult;
     }
 

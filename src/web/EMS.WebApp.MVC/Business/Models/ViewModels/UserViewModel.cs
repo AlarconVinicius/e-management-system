@@ -1,29 +1,34 @@
 ﻿using EMS.WebApp.MVC.Business.DomainObjects;
 using EMS.WebApp.MVC.Extensions;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace EMS.WebApp.MVC.Business.Models.ViewModels;
 
 public class UserViewModel
 {
     public Guid Id { get; set; }
+    public Guid CompanyId { get; set; }
     public string Name { get; set; }
+    public string LastName { get; set; }
     public string Email { get; set; }
+    public string PhoneNumber { get; set; }
     public string Cpf { get; set; }
-    public bool Deleted { get; set; }
+    public bool IsActive { get; set; }
 
-    public Address Address { get; set; }
 
     public UserViewModel() { }
 
-    public UserViewModel(Guid id, string name, string email, string cpf)
+    public UserViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf)
     {
         Id = id;
+        CompanyId = companyId;
         Name = name;
+        LastName = lastName;
         Email = email;
+        PhoneNumber = phoneNumber;
         Cpf = cpf;
-        Deleted = false;
+        IsActive = true;
     }
 }
 

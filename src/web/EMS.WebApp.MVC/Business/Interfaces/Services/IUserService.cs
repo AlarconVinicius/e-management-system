@@ -5,6 +5,6 @@ namespace EMS.WebApp.MVC.Business.Interfaces.Services;
 
 public interface IUserService
 {
-    Task<ValidationResult> AddUser(Guid id, RegisterCompanyViewModel user);
+    Task<ValidationResult> AddUser(UserViewModel user);
     Task<ValidationResult> UpdateUser(Guid id, UpdateUserViewModel usser);
 }

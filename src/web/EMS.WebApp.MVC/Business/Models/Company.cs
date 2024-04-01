@@ -6,7 +6,7 @@ public class Company : Entity
 {
     public Guid PlanId { get; set; }
     public string Name { get; set; }
-    public Cpf CpfOrCnpj { get; set; } // Trocar nome
+    public Cpf CpfOrCnpj { get; set; }
     public bool IsActive { get; set; }
 
     public Plan Plan { get; set; }
@@ -19,6 +19,14 @@ public class Company : Entity
 
     public Company(Guid planId, string name, string cpfOrCnpj, bool isActive)
     {
+        PlanId = planId;
+        Name = name;
+        CpfOrCnpj = new Cpf(cpfOrCnpj);
+        IsActive = isActive;
+    }
+    public Company(Guid id, Guid planId, string name, string cpfOrCnpj, bool isActive)
+    {
+        ChangeId(id);
         PlanId = planId;
         Name = name;
         CpfOrCnpj = new Cpf(cpfOrCnpj);

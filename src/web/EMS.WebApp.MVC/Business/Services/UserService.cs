@@ -16,10 +16,10 @@ public class UserService : MainService, IUserService
         _subscriberRepository = subscriberRepository;
     }
 
-    public async Task<ValidationResult> AddUser(Guid id, RegisterCompanyViewModel user)
+    public async Task<ValidationResult> AddUser(UserViewModel user)
     {
         if (await UserExists(user.Cpf)) return _validationResult;
-        _subscriberRepository.AddUser(new User(id, Guid.Empty, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf));
+        _subscriberRepository.AddUser(new User(user.Id, user.CompanyId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf));
         return _validationResult;
     }
 

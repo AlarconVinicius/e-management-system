@@ -5,6 +5,6 @@ namespace EMS.WebApp.MVC.Business.Interfaces.Services;
 
 public interface ICompanyService
 {
-    Task<ValidationResult> AddCompany(RegisterCompanyViewModel company);
+    Task<ValidationResult> AddCompany(CompanyViewModel company);
     //Task<ValidationResult> UpdateCompany(Guid id, UpdateCompanyViewModel usser);
 }
