@@ -1,13 +1,11 @@
-﻿using EMS.WebApp.MVC.Business.Models.Subscription;
-
-namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+﻿namespace EMS.WebApp.MVC.Business.Models.ViewModels;
 
 public class PlanViewModel
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string SubTitle { get; set; } = string.Empty;
-    public double Price { get; set; }
+    public string Subtitle { get; set; } = string.Empty;
+    public decimal Price { get; set; }
     public string Benefits { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 
@@ -17,7 +15,7 @@ public class PlanViewModel
         {
             Id = plan.Id,
             Title = plan.Title,
-            SubTitle = plan.SubTitle,
+            Subtitle = plan.Subtitle,
             Price = plan.Price,
             Benefits = plan.Benefits,
             IsActive = plan.IsActive
@@ -26,14 +24,6 @@ public class PlanViewModel
 
     public Plan ToDomain(PlanViewModel planViewModel)
     {
-        return new Plan
-        {
-            Id = planViewModel.Id,
-            Title = planViewModel.Title,
-            SubTitle = planViewModel.SubTitle,
-            Price = planViewModel.Price,
-            Benefits = planViewModel.Benefits,
-            IsActive = planViewModel.IsActive
-        };
+        return new Plan(planViewModel.Title, planViewModel.Subtitle, planViewModel.Price, planViewModel.Benefits, planViewModel.IsActive);
     }
 }

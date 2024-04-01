@@ -1,6 +1,6 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces;
 using EMS.WebApp.MVC.Business.Interfaces.Repository;
-using EMS.WebApp.MVC.Business.Models.Subscription;
+using EMS.WebApp.MVC.Business.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Data.Repository;

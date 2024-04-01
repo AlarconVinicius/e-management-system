@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.Models.Users;
+﻿using EMS.WebApp.MVC.Business.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -39,20 +39,21 @@ public class AddressMapping : IEntityTypeConfiguration<Address>
             .IsRequired()
             .HasColumnType("varchar(50)");
 
-        // 1 : 1 => User : Address
-        builder.HasOne(c => c.Subscriber)
+        builder.Property(p => p.CreatedAt).IsRequired();
+        builder.Property(p => p.UpdatedAt).IsRequired();
+
+        builder.Property(a => a.UserId)
+                .IsRequired(false);
+
+        builder.Property(a => a.ClientId)
+            .IsRequired(false);
+
+        builder.HasOne(c => c.User)
             .WithOne(s => s.Address)
             .HasForeignKey<Address>(a => a.UserId);
 
-        //// 1 : 1 => Employee : Address
-        //builder.HasOne<Employee>(e => e.Employee)
-        //    .WithOne(a => a.Address)
-        //    .HasForeignKey<Address>(a => a.Id);
-
-        //// 1 : 1 => Subscriber : Address
-        //builder.HasOne(s => s.Subscriber)
-        //    .WithOne(a => a.Address)
-        //    .HasForeignKey<Address>(a => a.Id);
-
+        builder.HasOne(c => c.Client)
+            .WithOne(s => s.Address)
+            .HasForeignKey<Address>(a => a.ClientId);
     }
 }

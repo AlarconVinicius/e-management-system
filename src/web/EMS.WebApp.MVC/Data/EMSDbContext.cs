@@ -1,6 +1,5 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces;
-using EMS.WebApp.MVC.Business.Models.Subscription;
-using EMS.WebApp.MVC.Business.Models.Users;
+using EMS.WebApp.MVC.Business.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Data;
@@ -14,10 +13,13 @@ public class EMSDbContext : DbContext, IUnitOfWork
         ChangeTracker.AutoDetectChangesEnabled = false;
     }
 
-    public DbSet<Subscriber> Subscribers { get; set; }
-    public DbSet<Address> Addresses { get; set; }
     public DbSet<Plan> Plans { get; set; }
-    public DbSet<PlanSubscriber> PlanSubscribers { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<Address> Addresses { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Client> Clients { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Service> Services { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,14 +27,21 @@ public class EMSDbContext : DbContext, IUnitOfWork
             e => e.GetProperties().Where(p => p.ClrType == typeof(string))))
             property.SetColumnType("varchar(100)");
 
-        //foreach (var relationship in modelBuilder.Model.GetEntityTypes()
-        //    .SelectMany(e => e.GetForeignKeys())) relationship.DeleteBehavior = DeleteBehavior.ClientSetNull;
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(EMSDbContext).Assembly);
     }
 
     public async Task<bool> Commit()
     {
+        //foreach (var entry in ChangeTracker.Entries()
+        //        .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified))
+        //{
+        //    if (entry.State == EntityState.Added)
+        //    {
+        //        entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+        //    }
+        //    entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+        //}
+
         var sucesso = await base.SaveChangesAsync() > 0;
         return sucesso;
     }

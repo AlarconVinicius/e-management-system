@@ -1,7 +1,6 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Interfaces.Services;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
-using EMS.WebApp.MVC.Business.Services;
 using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +12,17 @@ public class AuthenticationController : MainController
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IAspNetUser _appUser;
     private readonly IPlanRepository _planRepository;
-    private readonly ISubscriberService _subscriberService;
-    private readonly IPlanSubscriberService _planSubscriberService;
+    private readonly IUserService _userService;
+    private readonly ICompanyService _companyService;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ISubscriberService subscriberService, IPlanSubscriberService planSubscriberService)
+    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _appUser = appUser;
         _planRepository = planRepository;
-        _subscriberService = subscriberService;
-        _planSubscriberService = planSubscriberService;
+        _companyService = companyService;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -36,12 +35,12 @@ public class AuthenticationController : MainController
         if (plan is null)
             return NotFound();
 
-        var registerUser = new RegisterUser();
+        var registerCompany = new RegisterCompanyViewModel();
 
-        var viewModel = new PlanUserViewModel
+        var viewModel = new PlanCompanyViewModel
         {
             Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterUser = registerUser
+            RegisterCompany = registerCompany
         };
 
         return View(viewModel);
@@ -49,33 +48,34 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("nova-conta/{planId}")]
-    public async Task<IActionResult> Register(Guid planId, RegisterUser registerUser, string returnUrl = null)
+    public async Task<IActionResult> Register(Guid planId, RegisterCompanyViewModel registerCompany, string returnUrl = null)
     {
         var plan = await _planRepository.GetById(planId);
         if (plan is null)
             return NotFound();
 
-        var viewModel = new PlanUserViewModel
+        var viewModel = new PlanCompanyViewModel
         {
             Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterUser = registerUser
+            RegisterCompany = registerCompany
         };
         if (ModelState.IsValid)
         {
             var user = new IdentityUser
             {
-                UserName = registerUser.Email,
-                Email = registerUser.Email,
+                UserName = registerCompany.Email,
+                Email = registerCompany.Email,
                 EmailConfirmed = true
             };
 
-            var result = await _userManager.CreateAsync(user, registerUser.Password);
+            var result = await _userManager.CreateAsync(user, registerCompany.Password);
 
             if (result.Succeeded)
             {
-                await AddSubscriber(registerUser, user);
-
-                await AddPlanSubscriber(registerUser, user);
+                var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
+                await AddCompany(companyVM);
+                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
+                await AddUser(userVM);
 
                 if (HasErrorsInResponse(ModelState))
                 {
@@ -149,22 +149,23 @@ public class AuthenticationController : MainController
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
-    private async Task AddSubscriber(RegisterUser registerUser, IdentityUser user)
+    private async Task AddCompany(CompanyViewModel registerCompany)
     {
-        var subscriberResult = await _subscriberService.AddSubscriber(Guid.Parse(user.Id), registerUser);
-        if (!subscriberResult.IsValid)
+        var companyResult = await _companyService.AddCompany(registerCompany);
+        if (!companyResult.IsValid)
         {
-            AddError(subscriberResult);
+            AddError(companyResult);
         }
     }
-    private async Task AddPlanSubscriber(RegisterUser registerUser, IdentityUser user)
+    private async Task AddUser(UserViewModel registerUser)
     {
-        var planSubscriberResult = await _planSubscriberService.AddPlanSubscriber(Guid.Parse(user.Id), registerUser);
+        var planSubscriberResult = await _userService.AddUser(registerUser);
         if (!planSubscriberResult.IsValid)
         {
             AddError(planSubscriberResult);
         }
     }
+
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
     //    IdentityResult result;

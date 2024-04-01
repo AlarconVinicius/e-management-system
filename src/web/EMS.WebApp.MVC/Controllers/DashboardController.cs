@@ -1,11 +1,8 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models.Subscription;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;
@@ -15,14 +12,14 @@ namespace EMS.WebApp.MVC.Controllers;
 public class DashboardController : MainController
 {
     private readonly IAspNetUser _appUser;
-    private readonly ISubscriberRepository _subscriberRepository;
-    private readonly ISubscriberService _subscriberService;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
 
-    public DashboardController(IAspNetUser appUser, ISubscriberRepository subscriberRepository, ISubscriberService subscriberService)
+    public DashboardController(IAspNetUser appUser, IUserRepository userRepository, IUserService userService)
     {
         _appUser = appUser;
-        _subscriberRepository = subscriberRepository;
-        _subscriberService = subscriberService;
+        _userRepository = userRepository;
+        _userService = userService;
     }
 
     public ActionResult Index()
@@ -35,13 +32,13 @@ public class DashboardController : MainController
     public async Task<IActionResult> UpdateProfile()
     {
         var id = _appUser.GetUserId();
-        var subscriberDb = await _subscriberRepository.GetById(id);
+        var userDb = await _userRepository.GetById(id);
         //var employeeDb = await _employeeRepository.GetById(id);
 
         UserViewModel userViewModel;
-        if (subscriberDb is not null)
+        if (userDb is not null)
         {
-            userViewModel = new UserViewModel(subscriberDb.Id, subscriberDb.Name, subscriberDb.Email.Address, subscriberDb.Cpf.Number);
+            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
         }
         //else if (employeeDb != null)
         //{
@@ -79,11 +76,11 @@ public class DashboardController : MainController
             return View();
         }
         var id = _appUser.GetUserId();
-        var subscriberDb = await _subscriberRepository.GetById(id);
+        var userDb = await _userRepository.GetById(id);
 
-        if (subscriberDb != null)
+        if (userDb != null)
         {
-            var subsResult = await _subscriberService.UpdateSubscriber(id, updatedUser);
+            var subsResult = await _userService.UpdateUser(id, updatedUser);
             if (!subsResult.IsValid)
             {
                 AddError(subsResult);
