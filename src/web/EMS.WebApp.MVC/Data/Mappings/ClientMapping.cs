@@ -53,5 +53,9 @@ public class ClientMapping : IEntityTypeConfiguration<Client>
 
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
+
+        builder.HasOne(c => c.Company)
+            .WithMany(p => p.Clients)
+            .HasForeignKey(c => c.CompanyId);
     }
 }

@@ -13,11 +13,14 @@ public class User : Entity
     public Address Address { get; private set; }
     public bool IsActive { get; private set; }
 
+    public Company Company { get; set; }
+
     protected User() { }
 
-    public User(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
+    public User(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf)
     {
         ChangeId(id);
+        CompanyId = companyId;
         Name = name;
         LastName = lastName;
         Email = new Email(email);

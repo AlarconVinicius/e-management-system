@@ -34,5 +34,25 @@ public class CompanyMapping : IEntityTypeConfiguration<Company>
 
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
+
+        builder.HasOne(c => c.Plan)
+            .WithMany(p => p.Companies)
+            .HasForeignKey(c => c.PlanId);
+
+        builder.HasMany(p => p.Users)
+        .WithOne(c => c.Company)
+        .HasForeignKey(c => c.CompanyId);
+
+        builder.HasMany(p => p.Clients)
+        .WithOne(c => c.Company)
+        .HasForeignKey(c => c.CompanyId);
+
+        builder.HasMany(p => p.Products)
+        .WithOne(c => c.Company)
+        .HasForeignKey(c => c.CompanyId);
+
+        builder.HasMany(p => p.Services)
+        .WithOne(c => c.Company)
+        .HasForeignKey(c => c.CompanyId);
     }
 }

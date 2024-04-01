@@ -9,6 +9,8 @@ public class Product : Entity
     public string Image { get; private set; }
     public bool IsActive { get; private set; }
 
+    public Company Company { get; set; }
+
     public Product() { }
 
     public Product(Guid companyId, string title, string description, decimal unitaryValue, string image, bool isActive)

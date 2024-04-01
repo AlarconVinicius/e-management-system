@@ -8,6 +8,8 @@ public class Service : Entity
     public decimal Value { get; private set; }
     public bool IsActive { get; private set; }
 
+    public Company Company { get; set; }
+
     public Service() { }
 
     public Service(Guid companyId, string title, string description, decimal value)

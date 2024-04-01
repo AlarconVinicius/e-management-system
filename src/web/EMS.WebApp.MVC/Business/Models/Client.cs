@@ -13,6 +13,8 @@ public class Client : Entity
     public Address Address { get; private set; }
     public bool IsActive { get; private set; }
 
+    public Company Company { get; set; }
+
     protected Client() { }
 
     public Client(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)

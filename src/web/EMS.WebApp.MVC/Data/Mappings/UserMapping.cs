@@ -53,5 +53,9 @@ public class UserMapping : IEntityTypeConfiguration<User>
 
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
+
+        builder.HasOne(c => c.Company)
+            .WithMany(p => p.Users)
+            .HasForeignKey(c => c.CompanyId);
     }
 }

@@ -33,6 +33,10 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
         builder.Property(p => p.CreatedAt).IsRequired();
         builder.Property(p => p.UpdatedAt).IsRequired();
 
+        builder.HasOne(c => c.Company)
+            .WithMany(p => p.Products)
+            .HasForeignKey(c => c.CompanyId);
+
         builder.ToTable(t => t.HasCheckConstraint("CK_Product_UnitaryValue", "UnitaryValue >= 0"));
     }
 }
