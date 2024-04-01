@@ -317,13 +317,13 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Client", b =>
             {
-                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                     .WithMany("Clients")
                     .HasForeignKey("CompanyId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
 
-                b.OwnsOne("EMS.WebApp.MVC.Business.Models.Client.Cpf#EMS.WebApp.MVC.Business.DomainObjects.Cpf", "Cpf", b1 =>
+                b.OwnsOne("EMS.WebApp.MVC.Business.DomainObjects.Cpf", "Cpf", b1 =>
                     {
                         b1.Property<Guid>("ClientId")
                             .HasColumnType("uniqueidentifier");
@@ -336,13 +336,13 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
                         b1.HasKey("ClientId");
 
-                        b1.ToTable("Clients", (string)null);
+                        b1.ToTable("Clients");
 
                         b1.WithOwner()
                             .HasForeignKey("ClientId");
                     });
 
-                b.OwnsOne("EMS.WebApp.MVC.Business.Models.Client.Email#EMS.WebApp.MVC.Business.DomainObjects.Email", "Email", b1 =>
+                b.OwnsOne("EMS.WebApp.MVC.Business.DomainObjects.Email", "Email", b1 =>
                     {
                         b1.Property<Guid>("ClientId")
                             .HasColumnType("uniqueidentifier");
@@ -354,11 +354,13 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
                         b1.HasKey("ClientId");
 
-                        b1.ToTable("Clients", (string)null);
+                        b1.ToTable("Clients");
 
                         b1.WithOwner()
                             .HasForeignKey("ClientId");
                     });
+
+                b.Navigation("Company");
 
                 b.Navigation("Cpf");
 
@@ -373,7 +375,7 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
 
-                b.OwnsOne("EMS.WebApp.MVC.Business.Models.Company.CpfOrCnpj#EMS.WebApp.MVC.Business.DomainObjects.Cpf", "CpfOrCnpj", b1 =>
+                b.OwnsOne("EMS.WebApp.MVC.Business.DomainObjects.Cpf", "CpfOrCnpj", b1 =>
                     {
                         b1.Property<Guid>("CompanyId")
                             .HasColumnType("uniqueidentifier");
@@ -386,7 +388,7 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
                         b1.HasKey("CompanyId");
 
-                        b1.ToTable("Companies", (string)null);
+                        b1.ToTable("Companies");
 
                         b1.WithOwner()
                             .HasForeignKey("CompanyId");
@@ -399,31 +401,35 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
         modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Product", b =>
             {
-                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                     .WithMany("Products")
                     .HasForeignKey("CompanyId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
+
+                b.Navigation("Company");
             });
 
         modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Service", b =>
             {
-                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                     .WithMany("Services")
                     .HasForeignKey("CompanyId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
+
+                b.Navigation("Company");
             });
 
         modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.User", b =>
             {
-                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                     .WithMany("Users")
                     .HasForeignKey("CompanyId")
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired();
 
-                b.OwnsOne("EMS.WebApp.MVC.Business.Models.User.Cpf#EMS.WebApp.MVC.Business.DomainObjects.Cpf", "Cpf", b1 =>
+                b.OwnsOne("EMS.WebApp.MVC.Business.DomainObjects.Cpf", "Cpf", b1 =>
                     {
                         b1.Property<Guid>("UserId")
                             .HasColumnType("uniqueidentifier");
@@ -436,13 +442,13 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
                         b1.HasKey("UserId");
 
-                        b1.ToTable("Users", (string)null);
+                        b1.ToTable("Users");
 
                         b1.WithOwner()
                             .HasForeignKey("UserId");
                     });
 
-                b.OwnsOne("EMS.WebApp.MVC.Business.Models.User.Email#EMS.WebApp.MVC.Business.DomainObjects.Email", "Email", b1 =>
+                b.OwnsOne("EMS.WebApp.MVC.Business.DomainObjects.Email", "Email", b1 =>
                     {
                         b1.Property<Guid>("UserId")
                             .HasColumnType("uniqueidentifier");
@@ -454,11 +460,13 @@ partial class EMSDbContextModelSnapshot : ModelSnapshot
 
                         b1.HasKey("UserId");
 
-                        b1.ToTable("Users", (string)null);
+                        b1.ToTable("Users");
 
                         b1.WithOwner()
                             .HasForeignKey("UserId");
                     });
+
+                b.Navigation("Company");
 
                 b.Navigation("Cpf");
 

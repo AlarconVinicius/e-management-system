@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.WebApp.MVC.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240330191659_Identity")]
+    [Migration("20240401171724_Identity")]
     partial class Identity
     {
         /// <inheritdoc />

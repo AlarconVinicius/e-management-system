@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.WebApp.MVC.Migrations
 {
     [DbContext(typeof(EMSDbContext))]
-    [Migration("20240330191409_Initial")]
+    [Migration("20240401171622_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -323,7 +323,7 @@ namespace EMS.WebApp.MVC.Migrations
 
             modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Client", b =>
                 {
-                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                         .WithMany("Clients")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -366,6 +366,8 @@ namespace EMS.WebApp.MVC.Migrations
                                 .HasForeignKey("ClientId");
                         });
 
+                    b.Navigation("Company");
+
                     b.Navigation("Cpf");
 
                     b.Navigation("Email");
@@ -405,25 +407,29 @@ namespace EMS.WebApp.MVC.Migrations
 
             modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Product", b =>
                 {
-                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                         .WithMany("Products")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.Service", b =>
                 {
-                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                         .WithMany("Services")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("EMS.WebApp.MVC.Business.Models.User", b =>
                 {
-                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", null)
+                    b.HasOne("EMS.WebApp.MVC.Business.Models.Company", "Company")
                         .WithMany("Users")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -465,6 +471,8 @@ namespace EMS.WebApp.MVC.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
                         });
+
+                    b.Navigation("Company");
 
                     b.Navigation("Cpf");
 
