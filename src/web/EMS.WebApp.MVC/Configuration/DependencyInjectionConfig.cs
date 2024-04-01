@@ -21,9 +21,12 @@ public static class DependencyInjectionConfig
         services.AddScoped<INotifier, Notifier>();
 
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICompanyService, CompanyService>();
 
         services.AddScoped<IPlanRepository, PlanRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICompanyRepository, CompanyRepository>();
+
         services.AddScoped<EMSDbContext>();
     }
 }

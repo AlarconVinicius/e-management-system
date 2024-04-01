@@ -32,15 +32,15 @@ public class EMSDbContext : DbContext, IUnitOfWork
 
     public async Task<bool> Commit()
     {
-        foreach (var entry in ChangeTracker.Entries()
-                .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified))
-        {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
-            }
-            entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
-        }
+        //foreach (var entry in ChangeTracker.Entries()
+        //        .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified))
+        //{
+        //    if (entry.State == EntityState.Added)
+        //    {
+        //        entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+        //    }
+        //    entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+        //}
 
         var sucesso = await base.SaveChangesAsync() > 0;
         return sucesso;

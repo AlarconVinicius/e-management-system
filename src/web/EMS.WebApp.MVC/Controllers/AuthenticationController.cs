@@ -12,15 +12,17 @@ public class AuthenticationController : MainController
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IAspNetUser _appUser;
     private readonly IPlanRepository _planRepository;
-    private readonly IUserService _subscriberService;
+    private readonly IUserService _userService;
+    private readonly ICompanyService _companyService;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, IUserService subscriberService)
+    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _appUser = appUser;
         _planRepository = planRepository;
-        _subscriberService = subscriberService;
+        _companyService = companyService;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -70,9 +72,9 @@ public class AuthenticationController : MainController
 
             if (result.Succeeded)
             {
-                //await AddCompany(registerCompany, user);
+                await AddCompany(registerCompany);
 
-                //await AddPlanSubscriber(registerUser, user);
+                await AddUser(Guid.Parse(user.Id), registerCompany);
 
                 if (HasErrorsInResponse(ModelState))
                 {
@@ -146,22 +148,22 @@ public class AuthenticationController : MainController
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
-    //private async Task AddCompany(RegisterUser registerUser, IdentityUser user)
-    //{
-    //    var subscriberResult = await _subscriberService.AddSubscriber(Guid.Parse(user.Id), registerUser);
-    //    if (!subscriberResult.IsValid)
-    //    {
-    //        AddError(subscriberResult);
-    //    }
-    //}
-    //private async Task AddPlanSubscriber(RegisterUser registerUser, IdentityUser user)
-    //{
-    //    var planSubscriberResult = await _planSubscriberService.AddPlanSubscriber(Guid.Parse(user.Id), registerUser);
-    //    if (!planSubscriberResult.IsValid)
-    //    {
-    //        AddError(planSubscriberResult);
-    //    }
-    //}
+    private async Task AddCompany(RegisterCompanyViewModel registerCompany)
+    {
+        var companyResult = await _companyService.AddCompany(registerCompany);
+        if (!companyResult.IsValid)
+        {
+            AddError(companyResult);
+        }
+    }
+    private async Task AddUser(Guid id, RegisterCompanyViewModel registerCompany)
+    {
+        var planSubscriberResult = await _userService.AddUser(id, registerCompany);
+        if (!planSubscriberResult.IsValid)
+        {
+            AddError(planSubscriberResult);
+        }
+    }
 
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
