@@ -3,12 +3,15 @@ using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
 using EMS.WebApp.MVC.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Controllers;
 
+[Authorize]
+[Route("dashboard/produtos")]
 public class ProductsController : Controller
 {
     private readonly EMSDbContext _context;
@@ -25,9 +28,20 @@ public class ProductsController : Controller
     public async Task<IActionResult> Index()
     {
         var eMSDbContext = _context.Products.Include(p => p.Company);
-        return View(await eMSDbContext.ToListAsync());
+        var mappedProducts = (await eMSDbContext).Select(p => new ProductViewModel
+        {
+            Id = p.Id,
+            Title = p.Title,
+            Description = p.Description,
+            UnitaryValue = p.UnitaryValue,
+            Image = p.Image,
+            IsActive = p.IsActive
+
+        });
+        return View(mappedProducts);
     }
 
+    [HttpGet("detalhes/{id}")]
     public async Task<IActionResult> Details(Guid? id)
     {
         if (id == null || _context.Products == null)
@@ -46,13 +60,14 @@ public class ProductsController : Controller
         return View(product);
     }
 
+    [HttpGet("adicionar")]
     public IActionResult Create()
     {
         ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("adicionar")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductViewModel product)
     {
@@ -68,6 +83,7 @@ public class ProductsController : Controller
         return View(product);
     }
 
+    [HttpGet("editar/{id}")]
     public async Task<IActionResult> Edit(Guid? id)
     {
         if (id == null || _context.Products == null)
@@ -76,17 +92,26 @@ public class ProductsController : Controller
         }
 
         var product = await _context.Products.FindAsync(id);
+        var mappedProduct = new ProductViewModel
+        {
+            Id = product.Id,
+            Title = product.Title,
+            Description = product.Description,
+            UnitaryValue = product.UnitaryValue,
+            Image = product.Image,
+            IsActive = product.IsActive
+        };
         if (product == null)
         {
             return NotFound();
         }
-        ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
-        return View(product);
+        //ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
+        return View(mappedProduct);
     }
 
-    [HttpPost]
+    [HttpPost("editar/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("CompanyId,Title,Description,UnitaryValue,Image,IsActive,Id,CreatedAt,UpdatedAt")] Product product)
+    public async Task<IActionResult> Edit(Guid id, ProductViewModel product)
     {
         if (id != product.Id)
         {
@@ -113,10 +138,11 @@ public class ProductsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
+        //ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
         return View(product);
     }
 
+    [HttpGet("deletar/{id}")]
     public async Task<IActionResult> Delete(Guid? id)
     {
         if (id == null || _context.Products == null)
@@ -135,7 +161,7 @@ public class ProductsController : Controller
         return View(product);
     }
 
-    [HttpPost, ActionName("Delete")]
+    [HttpPost("deletar/{id}"), ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {

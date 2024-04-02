@@ -1,4 +1,4 @@
-﻿@model IEnumerable<EMS.WebApp.MVC.Business.Models.Product>
+﻿@model IEnumerable<EMS.WebApp.MVC.Business.Models.ViewModels.ProductViewModel>
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Produtos";
@@ -62,9 +62,9 @@
                         <td>@(product.IsActive ? "Ativo" : "Desativado")</td>
                         <td>
                             <a href="#" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a>
-                            <a href="#" class="btn btn-warning me-3"><span class="fa fa-eye"></span></a>
-                            <a href="#" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#ModalDeleteRecipe" class="btn btn-danger"><span class="fa fa-trash"></span></a>
+                            <a asp-controller="Products" asp-action="Details" class="btn btn-warning me-3"><span class="fa fa-eye"></span></a>
+                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
+                            <a asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" data-bs-toggle="modal" data-bs-target="#ModalDeleteRecipe" class="btn btn-danger"><span class="fa fa-trash"></span></a>
                         </td>
                     </tr>
                 }
