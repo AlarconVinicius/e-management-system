@@ -25,7 +25,7 @@ public class PlanConfiguration : IEntityTypeConfiguration<Plan>
 
         builder.Property(p => p.Benefits)
             .IsRequired()
-            .HasColumnType("Text");
+            .HasColumnType("varchar(1000)");
 
         builder.Property(p => p.IsActive)
             .IsRequired();
