@@ -26,6 +26,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IPlanRepository, PlanRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         services.AddScoped<EMSDbContext>();
     }
