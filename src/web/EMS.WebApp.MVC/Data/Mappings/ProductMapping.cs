@@ -21,7 +21,7 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
 
         builder.Property(c => c.Description)
             .IsRequired()
-            .HasColumnType("Text");
+            .HasColumnType("varchar(1000)");
 
         builder.Property(c => c.UnitaryValue)
             .HasDefaultValue(0.0)

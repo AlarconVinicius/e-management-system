@@ -13,7 +13,7 @@ public abstract class Entity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    protected void UpdateEntityDate()
+    public void UpdateEntityDate()
     {
         UpdatedAt = DateTime.UtcNow;
     }

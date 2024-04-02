@@ -22,4 +22,31 @@ public class Product : Entity
         Image = image;
         IsActive = isActive;
     }
+
+    #region Setters
+    public void SetTitle(string title)
+    {
+        Title = title;
+    }
+
+    public void SetDescription(string description)
+    {
+        Description = description;
+    }
+
+    public void SetUnitaryValue(decimal unitaryValue)
+    {
+        UnitaryValue = unitaryValue;
+    }
+
+    public void SetImage(string image)
+    {
+        Image = image;
+    }
+
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
+    #endregion
 }

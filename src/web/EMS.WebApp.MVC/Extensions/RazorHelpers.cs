@@ -31,4 +31,9 @@ public static class RazorHelpers
     {
         return benefits.Split(',').ToList();
     }
+
+    public static string FormatDate(this RazorPage page, DateTime value)
+    {
+        return value.ToString("dd/MM/yyyy");
+    }
 }
