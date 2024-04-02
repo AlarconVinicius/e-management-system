@@ -30,4 +30,10 @@ public class ProductViewModel
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
+
+    [DisplayName("Data de Cadastro")]
+    public DateTime CreatedAt { get; set; }
+
+    [DisplayName("Data de Modificação")]
+    public DateTime UpdatedAt { get; set; }
 }

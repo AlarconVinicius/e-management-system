@@ -1,16 +1,16 @@
 ﻿@model EMS.WebApp.MVC.Business.Models.ViewModels.ProductViewModel
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Produtos";
+    ViewData["Title"] = "Editar Produto";
 }
 
-<div class="mb-3">
+@* <div class="mb-3">
     <h4>Produtos</h4>
-</div>
+</div> *@
 <div class="card border-0 col-md-12">
     <div class="card-header d-flex justify-content-between">
         <h5 class="card-title">
-            Editar Produto
+            Editar Produto: @Model.Title
         </h5>
     </div>
     <div class="card-body">

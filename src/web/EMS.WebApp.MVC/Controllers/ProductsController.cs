@@ -2,68 +2,86 @@
 using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
-using EMS.WebApp.MVC.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Controllers;
 
 [Authorize]
-[Route("dashboard/produtos")]
+//[Route("dashboard/produtos")]
 public class ProductsController : Controller
 {
-    private readonly EMSDbContext _context;
+    private readonly IProductRepository _productRepository;
     private readonly IAspNetUser _appUser;
     private readonly IUserRepository _userRepository;
 
-    public ProductsController(EMSDbContext context, IAspNetUser appUser, IUserRepository userRepository)
+    public ProductsController(IProductRepository productRepository, IAspNetUser appUser, IUserRepository userRepository)
     {
-        _context = context;
+        _productRepository = productRepository;
         _appUser = appUser;
         _userRepository = userRepository;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
-        var eMSDbContext = _context.Products.Include(p => p.Company);
-        var mappedProducts = (await eMSDbContext).Select(p => new ProductViewModel
+        var ps = 8;
+        var productDb = await _productRepository.GetAllProducts(ps, page, q);
+        var mappedProducts = new PagedViewModel<ProductViewModel>
         {
-            Id = p.Id,
-            Title = p.Title,
-            Description = p.Description,
-            UnitaryValue = p.UnitaryValue,
-            Image = p.Image,
-            IsActive = p.IsActive
+            List = productDb.List.Select(p => new ProductViewModel
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Description = p.Description,
+                UnitaryValue = p.UnitaryValue,
+                Image = p.Image,
+                IsActive = p.IsActive,
+                CreatedAt = p.CreatedAt,
+                UpdatedAt = p.UpdatedAt
+            }),
+            PageIndex = productDb.PageIndex,
+            PageSize = productDb.PageSize,
+            Query = productDb.Query,
+            TotalResults = productDb.TotalResults
+        };
+        ViewBag.Search = q;
+        mappedProducts.ReferenceAction = "Index";
+        //if (!string.IsNullOrEmpty(search))
+        //{
+        //    mappedProducts = mappedProducts.Where(p => p.Title.Contains(search) || p.Description.Contains(search));
+        //}
 
-        });
         return View(mappedProducts);
     }
 
     [HttpGet("detalhes/{id}")]
-    public async Task<IActionResult> Details(Guid? id)
+    public async Task<IActionResult> Details(Guid id)
     {
-        if (id == null || _context.Products == null)
+        var productDb = await _productRepository.GetById(id);
+        if (productDb is null)
         {
             return NotFound();
         }
-
-        var product = await _context.Products
-            .Include(p => p.Company)
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (product == null)
+        var mappedProduct = new ProductViewModel
         {
-            return NotFound();
-        }
+            Id = productDb.Id,
+            Title = productDb.Title,
+            Description = productDb.Description,
+            UnitaryValue = productDb.UnitaryValue,
+            Image = productDb.Image,
+            IsActive = productDb.IsActive,
+            CreatedAt = productDb.CreatedAt,
+            UpdatedAt = productDb.UpdatedAt
 
-        return View(product);
+        };
+        return View(mappedProduct);
     }
 
     [HttpGet("adicionar")]
     public IActionResult Create()
     {
-        ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
+        //ViewData["CompanyId"] = new SelectList(_productRepository.Companies, "Id", "Name");
         return View();
     }
 
@@ -76,36 +94,34 @@ public class ProductsController : Controller
         if (ModelState.IsValid)
         {
             var mappedProduct = new Product(userDb.CompanyId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
-            _context.Add(mappedProduct);
-            await _context.SaveChangesAsync();
+            _productRepository.AddProduct(mappedProduct);
+            await _productRepository.UnitOfWork.Commit();
             return RedirectToAction(nameof(Index));
         }
         return View(product);
     }
 
     [HttpGet("editar/{id}")]
-    public async Task<IActionResult> Edit(Guid? id)
+    public async Task<IActionResult> Edit(Guid id)
     {
-        if (id == null || _context.Products == null)
+        var productDb = await _productRepository.GetById(id);
+        if (productDb is null)
         {
             return NotFound();
         }
-
-        var product = await _context.Products.FindAsync(id);
         var mappedProduct = new ProductViewModel
         {
-            Id = product.Id,
-            Title = product.Title,
-            Description = product.Description,
-            UnitaryValue = product.UnitaryValue,
-            Image = product.Image,
-            IsActive = product.IsActive
+            Id = productDb.Id,
+            Title = productDb.Title,
+            Description = productDb.Description,
+            UnitaryValue = productDb.UnitaryValue,
+            Image = productDb.Image,
+            IsActive = productDb.IsActive,
+            CreatedAt = productDb.CreatedAt,
+            UpdatedAt = productDb.UpdatedAt
+
         };
-        if (product == null)
-        {
-            return NotFound();
-        }
-        //ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
+        //ViewData["CompanyId"] = new SelectList(_productRepository.Companies, "Id", "Name", product.CompanyId);
         return View(mappedProduct);
     }
 
@@ -122,12 +138,19 @@ public class ProductsController : Controller
         {
             try
             {
-                _context.Update(product);
-                await _context.SaveChangesAsync();
+                var productDb = await _productRepository.GetById(id);
+                productDb.SetTitle(product.Title);    
+                productDb.SetDescription(product.Description);    
+                productDb.SetImage(product.Image);    
+                productDb.SetUnitaryValue(product.UnitaryValue);    
+                productDb.SetIsActive(product.IsActive);    
+
+                _productRepository.UpdateProduct(productDb);
+                await _productRepository.UnitOfWork.Commit();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(product.Id))
+                if (! await ProductExists(product.Id))
                 {
                     return NotFound();
                 }
@@ -138,49 +161,51 @@ public class ProductsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
-        //ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", product.CompanyId);
+        //ViewData["CompanyId"] = new SelectList(_productRepository.Companies, "Id", "Name", product.CompanyId);
         return View(product);
     }
 
     [HttpGet("deletar/{id}")]
-    public async Task<IActionResult> Delete(Guid? id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        if (id == null || _context.Products == null)
+        var productDb = await _productRepository.GetById(id);
+        if (productDb is null)
         {
             return NotFound();
         }
-
-        var product = await _context.Products
-            .Include(p => p.Company)
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (product == null)
+        var mappedProduct = new ProductViewModel
         {
-            return NotFound();
-        }
+            Id = productDb.Id,
+            Title = productDb.Title,
+            Description = productDb.Description,
+            UnitaryValue = productDb.UnitaryValue,
+            Image = productDb.Image,
+            IsActive = productDb.IsActive,
+            CreatedAt = productDb.CreatedAt,
+            UpdatedAt = productDb.UpdatedAt
+        };
 
-        return View(product);
+        return View(mappedProduct);
     }
 
     [HttpPost("deletar/{id}"), ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        if (_context.Products == null)
+        var productDb = await _productRepository.GetById(id);
+        if (productDb is null)
         {
-            return Problem("Entity set 'EMSDbContext.Products'  is null.");
+            return NotFound();
         }
-        var product = await _context.Products.FindAsync(id);
-        if (product != null)
-        {
-            _context.Products.Remove(product);
-        }
-        
-        await _context.SaveChangesAsync();
+
+        await _productRepository.DeleteProduct(productDb);
+
+        await _productRepository.UnitOfWork.Commit();
         return RedirectToAction(nameof(Index));
     }
 
-    private bool ProductExists(Guid id)
+    private async Task<bool> ProductExists(Guid id)
     {
-      return _context.Products.Any(e => e.Id == id);
+      return await _productRepository.GetById(id) is not null;
     }
 }
