@@ -17,28 +17,36 @@ public class Client : Entity
 
     protected Client() { }
 
-    public Client(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
+    public Client(Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, bool isActive = true)
     {
-        ChangeId(id);
+        CompanyId = companyId;
         Name = name;
         LastName = lastName;
         Email = new Email(email);
         PhoneNumber = phoneNumber;
         Cpf = new Cpf(cpf);
-        IsActive = true;
+        IsActive = isActive;
     }
 
-    public void ChangeName(string name)
+    public void SetName(string name)
     {
         Name = name;
     }
-    public void ChangeLastName(string lastName)
+    public void SetLastName(string lastName)
     {
         LastName = lastName;
     }
-    public void ChangeEmail(string email)
+    public void SetEmail(string email)
     {
         Email = new Email(email);
+    }
+    public void SetPhoneNumber(string phoneNumber)
+    {
+        PhoneNumber = phoneNumber;
+    }
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
     }
     public void AssignAddress(Address address)
     {
