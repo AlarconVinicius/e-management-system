@@ -2,60 +2,63 @@
 
 namespace EMS.WebApp.MVC.Business.Utils.User;
 
+public interface IAspNetUser
+{
+    string Name { get; }
+    Guid GetUserId();
+    string GetUserEmail();
+    bool IsAuthenticated();
+    bool HasRole(string role);
+    bool HasClaim(string claimType, string claimValue);
+}
+
 public class AspNetUser : IAspNetUser
 {
-    private readonly IHttpContextAccessor _accessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AspNetUser(IHttpContextAccessor accessor)
+    public AspNetUser(IHttpContextAccessor httpContextAccessor)
     {
-        _accessor = accessor;
+        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     }
 
-    public string Name => _accessor.HttpContext!.User.Identity!.Name!;
+    private HttpContext HttpContext => _httpContextAccessor.HttpContext;
+
+    public string Name => HttpContext.User.Identity.Name;
 
     public Guid GetUserId()
     {
-        return IsAuthenticated() ? Guid.Parse(_accessor.HttpContext!.User.GetUserId()) : Guid.Empty;
+        if (!IsAuthenticated())
+            return Guid.Empty;
+
+        var userIdClaim = ((ClaimsIdentity)HttpContext.User.Identity).FindFirst(ClaimTypes.NameIdentifier);
+
+        return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
     }
 
     public string GetUserEmail()
     {
-        if (IsAuthenticated())
-        {
-            return _accessor.HttpContext.User.Identity.Name;
-        }
+        if (!IsAuthenticated())
+            return string.Empty;
 
-        return null;
-        //return IsAuthenticated() ? _accessor.HttpContext!.User.GetUserEmail() : "";
-    }
+        var emailClaim = ((ClaimsIdentity)HttpContext.User.Identity).FindFirst(ClaimTypes.Email);
 
-    public string GetUserToken()
-    {
-        return IsAuthenticated() ? _accessor.HttpContext!.User.GetUserToken() : "";
-    }
-
-    public string GetUserRefreshToken()
-    {
-        return IsAuthenticated() ? _accessor.HttpContext!.User.GetUserRefreshToken() : "";
+        return emailClaim?.Value ?? string.Empty;
     }
 
     public bool IsAuthenticated()
     {
-        return _accessor.HttpContext!.User.Identity!.IsAuthenticated;
+        return HttpContext.User.Identity.IsAuthenticated;
     }
 
     public bool HasRole(string role)
     {
-        return _accessor.HttpContext!.User.IsInRole(role);
+        return HttpContext.User.IsInRole(role);
     }
 
-    public IEnumerable<Claim> GetClaims()
+    public bool HasClaim(string claimType, string claimValue)
     {
-        return _accessor.HttpContext!.User.Claims;
-    }
+        var claim = ((ClaimsIdentity)HttpContext.User.Identity).FindFirst(claimType);
 
-    public HttpContext GetHttpContext()
-    {
-        return _accessor.HttpContext!;
+        return claim != null && claim.Value == claimValue;
     }
 }
