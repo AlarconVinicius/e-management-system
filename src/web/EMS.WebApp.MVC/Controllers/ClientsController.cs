@@ -86,7 +86,7 @@ public class ClientsController : Controller
         var userDb = await _userRepository.GetById(userId);
         if (ModelState.IsValid)
         {
-            var mappedClient = new Client(userDb.CompanyId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, client.IsActive);
+            var mappedClient = new Client(userDb.CompanyId, userDb.TenantId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, client.IsActive);
             _clientRepository.AddClient(mappedClient);
             await _clientRepository.UnitOfWork.Commit();
             return RedirectToAction(nameof(Index));

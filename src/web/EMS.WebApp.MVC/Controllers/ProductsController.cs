@@ -93,7 +93,7 @@ public class ProductsController : Controller
         var userDb = await _userRepository.GetById(userId);
         if (ModelState.IsValid)
         {
-            var mappedProduct = new Product(userDb.CompanyId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
+            var mappedProduct = new Product(userDb.CompanyId, userDb.TenantId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
             _productRepository.AddProduct(mappedProduct);
             await _productRepository.UnitOfWork.Commit();
             return RedirectToAction(nameof(Index));

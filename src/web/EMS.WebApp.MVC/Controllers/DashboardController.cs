@@ -24,6 +24,7 @@ public class DashboardController : MainController
 
     public ActionResult Index()
     {
+        //var tenant = _appUser.GetTenantId();
         return View();
     }
 
@@ -38,7 +39,7 @@ public class DashboardController : MainController
         UserViewModel userViewModel;
         if (userDb is not null)
         {
-            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
+            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
         }
         //else if (employeeDb != null)
         //{
