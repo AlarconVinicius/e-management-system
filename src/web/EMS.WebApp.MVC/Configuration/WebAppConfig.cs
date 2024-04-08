@@ -12,7 +12,7 @@ public static class WebAppConfig
     public static void AddMvcConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllersWithViews();
-
+        services.AddSession();
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
         );
@@ -47,7 +47,7 @@ public static class WebAppConfig
             app.UseStatusCodePagesWithRedirects("/erro/{0}");
             app.UseHsts();
         }
-
+        app.UseSession();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 

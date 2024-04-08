@@ -2,6 +2,7 @@
 using EMS.WebApp.MVC.Business.Interfaces.Services;
 using EMS.WebApp.MVC.Business.Services;
 using EMS.WebApp.MVC.Business.Services.Notifications;
+using EMS.WebApp.MVC.Business.Utils;
 using EMS.WebApp.MVC.Business.Utils.User;
 using EMS.WebApp.MVC.Data;
 using EMS.WebApp.MVC.Data.Repository;
@@ -22,12 +23,14 @@ public static class DependencyInjectionConfig
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<ITenantProvider, TenantProvider>();
 
         services.AddScoped<IPlanRepository, PlanRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<ITenantRepository, TenantRepository>();
 
         services.AddScoped<EMSDbContext>();
     }
