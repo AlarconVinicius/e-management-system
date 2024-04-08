@@ -16,6 +16,9 @@ public class CompanyViewModel
     public Guid PlanId { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    public Guid TenantId { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Nome da Empresa")]
     public string CompanyName { get; set; }
 
@@ -26,10 +29,11 @@ public class CompanyViewModel
 
     public CompanyViewModel() { }
 
-    public CompanyViewModel(Guid id, Guid planId, string companyName, string cpfOrCnpj)
+    public CompanyViewModel(Guid id, Guid planId, Guid tenantId, string companyName, string cpfOrCnpj)
     {
         Id = id;
         PlanId = planId;
+        TenantId = tenantId;
         CompanyName = companyName;
         CpfOrCnpj = cpfOrCnpj;
     }

@@ -9,6 +9,7 @@ public class UserViewModel
 {
     public Guid Id { get; set; }
     public Guid CompanyId { get; set; }
+    public Guid TenantId { get; set; }
     public string Name { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
@@ -19,10 +20,11 @@ public class UserViewModel
 
     public UserViewModel() { }
 
-    public UserViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf)
+    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf)
     {
         Id = id;
         CompanyId = companyId;
+        TenantId = tenantId;
         Name = name;
         LastName = lastName;
         Email = email;
