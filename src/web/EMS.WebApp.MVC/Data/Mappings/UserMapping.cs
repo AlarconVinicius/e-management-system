@@ -57,5 +57,9 @@ public class UserMapping : IEntityTypeConfiguration<User>
         builder.HasOne(c => c.Company)
             .WithMany(p => p.Users)
             .HasForeignKey(c => c.CompanyId);
+
+        builder.HasOne(c => c.Tenant)
+            .WithMany(p => p.Users)
+            .HasForeignKey(c => c.TenantId);
     }
 }

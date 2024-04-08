@@ -57,5 +57,9 @@ public class ClientMapping : IEntityTypeConfiguration<Client>
         builder.HasOne(c => c.Company)
             .WithMany(p => p.Clients)
             .HasForeignKey(c => c.CompanyId);
+
+        builder.HasOne(c => c.Tenant)
+            .WithMany(p => p.Clients)
+            .HasForeignKey(c => c.TenantId);
     }
 }

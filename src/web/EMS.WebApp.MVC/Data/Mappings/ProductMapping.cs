@@ -37,6 +37,10 @@ public class ProductMapping : IEntityTypeConfiguration<Product>
             .WithMany(p => p.Products)
             .HasForeignKey(c => c.CompanyId);
 
+        builder.HasOne(c => c.Tenant)
+            .WithMany(p => p.Products)
+            .HasForeignKey(c => c.TenantId);
+
         builder.ToTable(t => t.HasCheckConstraint("CK_Product_UnitaryValue", "UnitaryValue >= 0"));
     }
 }
