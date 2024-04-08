@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.WebApp.MVC.Migrations
 {
     [DbContext(typeof(EMSDbContext))]
-    [Migration("20240408000054_Tenant")]
+    [Migration("20240408164456_Tenant")]
     partial class Tenant
     {
         /// <inheritdoc />
