@@ -24,7 +24,6 @@ public class DashboardController : MainController
 
     public ActionResult Index()
     {
-        //var tenant = _appUser.GetTenantId();
         return View();
     }
 
@@ -34,30 +33,18 @@ public class DashboardController : MainController
     {
         var id = _appUser.GetUserId();
         var userDb = await _userRepository.GetById(id);
-        //var employeeDb = await _employeeRepository.GetById(id);
 
         UserViewModel userViewModel;
         if (userDb is not null)
         {
             userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
         }
-        //else if (employeeDb != null)
-        //{
-        //    userViewModel = new UserViewModel(employeeDb.Id, employeeDb.Name, employeeDb.Email.Address, employeeDb.EmployeeId);
-        //}
         else
         {
-            //userViewModel = new UserViewModel();
             return NotFound();
         }
 
         var updateUserViewModel = new UpdateUserViewModel();
-        //var updateUserViewModel = new UpdateUserViewModel
-        //{
-        //    Id = userViewModel.Id,
-        //    Name = userViewModel.Name,
-        //    Email = userViewModel.Email
-        //};
 
         var viewModel = new UserUpdateUserViewModel
         {
