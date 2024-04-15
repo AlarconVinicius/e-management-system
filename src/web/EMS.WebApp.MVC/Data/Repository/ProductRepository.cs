@@ -1,6 +1,7 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces;
 using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Data.Repository;
@@ -8,23 +9,31 @@ namespace EMS.WebApp.MVC.Data.Repository;
 public class ProductRepository : IProductRepository
 {
     private readonly EMSDbContext _context;
+    private readonly IAspNetUser _aspNetUser;
 
-    public ProductRepository(EMSDbContext context)
+    public ProductRepository(EMSDbContext context, IAspNetUser aspNetUser)
     {
         _context = context;
+        _aspNetUser = aspNetUser;
     }
 
     public IUnitOfWork UnitOfWork => _context;
 
     public async Task<PagedResult<Product>> GetAllProducts(int pageSize, int pageIndex, string query = null)
     {
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
         var productsQuery = _context.Products
             .AsNoTracking();
         if (!string.IsNullOrEmpty(query))
         {
             productsQuery = productsQuery.Where(p => p.Title.Contains(query) || p.Description.Contains(query));
         }
-        var products = await productsQuery.OrderBy(p => p.Title)
+        var products = await productsQuery.Where(p => p.TenantId == tenantId)
+                                     .OrderBy(p => p.Title)
                                      .ThenByDescending(p => p.UpdatedAt)
                                      .Skip(pageSize * (pageIndex - 1))
                                      .Take(pageSize)
@@ -43,7 +52,12 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> GetById(Guid id)
     {
-        return await _context.Products.FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
+        return await _context.Products.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public void AddProduct(Product product)
