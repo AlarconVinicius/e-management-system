@@ -12,7 +12,6 @@ public static class WebAppConfig
     public static void AddMvcConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllersWithViews();
-        services.AddSession();
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
         );
@@ -22,12 +21,12 @@ public static class WebAppConfig
             .AddErrorDescriber<IdentityMensagensPortugues>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        //                .AddCookie(options =>
-        //                {
-        //                    options.LoginPath = "/Identity/Account/Login";
-        //                    options.AccessDeniedPath = "/erro/403";
-        //                });
+        //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        //        .AddCookie(options =>
+        //        {
+        //            options.LoginPath = "/Identity/Account/Login";
+        //            options.AccessDeniedPath = "/erro/403";
+        //        });
         services.AddDbContext<EMSDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
         );
@@ -35,8 +34,6 @@ public static class WebAppConfig
 
     public static void UseMvcConfiguration(this IApplicationBuilder app, IWebHostEnvironment env, WebApplication webApp)
     {
-        //app.UseForwardedHeaders();
-
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -47,7 +44,6 @@ public static class WebAppConfig
             app.UseStatusCodePagesWithRedirects("/erro/{0}");
             app.UseHsts();
         }
-        app.UseSession();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 
@@ -87,9 +83,5 @@ public static class WebAppConfig
         {
             emsDbContext.Database.Migrate();
         }
-
-        //var userManager = scope.ServiceProvider.GetService<UserManager<IdentityUser>>();
-        //new ConfigureInitialAuthSeed(dbContext, userManager!).StartConfig();
-        //new ConfigureInitialBlogSeed(dbContext).StartConfig();
     }
 }

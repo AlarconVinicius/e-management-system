@@ -5,6 +5,7 @@ using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
@@ -89,6 +90,10 @@ public class AuthenticationController : MainController
                 }
 
                 await _planRepository.UnitOfWork.Commit();
+
+                var tenantIdClaim = new Claim("Tenant", tenant.Id.ToString());
+                await _userManager.AddClaimAsync(user, tenantIdClaim);
+
                 await _signInManager.SignInAsync(user, false);
 
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
@@ -122,13 +127,6 @@ public class AuthenticationController : MainController
             var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
             if (result.Succeeded)
             {
-                //_appUser.SetTenantId("MEU TENANT");
-                var user = await _userManager.FindByEmailAsync(loginUser.Email);
-                if (user != null)
-                {
-                    // Adiciona a claim de e-mail
-                    //await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Email, loginUser.Email));
-                }
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
 
                 return LocalRedirect(returnUrl);

@@ -23,7 +23,6 @@ public static class DependencyInjectionConfig
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<ITenantProvider, TenantProvider>();
 
         services.AddScoped<IPlanRepository, PlanRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

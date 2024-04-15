@@ -6,6 +6,7 @@ public interface IAspNetUser
 {
     string Name { get; }
     Guid GetUserId();
+    Guid GetTenantId();
     string GetUserEmail();
     bool IsAuthenticated();
     bool HasRole(string role);
@@ -61,4 +62,15 @@ public class AspNetUser : IAspNetUser
 
         return claim != null && claim.Value == claimValue;
     }
+
+    public Guid GetTenantId()
+    {
+        if (!IsAuthenticated())
+            return Guid.Empty;
+
+        var tenantClaim = ((ClaimsIdentity)HttpContext.User.Identity).FindFirst("Tenant");
+
+        return tenantClaim != null ? Guid.Parse(tenantClaim.Value) : Guid.Empty;
+    }
+
 }
