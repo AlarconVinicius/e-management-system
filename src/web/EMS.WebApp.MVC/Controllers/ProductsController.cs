@@ -91,9 +91,10 @@ public class ProductsController : Controller
     {
         var userId = _appUser.GetUserId();
         var userDb = await _userRepository.GetById(userId);
+        var tenantId = _appUser.GetTenantId();
         if (ModelState.IsValid)
         {
-            var mappedProduct = new Product(userDb.CompanyId, userDb.TenantId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
+            var mappedProduct = new Product(userDb.CompanyId, tenantId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
             _productRepository.AddProduct(mappedProduct);
             await _productRepository.UnitOfWork.Commit();
             return RedirectToAction(nameof(Index));
