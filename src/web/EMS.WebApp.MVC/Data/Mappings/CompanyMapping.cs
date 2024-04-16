@@ -39,6 +39,15 @@ public class CompanyMapping : IEntityTypeConfiguration<Company>
             .WithMany(p => p.Companies)
             .HasForeignKey(c => c.PlanId);
 
+        builder.HasOne(c => c.Tenant)
+            .WithOne(t => t.Company)
+            .HasForeignKey<Company>(c => c.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
+        //builder.HasOne(c => c.Tenant)
+        //    .WithMany(p => p.Companies)
+        //    .HasForeignKey(c => c.TenantId)
+        //    .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasMany(p => p.Users)
         .WithOne(c => c.Company)
         .HasForeignKey(c => c.CompanyId);

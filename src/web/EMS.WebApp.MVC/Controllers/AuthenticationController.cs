@@ -1,9 +1,11 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Interfaces.Services;
+using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
@@ -14,8 +16,9 @@ public class AuthenticationController : MainController
     private readonly IPlanRepository _planRepository;
     private readonly IUserService _userService;
     private readonly ICompanyService _companyService;
+    private readonly ITenantRepository _tenantRepository;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService)
+    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -23,6 +26,7 @@ public class AuthenticationController : MainController
         _planRepository = planRepository;
         _companyService = companyService;
         _userService = userService;
+        _tenantRepository = tenantRepository;
     }
 
     [HttpGet]
@@ -72,9 +76,11 @@ public class AuthenticationController : MainController
 
             if (result.Succeeded)
             {
-                var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
+                var tenant = await AddTenant();
+
+                var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, tenant.Id, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
                 await AddCompany(companyVM);
-                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
+                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, tenant.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
                 await AddUser(userVM);
 
                 if (HasErrorsInResponse(ModelState))
@@ -84,6 +90,10 @@ public class AuthenticationController : MainController
                 }
 
                 await _planRepository.UnitOfWork.Commit();
+
+                var tenantIdClaim = new Claim("Tenant", tenant.Id.ToString());
+                await _userManager.AddClaimAsync(user, tenantIdClaim);
+
                 await _signInManager.SignInAsync(user, false);
 
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
@@ -117,12 +127,6 @@ public class AuthenticationController : MainController
             var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(loginUser.Email);
-                if (user != null)
-                {
-                    // Adiciona a claim de e-mail
-                    //await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Email, loginUser.Email));
-                }
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
 
                 return LocalRedirect(returnUrl);
@@ -149,6 +153,12 @@ public class AuthenticationController : MainController
         //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
+
+    private async Task<Tenant> AddTenant()
+    {
+        return await _tenantRepository.AddTenant();
+    }
+
     private async Task AddCompany(CompanyViewModel registerCompany)
     {
         var companyResult = await _companyService.AddCompany(registerCompany);
@@ -159,10 +169,10 @@ public class AuthenticationController : MainController
     }
     private async Task AddUser(UserViewModel registerUser)
     {
-        var planSubscriberResult = await _userService.AddUser(registerUser);
-        if (!planSubscriberResult.IsValid)
+        var userResult = await _userService.AddUser(registerUser);
+        if (!userResult.IsValid)
         {
-            AddError(planSubscriberResult);
+            AddError(userResult);
         }
     }
 

@@ -19,7 +19,7 @@ public class CompanyService : MainService, ICompanyService
     public async Task<ValidationResult> AddCompany(CompanyViewModel company)
     {
         if (await CompanyExists(company.CpfOrCnpj)) return _validationResult;
-        _companyRepository.AddCompany(new Company(company.Id, company.PlanId, company.CompanyName, company.CpfOrCnpj, true));
+        _companyRepository.AddCompany(new Company(company.Id, company.PlanId, company.TenantId, company.CompanyName, company.CpfOrCnpj, true));
         return _validationResult;
     }
 

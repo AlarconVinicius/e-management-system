@@ -5,6 +5,7 @@ namespace EMS.WebApp.MVC.Business.Models;
 public class Client : Entity
 {
     public Guid CompanyId { get; private set; }
+    public Guid TenantId { get; private set; }
     public string Name { get; private set; }
     public string LastName { get; private set; }
     public Email Email { get; private set; }
@@ -14,12 +15,14 @@ public class Client : Entity
     public bool IsActive { get; private set; }
 
     public Company Company { get; set; }
+    public Tenant Tenant { get; private set; }
 
     protected Client() { }
 
-    public Client(Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, bool isActive = true)
+    public Client(Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, bool isActive = true)
     {
         CompanyId = companyId;
+        TenantId = tenantId;
         Name = name;
         LastName = lastName;
         Email = new Email(email);

@@ -37,6 +37,10 @@ public class ServiceMapping : IEntityTypeConfiguration<Service>
             .WithMany(p => p.Services)
             .HasForeignKey(c => c.CompanyId);
 
+        builder.HasOne(c => c.Tenant)
+            .WithMany(p => p.Services)
+            .HasForeignKey(c => c.TenantId);
+
         builder.ToTable(t => t.HasCheckConstraint("CK_Service_Value", "Value >= 0"));
     }
 }

@@ -19,7 +19,7 @@ public class UserService : MainService, IUserService
     public async Task<ValidationResult> AddUser(UserViewModel user)
     {
         if (await UserExists(user.Cpf)) return _validationResult;
-        _subscriberRepository.AddUser(new User(user.Id, user.CompanyId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf));
+        _subscriberRepository.AddUser(new User(user.Id, user.CompanyId, user.TenantId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf));
         return _validationResult;
     }
 

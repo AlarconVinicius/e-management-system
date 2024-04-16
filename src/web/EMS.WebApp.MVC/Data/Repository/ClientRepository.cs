@@ -1,6 +1,7 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces;
 using EMS.WebApp.MVC.Business.Interfaces.Repository;
 using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Data.Repository;
@@ -8,23 +9,31 @@ namespace EMS.WebApp.MVC.Data.Repository;
 public class ClientRepository : IClientRepository
 {
     private readonly EMSDbContext _context;
+    private readonly IAspNetUser _aspNetUser;
 
-    public ClientRepository(EMSDbContext context)
+    public ClientRepository(EMSDbContext context, IAspNetUser aspNetUser)
     {
         _context = context;
+        _aspNetUser = aspNetUser;
     }
 
     public IUnitOfWork UnitOfWork => _context;
 
     public async Task<PagedResult<Client>> GetAllClients(int pageSize, int pageIndex, string query = null)
     {
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
         var clientsQuery = _context.Clients
             .AsNoTracking();
         if (!string.IsNullOrEmpty(query))
         {
             clientsQuery = clientsQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
         }
-        var clients = await clientsQuery.OrderBy(p => p.Name)
+        var clients = await clientsQuery.Where(p => p.TenantId == tenantId)
+                                     .OrderBy(p => p.Name)
                                      .ThenByDescending(p => p.UpdatedAt)
                                      .Skip(pageSize * (pageIndex - 1))
                                      .Take(pageSize)
@@ -43,7 +52,12 @@ public class ClientRepository : IClientRepository
 
     public async Task<Client> GetById(Guid id)
     {
-        return await _context.Clients.FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
+        return await _context.Clients.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public void AddClient(Client client)
