@@ -12,13 +12,14 @@ public class AuthenticationController : MainController
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IAspNetUser _appUser;
     private readonly IPlanRepository _planRepository;
     private readonly IUserService _userService;
     private readonly ICompanyService _companyService;
     private readonly ITenantRepository _tenantRepository;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository)
+    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository, RoleManager<IdentityRole> roleManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
@@ -27,6 +28,7 @@ public class AuthenticationController : MainController
         _companyService = companyService;
         _userService = userService;
         _tenantRepository = tenantRepository;
+        _roleManager = roleManager;
     }
 
     [HttpGet]
@@ -80,7 +82,8 @@ public class AuthenticationController : MainController
 
                 var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, tenant.Id, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
                 await AddCompany(companyVM);
-                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, tenant.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
+                var role = "Admin";
+                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, tenant.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf, role);
                 await AddUser(userVM);
 
                 if (HasErrorsInResponse(ModelState))
@@ -93,7 +96,7 @@ public class AuthenticationController : MainController
 
                 var tenantIdClaim = new Claim("Tenant", tenant.Id.ToString());
                 await _userManager.AddClaimAsync(user, tenantIdClaim);
-
+                await AddRole(user, role);
                 await _signInManager.SignInAsync(user, false);
 
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
@@ -175,6 +178,38 @@ public class AuthenticationController : MainController
             AddError(userResult);
         }
     }
+    private async Task AddRole(IdentityUser user, string roleName)
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+
+        if (!roleExists)
+        {
+            var role = new IdentityRole(roleName);
+            var createRoleResult = await _roleManager.CreateAsync(role);
+
+            if (!createRoleResult.Succeeded)
+            {
+                foreach (var error in createRoleResult.Errors)
+                {
+                    AddError(error.Description);
+                }
+            }
+        }
+
+        if (user != null)
+        {
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+
+            if (!addToRoleResult.Succeeded)
+            {
+                foreach (var error in addToRoleResult.Errors)
+                {
+                    AddError(error.Description);
+                }
+            }
+        }
+    }
+
 
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
