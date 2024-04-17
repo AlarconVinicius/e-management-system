@@ -10,17 +10,44 @@ public class UserViewModel
     public Guid Id { get; set; }
     public Guid CompanyId { get; set; }
     public Guid TenantId { get; set; }
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Nome")]
     public string Name { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Sobrenome")]
     public string LastName { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
+    [DisplayName("E-mail")]
     public string Email { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Celular")]
     public string PhoneNumber { get; set; }
+
+    [Cpf]
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("CPF")]
     public string Cpf { get; set; }
+
+    [DisplayName("Tipo")]
+    public string Role { get; set; }
+
+    [DisplayName("Ativo")]
     public bool IsActive { get; set; }
+
+    [DisplayName("Data de Cadastro")]
+    public DateTime CreatedAt { get; set; }
+
+    [DisplayName("Data de Modificação")]
+    public DateTime UpdatedAt { get; set; }
 
 
     public UserViewModel() { }
 
-    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf)
+    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role)
     {
         Id = id;
         CompanyId = companyId;
@@ -31,6 +58,22 @@ public class UserViewModel
         PhoneNumber = phoneNumber;
         Cpf = cpf;
         IsActive = true;
+        Role = role;
+    }
+    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role, DateTime createdAt, DateTime updatedAt)
+    {
+        Id = id;
+        CompanyId = companyId;
+        TenantId = tenantId;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Cpf = cpf;
+        IsActive = true;
+        Role = role;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
     }
 }
 
