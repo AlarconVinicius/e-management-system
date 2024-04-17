@@ -9,17 +9,17 @@ namespace EMS.WebApp.MVC.Business.Services;
 
 public class UserService : MainService, IUserService
 {
-    public readonly IUserRepository _subscriberRepository;
+    public readonly IUserRepository _userRepository;
 
-    public UserService(INotifier notifier, IUserRepository subscriberRepository) : base(notifier)
+    public UserService(INotifier notifier, IUserRepository userRepository) : base(notifier)
     {
-        _subscriberRepository = subscriberRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<ValidationResult> AddUser(UserViewModel user)
     {
         if (await UserExists(user.Cpf)) return _validationResult;
-        _subscriberRepository.AddUser(new User(user.Id, user.CompanyId, user.TenantId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf));
+        _userRepository.AddUser(new User(user.Id, user.CompanyId, user.TenantId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf, user.Role));
         return _validationResult;
     }
 
@@ -27,18 +27,18 @@ public class UserService : MainService, IUserService
     {
         //if (!ExecuteValidation(new UserValidation(), subscriber)) return _validationResult;
 
-        var subscriberDb = await _subscriberRepository.GetById(subscriber.Id);
+        var subscriberDb = await _userRepository.GetById(subscriber.Id);
 
         subscriberDb.ChangeName(subscriber.Name);
         subscriberDb.ChangeEmail(subscriber.Email);
 
-        _subscriberRepository.UpdateUser(subscriberDb);
+        _userRepository.UpdateUser(subscriberDb);
         return _validationResult;
     }
 
     private async Task<bool> UserExists(string cpf)
     {
-        var userExist = await _subscriberRepository.GetByCpf(cpf);
+        var userExist = await _userRepository.GetByCpf(cpf);
 
         if (userExist != null!)
         {
