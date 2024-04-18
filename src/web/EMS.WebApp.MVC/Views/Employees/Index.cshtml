@@ -67,8 +67,8 @@
                         <td>
                             @* <a href="#" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
                             <a asp-controller="Employees" asp-action="Details" asp-route-id="@employee.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
-                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a asp-controller="Products" asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
+                            <a asp-controller="Employees" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
+                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
                         </td>
                     </tr>
                     itemIndex++;

@@ -5,6 +5,7 @@ using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
@@ -44,15 +45,28 @@ public class EmployeesController : MainController
         return View(mappedUsers);
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
+    [HttpGet("Details/{id}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var userDb = await _userRepository.GetById(id);
+        if (userDb is null)
+        {
+            return NotFound();
+        }
+        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+
+        return View(mappedUser);
+    }
+
+    //[Authorize(Roles = "Admin")]
+    [HttpGet("Create")]
     public async Task<IActionResult> Create()
     {
         return View();
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
+    //[Authorize(Roles = "Admin")]
+    [HttpPost("Create")]
     public async Task<IActionResult> Create(UserViewModel userVM, string returnUrl = null)
     {
         var userId = _appUser.GetUserId();
@@ -99,6 +113,97 @@ public class EmployeesController : MainController
         }
 
         return View(userVM);
+    }
+
+    [HttpGet("Edit/{id}")]
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var userDb = await _userRepository.GetById(id);
+        if (userDb is null)
+        {
+            return NotFound();
+        }
+        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+        
+        return View(mappedUser);
+    }
+
+    [HttpPost("Edit/{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, UserViewModel user)
+    {
+        if (id != user.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var userDb = await _userRepository.GetById(id);
+                userDb.SetName(user.Name);
+                userDb.SetLastName(user.LastName);
+                if (user.Email != userDb.Email.Address)
+                {
+                    userDb.SetEmail(user.Email);
+                }
+
+                userDb.SetPhoneNumber(user.PhoneNumber);
+                userDb.SetIsActive(user.IsActive);
+
+                _userRepository.UpdateUser(userDb);
+                await _userRepository.UnitOfWork.Commit();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await UserExists(user.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        //ViewData["CompanyId"] = new SelectList(_productRepository.Companies, "Id", "Name", product.CompanyId);
+        return View(user);
+    }
+
+    [HttpGet("Delete/{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userDb = await _userRepository.GetById(id);
+        if (userDb is null)
+        {
+            return NotFound();
+        }
+        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+
+        return View(mappedUser);
+    }
+
+    [HttpPost("Delete/{id}"), ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(Guid id)
+    {
+        var userDb = await _userRepository.GetById(id);
+        if (userDb is null)
+        {
+            return NotFound();
+        }
+
+        await _userRepository.DeleteUser(userDb);
+
+        await _userRepository.UnitOfWork.Commit();
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<bool> UserExists(Guid id)
+    {
+        return await _userRepository.GetById(id) is not null;
     }
     private async Task AddUser(UserViewModel userVM)
     {
