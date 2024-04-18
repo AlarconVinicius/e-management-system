@@ -37,7 +37,7 @@ public class DashboardController : MainController
         UserViewModel userViewModel;
         if (userDb is not null)
         {
-            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.R);
+            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role);
         }
         else
         {
