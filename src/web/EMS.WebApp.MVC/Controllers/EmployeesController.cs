@@ -66,7 +66,7 @@ public class EmployeesController : MainController
                 Email = userVM.Email,
                 EmailConfirmed = true
             };
-            var password = $"{userVM.Cpf[..5]}@{userVM.Name[..1]}{userVM.LastName[..1].ToLower()}";
+            var password = $"{userVM.Cpf[..5]}@{userVM.Name[..1].ToUpper()}{userVM.LastName[..1].ToLower()}";
 
             var result = await _userManager.CreateAsync(user, password);
 
