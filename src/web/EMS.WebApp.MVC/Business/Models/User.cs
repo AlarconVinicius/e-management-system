@@ -34,20 +34,30 @@ public class User : Entity
         Role = role;
     }
 
-    public void ChangeName(string name)
+    #region Setters
+    public void SetName(string name)
     {
         Name = name;
     }
-    public void ChangeLastName(string lastName)
+    public void SetLastName(string lastName)
     {
         LastName = lastName;
     }
-    public void ChangeEmail(string email)
+    public void SetPhoneNumber(string lastName)
+    {
+        LastName = lastName;
+    }
+    public void SetEmail(string email)
     {
         Email = new Email(email);
+    }
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
     }
     public void AssignAddress(Address address)
     {
         Address = address;
     }
+    #endregion
 }

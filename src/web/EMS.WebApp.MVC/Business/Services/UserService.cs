@@ -29,8 +29,8 @@ public class UserService : MainService, IUserService
 
         var subscriberDb = await _userRepository.GetById(subscriber.Id);
 
-        subscriberDb.ChangeName(subscriber.Name);
-        subscriberDb.ChangeEmail(subscriber.Email);
+        subscriberDb.SetName(subscriber.Name);
+        subscriberDb.SetEmail(subscriber.Email);
 
         _userRepository.UpdateUser(subscriberDb);
         return _validationResult;
