@@ -80,18 +80,11 @@ public class UserViewModel
 public class RegisterUser
 {
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("Id do Plano")]
-    public Guid PlanId { get; set; }
+    public Guid Id { get; set; }
 
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres.", MinimumLength = 2)]
-    [DisplayName("Nome")]
-    public string Name { get; set; } = string.Empty;
+    [DisplayName("Cargo")]
+    public string Role { get; set; } = string.Empty;
 
-    [Cpf]
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("CPF")]
-    public string Cpf { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
@@ -105,11 +98,6 @@ public class RegisterUser
     [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
     [DisplayName("Senha")]
     public string Password { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [Compare("Password", ErrorMessage = "As senhas não conferem.")]
-    [DisplayName("Confirme sua senha")]
-    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class LoginUser
