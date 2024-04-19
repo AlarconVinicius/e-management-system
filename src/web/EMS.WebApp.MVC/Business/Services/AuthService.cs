@@ -1,12 +1,9 @@
 ﻿using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Services.Notifications;
-using EMS.WebApp.MVC.Migrations;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EMS.WebApp.MVC.Business.Services;
 
@@ -32,9 +29,26 @@ public class AuthService : MainService, IAuthService
         }
         return userDb;
     }
-    public Task<ValidationResult> Login(LoginUser loginUser)
+    public async Task<ValidationResult> Login(LoginUser loginUser)
     {
-        throw new NotImplementedException();
+        var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
+        if (result.Succeeded)
+        {
+            return _validationResult;
+        }
+        if (result.IsLockedOut)
+        {
+            Notify("Usuário temporariamente bloqueado devido às tentativas inválidas."); 
+            return _validationResult;
+        }
+
+        Notify("Usuário ou senha inválidos.");
+        return _validationResult;
+    }
+
+    public async Task Logout()
+    {
+        await _signInManager.SignOutAsync();
     }
 
     public async Task<ValidationResult> RegisterUser(RegisterUser registerUser)

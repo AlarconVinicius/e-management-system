@@ -8,6 +8,7 @@ public interface IAuthService
 {
     Task<IdentityUser> GetUserById(string userId);
     Task<ValidationResult> Login(LoginUser loginUser);
+    Task Logout();
     Task<ValidationResult> RegisterUser(RegisterUser registerUser);
     Task<ValidationResult> DeleteUser(string userId);
     Task<ValidationResult> AddOrUpdateUserClaim(string userId, string type, string value);

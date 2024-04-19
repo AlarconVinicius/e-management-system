@@ -3,13 +3,11 @@ using EMS.WebApp.MVC.Business.Interfaces.Services;
 using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IAspNetUser _appUser;
     private readonly IPlanRepository _planRepository;
     private readonly IUserService _userService;
@@ -17,9 +15,8 @@ public class AuthenticationController : MainController
     private readonly ITenantRepository _tenantRepository;
     private readonly IAuthService _authService;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository, IAuthService authService)
+    public AuthenticationController( IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository, IAuthService authService)
     {
-        _signInManager = signInManager;
         _appUser = appUser;
         _planRepository = planRepository;
         _companyService = companyService;
@@ -106,8 +103,15 @@ public class AuthenticationController : MainController
         }
         await _planRepository.UnitOfWork.Commit();
 
-        var identityUserDb = await _authService.GetUserById(identityUser.Id.ToString());
-        await _signInManager.SignInAsync(identityUserDb, false);
+        var loginUser = new LoginUser
+        {
+            Email = registerCompany.Email,
+            Password = registerCompany.Password
+        };
+        if (!await PerformLogin(loginUser))
+        {
+            return View(loginUser);
+        }
 
         if (string.IsNullOrEmpty(returnUrl)) 
             return RedirectToAction("Index", "Dashboard");
@@ -127,37 +131,28 @@ public class AuthenticationController : MainController
     [Route("login")]
     public async Task<IActionResult> Login(LoginUser loginUser, string returnUrl = null!)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
-            if (result.Succeeded)
-            {
-                if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
-
-                return LocalRedirect(returnUrl);
-            }
-            if (result.IsLockedOut)
-            {
-                AddError("Usuário temporariamente bloqueado devido às tentativas inválidas.");
-                return View(loginUser);
-            }
-            else
-            {
-                AddError("Usuário ou senha inválidos.");
-                return View(loginUser);
-            }
+            return View();
         }
-        return View();
+        if (!await PerformLogin(loginUser))
+        {
+            return View(loginUser);
+        }
+        if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Dashboard");
+
+        return LocalRedirect(returnUrl);
     }
 
     [HttpGet]
     [Route("sair")]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
+        await _authService.Logout();
         return RedirectToAction("Index", "Home");
     }
 
+    #region AuxRegisterMethods
     private async Task<bool> AddIdentityUser(RegisterUser identityUser)
     {
         var userIdentityResult = await _authService.RegisterUser(identityUser);
@@ -194,8 +189,22 @@ public class AuthenticationController : MainController
         }
         return true;
     }
+    #endregion
 
+    #region AuxLoginMethods
+    private async Task<bool> PerformLogin(LoginUser loginUser)
+    {
+        var loginResult = await _authService.Login(loginUser);
+        if (!loginResult.IsValid)
+        {
+            AddError(loginResult);
+            return false;
+        }
+        return true;
+    }
+    #endregion
 
+    #region CodeToReview
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
     //    IdentityResult result;
@@ -261,4 +270,5 @@ public class AuthenticationController : MainController
 
     //    return null!;
     //}
+    #endregion
 }
