@@ -60,7 +60,7 @@ public class EmployeesController : MainController
 
     //[Authorize(Roles = "Admin")]
     [HttpGet("Create")]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
         return View();
     }
@@ -101,6 +101,7 @@ public class EmployeesController : MainController
                 var tenantIdClaim = new Claim("Tenant", userMapped.TenantId.ToString());
                 await _userManager.AddClaimAsync(user, tenantIdClaim);
                 await AddRole(user, role);
+                TempData["Success"] = "Colaborador adicionado com sucesso!";
                 if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index");
 
                 return LocalRedirect(returnUrl);
@@ -154,6 +155,7 @@ public class EmployeesController : MainController
 
                 _userRepository.UpdateUser(userDb);
                 await _userRepository.UnitOfWork.Commit();
+                TempData["Success"] = "Colaborador atualizado com sucesso!";
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -198,6 +200,7 @@ public class EmployeesController : MainController
         await _userRepository.DeleteUser(userDb);
 
         await _userRepository.UnitOfWork.Commit();
+        TempData["Success"] = "Colaborador deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
