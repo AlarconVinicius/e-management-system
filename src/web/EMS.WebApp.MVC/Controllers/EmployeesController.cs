@@ -119,6 +119,14 @@ public class EmployeesController : MainController
     [HttpGet("Edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
     {
+        var userLoggedId = _appUser.GetUserId();
+        var userLoggedDb = await _userRepository.GetById(userLoggedId);
+
+        if(id != userLoggedId && userLoggedDb.Role != "Admin")
+        {
+            return RedirectToAction("Error", "Home", new { id = 403 });
+        }
+
         var userDb = await _userRepository.GetById(id);
         if (userDb is null)
         {
@@ -170,10 +178,10 @@ public class EmployeesController : MainController
             }
             return RedirectToAction(nameof(Index));
         }
-        //ViewData["CompanyId"] = new SelectList(_productRepository.Companies, "Id", "Name", product.CompanyId);
         return View(user);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet("Delete/{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -187,6 +195,7 @@ public class EmployeesController : MainController
         return View(mappedUser);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("Delete/{id}"), ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)

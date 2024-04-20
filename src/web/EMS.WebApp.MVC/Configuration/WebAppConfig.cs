@@ -3,6 +3,7 @@ using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Globalization;
 
 namespace EMS.WebApp.MVC.Configuration;
@@ -22,6 +23,11 @@ public static class WebAppConfig
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.AccessDeniedPath = "/Error/403";
+            options.LoginPath = "/login";
+        });
         //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         //        .AddCookie(options =>
         //        {
