@@ -51,12 +51,22 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetById(Guid id)
     {
-        return await _context.Users.FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
+        return await _context.Users.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public async Task<User> GetByCpf(string cpf)
     {
-        return await _context.Users.FirstOrDefaultAsync(c => c.Cpf.Number == cpf) ?? null!;
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
+        return await _context.Users.Where(p => p.TenantId == tenantId).FirstOrDefaultAsync(c => c.Cpf.Number == cpf) ?? null!;
     }
 
     public void AddUser(User subscriber)
