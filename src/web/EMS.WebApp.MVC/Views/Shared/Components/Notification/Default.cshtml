@@ -9,4 +9,13 @@
         <h4 id="msgRetorno">@Html.Raw(message)</h4>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <script>
+        setTimeout(function () {
+            var msgBox = document.getElementById('msg_box');
+            msgBox.classList.add('fadeOut');
+            setTimeout(function () {
+                msgBox.remove();
+            }, 1000);
+        }, 5000);
+    </script>
 }
