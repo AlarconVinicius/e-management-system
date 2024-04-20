@@ -8,8 +8,7 @@ public class MainController : Controller
 {
     protected bool HasErrorsInResponse(ModelStateDictionary modelState)
     {
-        if (!modelState.IsValid) return true;
-        return false;
+        return !modelState.IsValid;
     }
     protected void AddError(ValidationResult response)
     {
@@ -26,4 +25,13 @@ public class MainController : Controller
         ModelState.AddModelError(string.Empty, message);
     }
 
+    protected List<string> GetModelStateErrors()
+    {
+        var errors = new List<string>();
+        if (!ModelState.IsValid)
+        {
+            errors.AddRange(ModelState.Values.SelectMany(v => v.Errors).Select(error => error.ErrorMessage));
+        }
+        return errors;
+    }
 }
