@@ -11,6 +11,7 @@ public class User : Entity
     public Email Email { get; private set; }
     public string PhoneNumber { get; private set; }
     public Cpf Cpf { get; private set; }
+    public string Role { get; private set; }
     public Address Address { get; private set; }
     public bool IsActive { get; private set; }
 
@@ -19,7 +20,7 @@ public class User : Entity
 
     protected User() { }
 
-    public User(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf)
+    public User(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role)
     {
         ChangeId(id);
         CompanyId = companyId;
@@ -30,22 +31,33 @@ public class User : Entity
         PhoneNumber = phoneNumber;
         Cpf = new Cpf(cpf);
         IsActive = true;
+        Role = role;
     }
 
-    public void ChangeName(string name)
+    #region Setters
+    public void SetName(string name)
     {
         Name = name;
     }
-    public void ChangeLastName(string lastName)
+    public void SetLastName(string lastName)
     {
         LastName = lastName;
     }
-    public void ChangeEmail(string email)
+    public void SetPhoneNumber(string phoneNumber)
+    {
+        PhoneNumber = phoneNumber;
+    }
+    public void SetEmail(string email)
     {
         Email = new Email(email);
+    }
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
     }
     public void AssignAddress(Address address)
     {
         Address = address;
     }
+    #endregion
 }

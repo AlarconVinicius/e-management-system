@@ -3,30 +3,26 @@ using EMS.WebApp.MVC.Business.Interfaces.Services;
 using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
 using EMS.WebApp.MVC.Business.Utils.User;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly IAspNetUser _appUser;
     private readonly IPlanRepository _planRepository;
     private readonly IUserService _userService;
     private readonly ICompanyService _companyService;
     private readonly ITenantRepository _tenantRepository;
+    private readonly IAuthService _authService;
 
-    public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository)
+    public AuthenticationController( IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IUserService userService, ITenantRepository tenantRepository, IAuthService authService)
     {
-        _signInManager = signInManager;
-        _userManager = userManager;
         _appUser = appUser;
         _planRepository = planRepository;
         _companyService = companyService;
         _userService = userService;
         _tenantRepository = tenantRepository;
+        _authService = authService;
     }
 
     [HttpGet]
@@ -63,51 +59,64 @@ public class AuthenticationController : MainController
             Plan = new PlanViewModel().ToViewModel(plan),
             RegisterCompany = registerCompany
         };
-        if (ModelState.IsValid)
+
+        if (!ModelState.IsValid)
+            return View(viewModel);
+
+        var identityUser = new RegisterUser
         {
-            var user = new IdentityUser
-            {
-                UserName = registerCompany.Email,
-                Email = registerCompany.Email,
-                EmailConfirmed = true
-            };
+            Id = Guid.NewGuid(),
+            Role = "Admin",
+            Email = registerCompany.Email,
+            Password = registerCompany.Password
+        };
+        if (!await AddIdentityUser(identityUser))
+            return View(viewModel);
 
-            var result = await _userManager.CreateAsync(user, registerCompany.Password);
-
-            if (result.Succeeded)
-            {
-                var tenant = await AddTenant();
-
-                var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, tenant.Id, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
-                await AddCompany(companyVM);
-                var userVM = new UserViewModel(Guid.Parse(user.Id), companyVM.Id, tenant.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf);
-                await AddUser(userVM);
-
-                if (HasErrorsInResponse(ModelState))
-                {
-                    await _userManager.DeleteAsync(user);
-                    return View(viewModel);
-                }
-
-                await _planRepository.UnitOfWork.Commit();
-
-                var tenantIdClaim = new Claim("Tenant", tenant.Id.ToString());
-                await _userManager.AddClaimAsync(user, tenantIdClaim);
-
-                await _signInManager.SignInAsync(user, false);
-
-                if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
-
-                return LocalRedirect(returnUrl);
-            }
-
-            foreach (var error in result.Errors)
-            {
-                AddError(error.Description);
-            }
+        var tenant = await AddTenant();
+        if (tenant is null)
+        {
+            await _authService.DeleteUser(identityUser.Id.ToString());
+            return View(viewModel);
         }
 
-        return View(viewModel);
+        var companyVM = new CompanyViewModel(Guid.NewGuid(), registerCompany.PlanId, tenant.Id, registerCompany.CompanyName, registerCompany.CpfOrCnpj);
+        if (!await AddCompany(companyVM))
+        {
+            await _authService.DeleteUser(identityUser.Id.ToString());
+            return View(viewModel);
+        }
+
+        var userVM = new UserViewModel(identityUser.Id, companyVM.Id, tenant.Id, registerCompany.Name, registerCompany.LastName, registerCompany.Email, registerCompany.PhoneNumber, registerCompany.Cpf, identityUser.Role);
+        if (!await AddUser(userVM))
+        {
+            await _authService.DeleteUser(identityUser.Id.ToString());
+            return View(viewModel);
+        }
+
+        await _authService.AddOrUpdateUserClaim(identityUser.Id.ToString(), "Tenant", tenant.Id.ToString());
+
+        if (HasErrorsInResponse(ModelState))
+        {
+            await _authService.DeleteUser(identityUser.Id.ToString());
+            return View(viewModel);
+        }
+        await _planRepository.UnitOfWork.Commit();
+
+        var loginUser = new LoginUser
+        {
+            Email = registerCompany.Email,
+            Password = registerCompany.Password
+        };
+        if (!await PerformLogin(loginUser))
+        {
+            return View(loginUser);
+        }
+
+        if (string.IsNullOrEmpty(returnUrl)) 
+            return RedirectToAction("Index", "Dashboard");
+
+        return LocalRedirect(returnUrl);
     }
 
     [HttpGet]
@@ -122,36 +131,37 @@ public class AuthenticationController : MainController
     [Route("login")]
     public async Task<IActionResult> Login(LoginUser loginUser, string returnUrl = null!)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
-            if (result.Succeeded)
-            {
-                if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Home");
-
-                return LocalRedirect(returnUrl);
-            }
-            if (result.IsLockedOut)
-            {
-                AddError("Usuário temporariamente bloqueado devido às tentativas inválidas.");
-                return View(loginUser);
-            }
-            else
-            {
-                AddError("Usuário ou senha inválidos.");
-                return View(loginUser);
-            }
+            return View();
         }
-        return View();
+        if (!await PerformLogin(loginUser))
+        {
+            return View(loginUser);
+        }
+        if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Dashboard");
+
+        return LocalRedirect(returnUrl);
     }
 
     [HttpGet]
     [Route("sair")]
     public async Task<IActionResult> Logout()
     {
-        await _signInManager.SignOutAsync();
-        //await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await _authService.Logout();
         return RedirectToAction("Index", "Home");
+    }
+
+    #region AuxRegisterMethods
+    private async Task<bool> AddIdentityUser(RegisterUser identityUser)
+    {
+        var userIdentityResult = await _authService.RegisterUser(identityUser);
+        if (!userIdentityResult.IsValid)
+        {
+            AddError(userIdentityResult);
+            return false;
+        }
+        return true;
     }
 
     private async Task<Tenant> AddTenant()
@@ -159,23 +169,42 @@ public class AuthenticationController : MainController
         return await _tenantRepository.AddTenant();
     }
 
-    private async Task AddCompany(CompanyViewModel registerCompany)
+    private async Task<bool> AddCompany(CompanyViewModel registerCompany)
     {
         var companyResult = await _companyService.AddCompany(registerCompany);
         if (!companyResult.IsValid)
         {
             AddError(companyResult);
+            return false;
         }
+        return true;
     }
-    private async Task AddUser(UserViewModel registerUser)
+    private async Task<bool> AddUser(UserViewModel registerUser)
     {
         var userResult = await _userService.AddUser(registerUser);
         if (!userResult.IsValid)
         {
             AddError(userResult);
+            return false;
         }
+        return true;
     }
+    #endregion
 
+    #region AuxLoginMethods
+    private async Task<bool> PerformLogin(LoginUser loginUser)
+    {
+        var loginResult = await _authService.Login(loginUser);
+        if (!loginResult.IsValid)
+        {
+            AddError(loginResult);
+            return false;
+        }
+        return true;
+    }
+    #endregion
+
+    #region CodeToReview
     //public async Task<UserResponse> AddClaimAsync(AddUserClaim userClaim)
     //{
     //    IdentityResult result;
@@ -241,4 +270,5 @@ public class AuthenticationController : MainController
 
     //    return null!;
     //}
+    #endregion
 }

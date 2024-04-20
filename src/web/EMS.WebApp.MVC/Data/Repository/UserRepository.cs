@@ -1,4 +1,5 @@
 ﻿using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Business.Utils.User;
 using EMS.WebApp.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,17 +8,45 @@ namespace EMS.WebApp.MVC.Business.Interfaces.Repository;
 public class UserRepository : IUserRepository
 {
     private readonly EMSDbContext _context;
+    private readonly IAspNetUser _aspNetUser;
 
-    public UserRepository(EMSDbContext context)
+    public UserRepository(EMSDbContext context, IAspNetUser aspNetUser)
     {
         _context = context;
+        _aspNetUser = aspNetUser;
     }
 
     public IUnitOfWork UnitOfWork => _context;
 
-    public async Task<IEnumerable<User>> GetAllUsers()
+    public async Task<PagedResult<User>> GetAllUsers(int pageSize, int pageIndex, string query = null)
     {
-        return await _context.Users.AsNoTracking().ToListAsync();
+        var tenantId = _aspNetUser.GetTenantId();
+        if (tenantId == Guid.Empty)
+        {
+            return null;
+        }
+        var usersQuery = _context.Users
+            .AsNoTracking();
+        if (!string.IsNullOrEmpty(query))
+        {
+            usersQuery = usersQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
+        }
+        var users = await usersQuery.Where(p => p.TenantId == tenantId)
+                                     .OrderBy(p => p.Name)
+                                     .ThenByDescending(p => p.UpdatedAt)
+                                     .Skip(pageSize * (pageIndex - 1))
+                                     .Take(pageSize)
+                                     .ToListAsync();
+        var total = await usersQuery.CountAsync();
+
+        return new PagedResult<User>()
+        {
+            List = users,
+            TotalResults = total,
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            Query = query
+        };
     }
 
     public async Task<User> GetById(Guid id)

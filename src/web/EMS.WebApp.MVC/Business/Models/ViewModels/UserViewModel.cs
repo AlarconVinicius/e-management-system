@@ -10,17 +10,44 @@ public class UserViewModel
     public Guid Id { get; set; }
     public Guid CompanyId { get; set; }
     public Guid TenantId { get; set; }
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Nome")]
     public string Name { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Sobrenome")]
     public string LastName { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
+    [DisplayName("E-mail")]
     public string Email { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Celular")]
     public string PhoneNumber { get; set; }
+
+    [Cpf]
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("CPF")]
     public string Cpf { get; set; }
+
+    [DisplayName("Tipo")]
+    public string Role { get; set; }
+
+    [DisplayName("Ativo")]
     public bool IsActive { get; set; }
+
+    [DisplayName("Data de Cadastro")]
+    public DateTime CreatedAt { get; set; }
+
+    [DisplayName("Data de Modificação")]
+    public DateTime UpdatedAt { get; set; }
 
 
     public UserViewModel() { }
 
-    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf)
+    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role)
     {
         Id = id;
         CompanyId = companyId;
@@ -31,42 +58,43 @@ public class UserViewModel
         PhoneNumber = phoneNumber;
         Cpf = cpf;
         IsActive = true;
+        Role = role;
+    }
+    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role, DateTime createdAt, DateTime updatedAt)
+    {
+        Id = id;
+        CompanyId = companyId;
+        TenantId = tenantId;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Cpf = cpf;
+        IsActive = true;
+        Role = role;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
     }
 }
 
 public class RegisterUser
 {
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("Id do Plano")]
-    public Guid PlanId { get; set; }
+    public Guid Id { get; set; }
 
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres.", MinimumLength = 2)]
-    [DisplayName("Nome")]
-    public string Name { get; set; } = string.Empty;
+    [DisplayName("Cargo")]
+    public string Role { get; set; } = string.Empty;
 
-    [Cpf]
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("CPF")]
-    public string Cpf { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
     [DisplayName("E-mail")]
     public string Email { get; set; } = string.Empty;
 
-    //[Required(ErrorMessage = "O campo {0} é obrigatório")]
-    //public ERole Role { get; set; }
-
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
     [DisplayName("Senha")]
     public string Password { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [Compare("Password", ErrorMessage = "As senhas não conferem.")]
-    [DisplayName("Confirme sua senha")]
-    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class LoginUser
@@ -93,13 +121,66 @@ public class UpdateUserViewModel
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres.", MinimumLength = 2)]
+    [DisplayName("Sobrenome")]
+    public string LastName { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
     [DisplayName("E-mail")]
-    public string Email { get; set; } = string.Empty;
+    public string Email { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Celular")]
+    public string PhoneNumber { get; set; }
+
+    [DisplayName("CPF")]
+    public string Cpf { get; set; }
+
+    [DisplayName("Ativo")]
+    public bool IsActive { get; set; }
+
+    public UpdateUserPasswordViewModel UpdateUserPasswordViewModel { get; set; }
+    public UpdateUserViewModel() { }
+    public UpdateUserViewModel(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
+    {
+        Id = id;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Cpf = cpf;
+    }
 }
 
-public class UserUpdateUserViewModel
+public class UpdateUserPasswordViewModel
 {
-    public UserViewModel User;
-    public UpdateUserViewModel UpdateUser;
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id")]
+    public Guid Id { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
+    [DisplayName("Senha Atual")]
+    public string OldPassword { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
+    [DisplayName("Senha")]
+    public string Password { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [Compare("Password", ErrorMessage = "As senhas não conferem.")]
+    [DisplayName("Confirme sua senha")]
+    public string ConfirmPassword { get; set; } = string.Empty;
+
+    public UpdateUserPasswordViewModel() { }
+
+    public UpdateUserPasswordViewModel(Guid id, string oldPassword, string password, string confirmPassword)
+    {
+        Id = id;
+        OldPassword = oldPassword;
+        Password = password;
+        ConfirmPassword = confirmPassword;
+    }
 }

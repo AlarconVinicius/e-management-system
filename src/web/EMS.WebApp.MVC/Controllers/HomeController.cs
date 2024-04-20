@@ -28,9 +28,16 @@ public class HomeController : Controller
         return View();
     }
 
-    [Route("erro/{id:length(3,3)}")]
+    [Route("Error/{id:length(3,3)}")]
     public IActionResult Error(int id)
     {
+        if (_appUser.IsAuthenticated())
+        {
+            TempData["Template"] = "_LayoutAdmin";
+        } else
+        {
+            TempData["Template"] = "_Layout";
+        }
         var modelErro = new ErrorViewModel();
 
         if (id == 500)

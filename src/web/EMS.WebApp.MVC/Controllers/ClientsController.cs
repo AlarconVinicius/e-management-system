@@ -90,6 +90,7 @@ public class ClientsController : Controller
             var mappedClient = new Client(userDb.CompanyId, tenantId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, client.IsActive);
             _clientRepository.AddClient(mappedClient);
             await _clientRepository.UnitOfWork.Commit();
+            TempData["Success"] = "Cliente adicionado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
         return View(client);
@@ -102,18 +103,15 @@ public class ClientsController : Controller
         {
             return NotFound();
         }
-        var mappedClient = new ClientViewModel
+        var mappedClient = new UpdateClientViewModel
         {
             Id = clientDb.Id,
-            CompanyId = clientDb.CompanyId,
             Name = clientDb.Name,
             LastName = clientDb.LastName,
             Email = clientDb.Email.Address,
             PhoneNumber = clientDb.PhoneNumber,
             Cpf = clientDb.Cpf.Number,
-            IsActive = clientDb.IsActive,
-            CreatedAt = clientDb.CreatedAt,
-            UpdatedAt = clientDb.UpdatedAt
+            IsActive = clientDb.IsActive
 
         };
         return View(mappedClient);
@@ -121,7 +119,7 @@ public class ClientsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, ClientViewModel client)
+    public async Task<IActionResult> Edit(Guid id, UpdateClientViewModel client)
     {
         if (id != client.Id)
         {
@@ -140,6 +138,7 @@ public class ClientsController : Controller
 
                 _clientRepository.UpdateClient(clientDb);
                 await _clientRepository.UnitOfWork.Commit();
+                TempData["Success"] = "Cliente atualizado com sucesso!";
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -194,6 +193,7 @@ public class ClientsController : Controller
         await _clientRepository.DeleteClient(clientDb);
 
         await _clientRepository.UnitOfWork.Commit();
+        TempData["Success"] = "Cliente deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 

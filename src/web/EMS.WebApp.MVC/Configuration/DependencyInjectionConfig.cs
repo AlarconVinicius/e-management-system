@@ -2,7 +2,6 @@
 using EMS.WebApp.MVC.Business.Interfaces.Services;
 using EMS.WebApp.MVC.Business.Services;
 using EMS.WebApp.MVC.Business.Services.Notifications;
-using EMS.WebApp.MVC.Business.Utils;
 using EMS.WebApp.MVC.Business.Utils.User;
 using EMS.WebApp.MVC.Data;
 using EMS.WebApp.MVC.Data.Repository;
@@ -21,6 +20,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IAspNetUser, AspNetUser>();
         services.AddScoped<INotifier, Notifier>();
 
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICompanyService, CompanyService>();
 

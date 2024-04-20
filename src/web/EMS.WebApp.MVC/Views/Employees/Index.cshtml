@@ -1,8 +1,8 @@
 ﻿@using EMS.WebApp.MVC.Extensions;
-@model EMS.WebApp.MVC.Business.Models.ViewModels.PagedViewModel<ProductViewModel>
+@model EMS.WebApp.MVC.Business.Models.ViewModels.PagedViewModel<UserViewModel>
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Produtos";
+    ViewData["Title"] = "Colaboradores";
     var itemIndex = 0;
 }
 
@@ -10,10 +10,10 @@
 <div class="card border-0 col-md-12">
     <div class="card-header d-flex justify-content-between">
         <h5 class="card-title">
-            Produtos
+            Colaboradores
         </h5>
 
-        <form method="get" asp-controller="Products" asp-action="Index">
+        <form method="get" asp-controller="Employees" asp-action="Index">
                 <div class="d-flex align-items-center">
                     <div class="input-group me-3">
                         <input type="text"
@@ -29,8 +29,8 @@
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
-                    <a asp-controller="Products" asp-action="Create" class="btn btn-success align-self-center w-75">
-                        Adicionar Produto
+                    <a asp-controller="Employees" asp-action="Create" class="btn btn-success align-self-center w-75">
+                        Adicionar Colaborador
                     </a>
                 </div>
         </form>
@@ -40,10 +40,11 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Imagem</th>
                     <th scope="col">Nome</th>
-                    <th scope="col">Descrição</th>
-                    <th scope="col">Valor unitário</th>
+                    <th scope="col">Sobrenome</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Celular</th>
+                    <th scope="col">CPF</th>
                     <th scope="col">Status</th>
                     <th scope="col">Data de Cadastro</th>
                     <th scope="col">Data de Modificação</th>
@@ -51,23 +52,24 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var product in Model.List)
+                @foreach (var employee in Model.List)
                 {
                     <tr>
                         @* <td>@(itemIndex + 1)</td> *@
                         <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                        <td>@product.Image</td>
-                        <td>@product.Title</td>
-                        <td>@product.Description</td>
-                        <td>@this.FormatCurrency(product.UnitaryValue)</td>
-                        <td>@(product.IsActive ? "Ativo" : "Desativado")</td>
-                        <td>@this.FormatDate(product.CreatedAt)</td>
-                        <td>@this.FormatDate(product.UpdatedAt)</td>
+                        <td>@employee.Name</td>
+                        <td>@employee.LastName</td>
+                        <td>@employee.Email</td>
+                        <td>@employee.PhoneNumber</td>
+                        <td>@employee.Cpf</td>
+                        <td>@(employee.IsActive ? "Ativo" : "Desativado")</td>
+                        <td>@this.FormatDate(employee.CreatedAt)</td>
+                        <td>@this.FormatDate(employee.UpdatedAt)</td>
                         <td>
                             @* <a href="#" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
-                            <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
-                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
+                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@employee.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
+                            <a asp-controller="Employees" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
+                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
                         </td>
                     </tr>
                     itemIndex++;
