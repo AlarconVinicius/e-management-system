@@ -102,7 +102,7 @@ public class ClientsController : Controller
         {
             return NotFound();
         }
-        var mappedClient = new ClientViewModel
+        var mappedClient = new UpdateClientViewModel
         {
             Id = clientDb.Id,
             CompanyId = clientDb.CompanyId,
@@ -111,9 +111,7 @@ public class ClientsController : Controller
             Email = clientDb.Email.Address,
             PhoneNumber = clientDb.PhoneNumber,
             Cpf = clientDb.Cpf.Number,
-            IsActive = clientDb.IsActive,
-            CreatedAt = clientDb.CreatedAt,
-            UpdatedAt = clientDb.UpdatedAt
+            IsActive = clientDb.IsActive
 
         };
         return View(mappedClient);
@@ -121,7 +119,7 @@ public class ClientsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, ClientViewModel client)
+    public async Task<IActionResult> Edit(Guid id, UpdateClientViewModel client)
     {
         if (id != client.Id)
         {
