@@ -10,6 +10,7 @@ public interface IAuthService
     Task<ValidationResult> Login(LoginUser loginUser);
     Task Logout();
     Task<ValidationResult> RegisterUser(RegisterUser registerUser);
+    Task<ValidationResult> UpdateUserEmail(string userId, string newEmail);
     Task<ValidationResult> DeleteUser(string userId);
     Task<ValidationResult> AddOrUpdateUserClaim(string userId, string type, string value);
 }

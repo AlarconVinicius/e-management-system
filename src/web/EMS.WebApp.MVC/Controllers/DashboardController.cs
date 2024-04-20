@@ -34,46 +34,39 @@ public class DashboardController : MainController
         var id = _appUser.GetUserId();
         var userDb = await _userRepository.GetById(id);
 
-        UserViewModel userViewModel;
+        UpdateUserViewModel updateUserVM;
         if (userDb is not null)
         {
-            userViewModel = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role);
+            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
         }
         else
         {
             return NotFound();
         }
 
-        var updateUserViewModel = new UpdateUserViewModel();
-
-        var viewModel = new UserUpdateUserViewModel
-        {
-            User = userViewModel,
-            UpdateUser = updateUserViewModel
-        };
-
-        return View(viewModel);
+        return View(updateUserVM);
     }
 
     [HttpPost]
     [Route("atualizar-perfil")]
-    public async Task<IActionResult> UpdateProfile(UpdateUserViewModel updatedUser, string returnUrl = null)
+    public async Task<IActionResult> UpdateProfile(UpdateUserViewModel updateUserVM, string returnUrl = null)
     {
         if (!ModelState.IsValid)
         {
-            return View();
+            return View(updateUserVM);
         }
         var id = _appUser.GetUserId();
         var userDb = await _userRepository.GetById(id);
 
-        if (userDb != null)
+        if (userDb is null)
         {
-            var subsResult = await _userService.UpdateUser(id, updatedUser);
-            if (!subsResult.IsValid)
-            {
-                AddError(subsResult);
-                return View();
-            }
+            return NotFound();
+        }
+        var updateUserResult = await _userService.UpdateUser(id, updateUserVM);
+        if (!updateUserResult.IsValid)
+        {
+            AddError(updateUserResult);
+            return View(updateUserVM);
         }
         return RedirectToAction(nameof(UpdateProfile));
     }

@@ -75,6 +75,23 @@ public class AuthService : MainService, IAuthService
         }
         return _validationResult;
     }
+
+    public async Task<ValidationResult> UpdateUserEmail(string userId, string newEmail)
+    {
+        var userDb = await _userManager.FindByIdAsync(userId);
+        if (!await UserExists(userId))
+        {
+            Notify("Usuário não encontrado.");
+            return _validationResult;
+        }
+        userDb.UserName = newEmail;
+        userDb.NormalizedUserName = newEmail.ToUpper();
+        userDb.Email = newEmail;
+        userDb.NormalizedEmail = newEmail.ToUpper();
+        await _userManager.UpdateAsync(userDb);
+        return _validationResult;
+    }
+
     public async Task<ValidationResult> DeleteUser(string userId)
     {
         var userDb = await _userManager.FindByIdAsync(userId);

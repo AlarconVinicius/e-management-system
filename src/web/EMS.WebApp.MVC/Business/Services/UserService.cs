@@ -10,41 +10,92 @@ namespace EMS.WebApp.MVC.Business.Services;
 public class UserService : MainService, IUserService
 {
     public readonly IUserRepository _userRepository;
+    public readonly IAuthService _authService;
 
-    public UserService(INotifier notifier, IUserRepository userRepository) : base(notifier)
+    public UserService(INotifier notifier, IUserRepository userRepository, IAuthService authService) : base(notifier)
     {
         _userRepository = userRepository;
+        _authService = authService;
     }
 
     public async Task<ValidationResult> AddUser(UserViewModel user)
     {
-        if (await UserExists(user.Cpf)) return _validationResult;
+        if (await IsCpfInUse(user.Cpf)) return _validationResult;
         _userRepository.AddUser(new User(user.Id, user.CompanyId, user.TenantId, user.Name, user.LastName, user.Email, user.PhoneNumber, user.Cpf, user.Role));
         return _validationResult;
     }
 
-    public async Task<ValidationResult> UpdateUser(Guid id, UpdateUserViewModel subscriber)
+    public async Task<ValidationResult> UpdateUser(Guid id, UpdateUserViewModel updateUserVM)
     {
-        //if (!ExecuteValidation(new UserValidation(), subscriber)) return _validationResult;
+        if(id != updateUserVM.Id)
+        {
+            Notify("Usuário não encontrado.");
+            return _validationResult;
+        }
 
-        var subscriberDb = await _userRepository.GetById(subscriber.Id);
+        if (! await IdentityUserExists(id.ToString())) return _validationResult;
+        if (! await UserExists(id)) return _validationResult;
 
-        subscriberDb.SetName(subscriber.Name);
-        subscriberDb.SetEmail(subscriber.Email);
+        var userDb = await _userRepository.GetById(updateUserVM.Id);
+        var identityUserDb = await _authService.GetUserById(updateUserVM.Id.ToString());
 
-        _userRepository.UpdateUser(subscriberDb);
+
+        if (updateUserVM.Email != userDb.Email.Address || updateUserVM.Email != identityUserDb.Email)
+        {
+            var updateIdentityEmailResult = await _authService.UpdateUserEmail(id.ToString(), updateUserVM.Email);
+            if (!updateIdentityEmailResult.IsValid)
+            {
+                Notify(updateIdentityEmailResult);
+                return _validationResult;
+            }
+            userDb.SetEmail(updateUserVM.Email);
+        }
+
+        userDb.SetName(updateUserVM.Name);
+        userDb.SetLastName(updateUserVM.LastName);
+        userDb.SetPhoneNumber(updateUserVM.PhoneNumber);
+
+        _userRepository.UpdateUser(userDb);
+        await _userRepository.UnitOfWork.Commit();
+
         return _validationResult;
     }
 
-    private async Task<bool> UserExists(string cpf)
+    private async Task<bool> IsCpfInUse(string cpf)
     {
         var userExist = await _userRepository.GetByCpf(cpf);
 
-        if (userExist != null!)
+        if (userExist != null)
         {
             Notify("Este CPF já está em uso.");
             return true;
         };
+        return false;
+    }
+
+    private async Task<bool> UserExists(Guid userId)
+    {
+        var userExist = await _userRepository.GetById(userId);
+
+        if (userExist != null)
+        {
+            return true;
+        };
+
+        Notify("Usuário não encontrado.");
+        return false;
+    }
+
+    private async Task<bool> IdentityUserExists(string userId)
+    {
+        var identityUserExists = await _authService.GetUserById(userId);
+
+        if (identityUserExists != null)
+        {
+            return true;
+        };
+
+        Notify("Usuário não encontrado.");
         return false;
     }
 }

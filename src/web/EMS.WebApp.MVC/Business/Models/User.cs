@@ -43,9 +43,9 @@ public class User : Entity
     {
         LastName = lastName;
     }
-    public void SetPhoneNumber(string lastName)
+    public void SetPhoneNumber(string phoneNumber)
     {
-        LastName = lastName;
+        PhoneNumber = phoneNumber;
     }
     public void SetEmail(string email)
     {

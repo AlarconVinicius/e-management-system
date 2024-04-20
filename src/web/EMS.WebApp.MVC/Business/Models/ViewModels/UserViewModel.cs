@@ -91,9 +91,6 @@ public class RegisterUser
     [DisplayName("E-mail")]
     public string Email { get; set; } = string.Empty;
 
-    //[Required(ErrorMessage = "O campo {0} é obrigatório")]
-    //public ERole Role { get; set; }
-
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
     [DisplayName("Senha")]
@@ -124,13 +121,29 @@ public class UpdateUserViewModel
     public string Name { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres.", MinimumLength = 2)]
+    [DisplayName("Sobrenome")]
+    public string LastName { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
     [DisplayName("E-mail")]
-    public string Email { get; set; } = string.Empty;
-}
+    public string Email { get; set; }
 
-public class UserUpdateUserViewModel
-{
-    public UserViewModel User;
-    public UpdateUserViewModel UpdateUser;
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Celular")]
+    public string PhoneNumber { get; set; }
+
+    [DisplayName("CPF")]
+    public string Cpf { get; set; }
+    public UpdateUserViewModel() { }
+    public UpdateUserViewModel(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
+    {
+        Id = id;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Cpf = cpf;
+    }
 }
