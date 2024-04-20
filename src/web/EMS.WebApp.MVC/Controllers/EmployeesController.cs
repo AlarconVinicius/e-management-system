@@ -122,7 +122,7 @@ public class EmployeesController : MainController
         var userLoggedId = _appUser.GetUserId();
         var userLoggedDb = await _userRepository.GetById(userLoggedId);
 
-        if(id != userLoggedId && userLoggedDb.Role != "Admin")
+        if (id != userLoggedId && userLoggedDb.Role != "Admin")
         {
             return RedirectToAction("Error", "Home", new { id = 403 });
         }
@@ -132,53 +132,48 @@ public class EmployeesController : MainController
         {
             return NotFound();
         }
-        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
-        
-        return View(mappedUser);
-    }
 
-    [HttpPost("Edit/{id}")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, UserViewModel user)
-    {
-        if (id != user.Id)
+        UpdateUserViewModel updateUserVM;
+        if (userLoggedDb is not null)
+        {
+            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
+        }
+        else
         {
             return NotFound();
         }
 
-        if (ModelState.IsValid)
+        return View(updateUserVM);
+    }
+
+    [HttpPost("Edit/{id}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(Guid id, UpdateUserViewModel updateUserVM)
+    {
+        if (id != updateUserVM.Id)
         {
-            try
-            {
-                var userDb = await _userRepository.GetById(id);
-                userDb.SetName(user.Name);
-                userDb.SetLastName(user.LastName);
-                if (user.Email != userDb.Email.Address)
-                {
-                    userDb.SetEmail(user.Email);
-                }
-
-                userDb.SetPhoneNumber(user.PhoneNumber);
-                userDb.SetIsActive(user.IsActive);
-
-                _userRepository.UpdateUser(userDb);
-                await _userRepository.UnitOfWork.Commit();
-                TempData["Success"] = "Colaborador atualizado com sucesso!";
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await UserExists(user.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
+            return NotFound();
         }
-        return View(user);
+        ModelState.Remove("UpdateUserPasswordViewModel");
+        if (!ModelState.IsValid)
+        {
+            return View(updateUserVM);
+        }
+        var userDb = await _userRepository.GetById(id);
+
+        if (userDb is null)
+        {
+            return NotFound();
+        }
+        var updateUserResult = await _userService.UpdateUser(id, updateUserVM);
+        if (!updateUserResult.IsValid)
+        {
+            AddError(updateUserResult);
+            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
+            return View(updateUserVM);
+        }
+        TempData["Success"] = "Colaborador atualizado com sucesso!";
+        return RedirectToAction(nameof(Index));
     }
 
     [Authorize(Roles = "Admin")]

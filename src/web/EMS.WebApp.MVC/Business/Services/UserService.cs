@@ -27,17 +27,18 @@ public class UserService : MainService, IUserService
 
     public async Task<ValidationResult> UpdateUser(Guid id, UpdateUserViewModel updateUserVM)
     {
-        if(id != updateUserVM.Id)
+
+        if (!await IdentityUserExists(id.ToString())) return _validationResult;
+        if (!await UserExists(id)) return _validationResult;
+
+        var userDb = await _userRepository.GetById(updateUserVM.Id);
+        var identityUserDb = await _authService.GetUserById(updateUserVM.Id.ToString());
+
+        if (id != updateUserVM.Id && userDb.Role != "Admin")
         {
             Notify("Usuário não encontrado.");
             return _validationResult;
         }
-
-        if (! await IdentityUserExists(id.ToString())) return _validationResult;
-        if (! await UserExists(id)) return _validationResult;
-
-        var userDb = await _userRepository.GetById(updateUserVM.Id);
-        var identityUserDb = await _authService.GetUserById(updateUserVM.Id.ToString());
 
 
         if (updateUserVM.Email != userDb.Email.Address || updateUserVM.Email != identityUserDb.Email)

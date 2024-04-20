@@ -137,6 +137,9 @@ public class UpdateUserViewModel
     [DisplayName("CPF")]
     public string Cpf { get; set; }
 
+    [DisplayName("Ativo")]
+    public bool IsActive { get; set; }
+
     public UpdateUserPasswordViewModel UpdateUserPasswordViewModel { get; set; }
     public UpdateUserViewModel() { }
     public UpdateUserViewModel(Guid id, string name, string lastName, string email, string phoneNumber, string cpf)
