@@ -201,9 +201,13 @@ public class EmployeesController : MainController
             return NotFound();
         }
 
-        await _userRepository.DeleteUser(userDb);
-
-        await _userRepository.UnitOfWork.Commit();
+        var deleteUserResult = await _userService.DeleteUser(id);
+        if (!deleteUserResult.IsValid)
+        {
+            AddError(deleteUserResult);
+            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
+            return RedirectToAction(nameof(Index));
+        }
         TempData["Success"] = "Colaborador deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
