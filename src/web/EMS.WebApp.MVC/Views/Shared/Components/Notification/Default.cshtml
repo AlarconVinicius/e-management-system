@@ -1,0 +1,12 @@
+﻿@if (ViewData["MessageType"] != null && ViewData["Message"] != null)
+{
+    var messageType = ViewData["MessageType"].ToString();
+    var message = ViewData["Message"].ToString();
+
+    <div style="padding-top: 15px"></div>
+
+    <div id="msg_box" class="alert alert-@messageType alert-dismissible fade show" role="alert">
+        <h4 id="msgRetorno">@Html.Raw(message)</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
