@@ -69,8 +69,10 @@ public class DashboardController : MainController
         if (!updateUserResult.IsValid)
         {
             AddError(updateUserResult);
+            TempData["Failure"] = "Falha ao atualizar usuário: " + string.Join("; ", GetModelStateErrors());
             return View(updateUserVM);
         }
+        TempData["Success"] = "Usuário atualizado com sucesso!";
         return RedirectToAction(nameof(UpdateProfile));
     }
 
