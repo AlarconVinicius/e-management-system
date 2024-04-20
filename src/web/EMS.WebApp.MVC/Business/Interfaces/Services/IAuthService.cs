@@ -11,6 +11,7 @@ public interface IAuthService
     Task Logout();
     Task<ValidationResult> RegisterUser(RegisterUser registerUser);
     Task<ValidationResult> UpdateUserEmail(string userId, string newEmail);
+    Task<ValidationResult> UpdatePassword(string userId, UpdateUserPasswordViewModel passwordVM);
     Task<ValidationResult> DeleteUser(string userId);
     Task<ValidationResult> AddOrUpdateUserClaim(string userId, string type, string value);
 }

@@ -92,6 +92,43 @@ public class AuthService : MainService, IAuthService
         return _validationResult;
     }
 
+    public async Task<ValidationResult> UpdatePassword(string userId, UpdateUserPasswordViewModel passwordVM)
+    {
+        var userDb = await _userManager.FindByIdAsync(userId);
+        if (!await UserExists(userId))
+        {
+            Notify("Usuário não encontrado.");
+            return _validationResult;
+        }
+
+        var passwordCheckResult = await _userManager.CheckPasswordAsync(userDb, passwordVM.OldPassword);
+
+        if (!passwordCheckResult)
+        {
+            Notify("A senha atual está incorreta.");
+            return _validationResult;
+        }
+
+        if (passwordVM.Password != passwordVM.ConfirmPassword)
+        {
+            Notify("As senhas não conferem.");
+            return _validationResult;
+        }
+
+        var updatePasswordResult = await _userManager.ChangePasswordAsync(userDb, passwordVM.OldPassword, passwordVM.Password);
+
+        if (!updatePasswordResult.Succeeded)
+        {
+            foreach (var error in updatePasswordResult.Errors)
+            {
+                Notify(error.Description);
+            }
+            return _validationResult;
+        }
+
+        return _validationResult;
+    }
+
     public async Task<ValidationResult> DeleteUser(string userId)
     {
         var userDb = await _userManager.FindByIdAsync(userId);
