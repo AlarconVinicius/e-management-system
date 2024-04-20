@@ -97,6 +97,7 @@ public class ProductsController : Controller
             var mappedProduct = new Product(userDb.CompanyId, tenantId, product.Title, product.Description, product.UnitaryValue, product.Image, product.IsActive);
             _productRepository.AddProduct(mappedProduct);
             await _productRepository.UnitOfWork.Commit();
+            TempData["Success"] = "Produto adicionado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
         return View(product);
@@ -148,6 +149,7 @@ public class ProductsController : Controller
 
                 _productRepository.UpdateProduct(productDb);
                 await _productRepository.UnitOfWork.Commit();
+                TempData["Success"] = "Produto atualizado com sucesso!";
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -202,6 +204,7 @@ public class ProductsController : Controller
         await _productRepository.DeleteProduct(productDb);
 
         await _productRepository.UnitOfWork.Commit();
+        TempData["Success"] = "Produto deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
