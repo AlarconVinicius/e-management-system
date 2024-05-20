@@ -7,14 +7,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FC8ECCF2-E8C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{1FE4E83C-1D22-4D9D-8DF6-3B1D71A40063}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApp.MVC", "src\web\EMS.WebApp.MVC\EMS.WebApp.MVC.csproj", "{1374D4B4-689A-43A9-8BA2-5099E8FF8DD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApp.MVC", "src\web\mvc\EMS.WebApp.MVC\EMS.WebApp.MVC.csproj", "{1374D4B4-689A-43A9-8BA2-5099E8FF8DD5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49C729CF-F609-423B-AF32-21004E133324}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApp.Business", "src\web\EMS.WebApp.Business\EMS.WebApp.Business.csproj", "{D22446FB-8804-481B-92CE-451AEEFA3AE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApp.Business", "src\web\mvc\EMS.WebApp.Business\EMS.WebApp.Business.csproj", "{D22446FB-8804-481B-92CE-451AEEFA3AE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildingBlocks", "BuildingBlocks", "{67EB68E3-820C-426F-AD93-2D1ACC2D9BAF}"
 EndProject

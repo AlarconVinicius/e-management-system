@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\building blocks\EMS.Core\EMS.Core.csproj" />
+    <ProjectReference Include="..\..\..\building blocks\EMS.Core\EMS.Core.csproj" />
   </ItemGroup>
 
 </Project>
