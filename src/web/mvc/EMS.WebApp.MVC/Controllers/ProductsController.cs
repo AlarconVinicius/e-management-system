@@ -74,6 +74,7 @@ public class ProductsController : Controller
         var userId = _appUser.GetUserId();
         var userDb = await _employeeRepository.GetByIdAsync(userId);
         var tenantId = _appUser.GetTenantId();
+        product.CompanyId = tenantId;
         if (ModelState.IsValid)
         {
             var mappedProduct = _mapper.Map<Product>(product);
