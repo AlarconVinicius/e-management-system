@@ -4,5 +4,6 @@ namespace EMS.WebApp.Business.Interfaces.Repositories;
 
 public interface ICompanyRepository : IRepository<Company>
 {
-    Task<bool> Block(Guid id);
+    Task<PagedResult<Company>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null);
+    Task Block(Guid id);
 }

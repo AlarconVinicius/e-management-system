@@ -16,11 +16,11 @@ public abstract class User : Entity
 
     public Company Company { get; set; }
 
-    protected User() { }
+    public User() { }
 
     protected User(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string document, string role)
     {
-        ChangeId(id);
+        SetId(id);
         CompanyId = companyId;
         Name = name;
         LastName = lastName;

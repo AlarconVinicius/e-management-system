@@ -10,7 +10,7 @@ public class Plan : Entity
 
     public ICollection<Company> Companies { get; set; } = new List<Company>();  
 
-    protected Plan() { }
+    public Plan() { }
 
     public Plan(string title, string subtitle, decimal price, string benefits, bool isActive)
     {
