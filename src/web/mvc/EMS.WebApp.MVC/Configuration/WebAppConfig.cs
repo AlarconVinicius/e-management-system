@@ -1,7 +1,9 @@
-﻿using EMS.WebApp.Data.Context;
-using EMS.WebApp.MVC.Data;
+﻿using EMS.WebApp.Business.Configuration;
+using EMS.WebApp.Data.Configuration;
+using EMS.WebApp.Data.Context;
+using EMS.WebApp.Identity.Configuration;
+using EMS.WebApp.Identity.Data;
 using EMS.WebApp.MVC.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -13,30 +15,12 @@ public static class WebAppConfig
     public static void AddMvcConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllersWithViews();
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
-        );
-
-        services.AddDefaultIdentity<IdentityUser>(options =>
-            options.SignIn.RequireConfirmedAccount = false)
-            .AddErrorDescriber<IdentityMensagensPortugues>()
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
 
         services.ConfigureApplicationCookie(options =>
         {
             options.AccessDeniedPath = "/Error/403";
             options.LoginPath = "/login";
         });
-        //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        //        .AddCookie(options =>
-        //        {
-        //            options.LoginPath = "/Identity/Account/Login";
-        //            options.AccessDeniedPath = "/erro/403";
-        //        });
-        services.AddDbContext<EMSDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
-        );
     }
 
     public static void UseMvcConfiguration(this IApplicationBuilder app, IWebHostEnvironment env, WebApplication webApp)
