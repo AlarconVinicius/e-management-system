@@ -21,33 +21,30 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 
     public override async Task<IEnumerable<Employee>> SearchAsync(Expression<Func<Employee, bool>> predicate)
     {
-        return await Db.Users.OfType<Employee>()
-                             .AsNoTracking()
-                             .Where(p => p.CompanyId == _tenantId)
-                             .Where(predicate).ToListAsync();
+        return await DbSet.AsNoTracking()
+                          .Where(p => p.CompanyId == _tenantId)
+                          .Where(predicate).ToListAsync();
     }
 
     public async override Task<Employee> GetByIdAsync(Guid id)
     {
-        return await Db.Users.OfType<Employee>()
-                             .Where(p => p.CompanyId == _tenantId)
-                             .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        return await DbSet.Where(p => p.CompanyId == _tenantId)
+                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public async Task<PagedResult<Employee>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
     {
-        var employeesQuery = Db.Users.AsNoTracking().Where(p => p.CompanyId == _tenantId);
+        var employeesQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == _tenantId);
 
         if (!string.IsNullOrEmpty(query))
         {
             employeesQuery = employeesQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
         }
-        var users = await employeesQuery.OfType<Employee>()
-                                    .OrderBy(p => p.Name)
-                                    .ThenByDescending(p => p.UpdatedAt)
-                                    .Skip(pageSize * (pageIndex - 1))
-                                    .Take(pageSize)
-                                    .ToListAsync();
+        var users = await employeesQuery.OrderBy(p => p.Name)
+                                        .ThenByDescending(p => p.UpdatedAt)
+                                        .Skip(pageSize * (pageIndex - 1))
+                                        .Take(pageSize)
+                                        .ToListAsync();
         var total = await employeesQuery.CountAsync();
 
         return new PagedResult<Employee>()

@@ -8,6 +8,7 @@ public class EmployeeMapping : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
+        builder.ToTable("Employees");
 
         builder.Property(c => c.Salary)
             .HasDefaultValue(0.0)

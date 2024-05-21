@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMS.WebApp.Data.Migrations
 {
     [DbContext(typeof(EMSDbContext))]
-    [Migration("20240520194528_Initial")]
+    [Migration("20240521223421_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -196,10 +196,6 @@ namespace EMS.WebApp.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -227,16 +223,14 @@ namespace EMS.WebApp.Data.Migrations
 
                     b.ToTable("Users", (string)null);
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("EMS.WebApp.Business.Models.Client", b =>
                 {
                     b.HasBaseType("EMS.WebApp.Business.Models.User");
 
-                    b.HasDiscriminator().HasValue("Client");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("EMS.WebApp.Business.Models.Employee", b =>
@@ -248,12 +242,10 @@ namespace EMS.WebApp.Data.Migrations
                         .HasColumnType("decimal(18, 2)")
                         .HasDefaultValue(0m);
 
-                    b.ToTable("Users", t =>
+                    b.ToTable("Employees", null, t =>
                         {
                             t.HasCheckConstraint("CK_Employee_Salary", "Salary >= 0");
                         });
-
-                    b.HasDiscriminator().HasValue("Employee");
                 });
 
             modelBuilder.Entity("EMS.WebApp.Business.Models.Address", b =>
@@ -356,6 +348,24 @@ namespace EMS.WebApp.Data.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("Email");
+                });
+
+            modelBuilder.Entity("EMS.WebApp.Business.Models.Client", b =>
+                {
+                    b.HasOne("EMS.WebApp.Business.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("EMS.WebApp.Business.Models.Client", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EMS.WebApp.Business.Models.Employee", b =>
+                {
+                    b.HasOne("EMS.WebApp.Business.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("EMS.WebApp.Business.Models.Employee", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EMS.WebApp.Business.Models.Company", b =>

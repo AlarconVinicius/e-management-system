@@ -21,7 +21,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 
     public override async Task<IEnumerable<Product>> SearchAsync(Expression<Func<Product, bool>> predicate)
     {
-        return await Db.Products.AsNoTracking()
+        return await DbSet.AsNoTracking()
                                 .Where(p => p.CompanyId == _tenantId)
                                 .Where(predicate)
                                 .ToListAsync();
@@ -29,24 +29,23 @@ public class ProductRepository : Repository<Product>, IProductRepository
 
     public async override Task<Product> GetByIdAsync(Guid id)
     {
-        return await Db.Products.Where(p => p.CompanyId == _tenantId)
-                                .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        return await DbSet.Where(p => p.CompanyId == _tenantId)
+                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public async Task<PagedResult<Product>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
     {
-        var productsQuery = Db.Products.Where(p => p.CompanyId == _tenantId).AsNoTracking();
+        var productsQuery = DbSet.Where(p => p.CompanyId == _tenantId).AsNoTracking();
 
         if (!string.IsNullOrEmpty(query))
         {
             productsQuery = productsQuery.Where(p => p.Title.Contains(query));
         }
-        var users = await productsQuery.OfType<Product>()
-                                    .OrderBy(p => p.Title)
-                                    .ThenByDescending(p => p.UpdatedAt)
-                                    .Skip(pageSize * (pageIndex - 1))
-                                    .Take(pageSize)
-                                    .ToListAsync();
+        var users = await productsQuery.OrderBy(p => p.Title)
+                                       .ThenByDescending(p => p.UpdatedAt)
+                                       .Skip(pageSize * (pageIndex - 1))
+                                       .Take(pageSize)
+                                       .ToListAsync();
         var total = await productsQuery.CountAsync();
 
         return new PagedResult<Product>()

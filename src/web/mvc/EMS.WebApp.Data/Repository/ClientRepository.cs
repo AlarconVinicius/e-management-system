@@ -21,33 +21,30 @@ public class ClientRepository : Repository<Client>, IClientRepository
 
     public override async Task<IEnumerable<Client>> SearchAsync(Expression<Func<Client, bool>> predicate)
     {
-        return await Db.Users.OfType<Client>()
-                             .AsNoTracking()
-                             .Where(p => p.CompanyId == _tenantId)
-                             .Where(predicate)
-                             .ToListAsync();
+        return await DbSet.AsNoTracking()
+                          .Where(p => p.CompanyId == _tenantId)
+                          .Where(predicate)
+                          .ToListAsync();
     }
 
     public async override Task<Client> GetByIdAsync(Guid id)
     {
-        return await Db.Users.OfType<Client>()
-                             .Where(p => p.CompanyId == _tenantId)
-                             .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        return await DbSet.Where(p => p.CompanyId == _tenantId)
+                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
     }
 
     public async Task<PagedResult<Client>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
     {
-        var clientsQuery = Db.Users.AsNoTracking().Where(p => p.CompanyId == _tenantId);
+        var clientsQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == _tenantId);
         if (!string.IsNullOrEmpty(query))
         {
             clientsQuery = clientsQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
         }
-        var users = await clientsQuery.OfType<Client>()
-                                    .OrderBy(p => p.Name)
-                                    .ThenByDescending(p => p.UpdatedAt)
-                                    .Skip(pageSize * (pageIndex - 1))
-                                    .Take(pageSize)
-                                    .ToListAsync();
+        var users = await clientsQuery.OrderBy(p => p.Name)
+                                      .ThenByDescending(p => p.UpdatedAt)
+                                      .Skip(pageSize * (pageIndex - 1))
+                                      .Take(pageSize)
+                                      .ToListAsync();
         var total = await clientsQuery.CountAsync();
 
         return new PagedResult<Client>()

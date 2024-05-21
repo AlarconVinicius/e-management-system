@@ -2,7 +2,6 @@
 using EMS.WebApp.Business.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace EMS.WebApp.Data.Mappings;
 
@@ -10,6 +9,7 @@ public class UserMapping : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        builder.UseTptMappingStrategy();
         builder.ToTable("Users");
 
         builder.HasKey(c => c.Id);
@@ -46,9 +46,9 @@ public class UserMapping : IEntityTypeConfiguration<User>
                 .HasColumnType($"varchar({Cpf.MaxCpfLength})");
         });
 
-        builder.HasDiscriminator<string>("Discriminator")
-                .HasValue<Employee>("Employee")
-                .HasValue<Client>("Client");
+        //builder.HasDiscriminator<string>("Discriminator")
+        //        .HasValue<Employee>("Employee")
+        //        .HasValue<Client>("Client");
 
         builder.HasOne(c => c.Address)
             .WithOne(c => c.User);

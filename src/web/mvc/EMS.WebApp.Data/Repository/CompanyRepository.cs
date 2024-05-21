@@ -1,6 +1,5 @@
 ﻿using EMS.WebApp.Business.Interfaces.Repositories;
 using EMS.WebApp.Business.Models;
-using EMS.WebApp.Business.Utils;
 using EMS.WebApp.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,8 +13,7 @@ public class CompanyRepository : Repository<Company>, ICompanyRepository
 
     public async Task<PagedResult<Company>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
     {
-        var companiesQuery = Db.Companies
-            .AsNoTracking();
+        var companiesQuery = DbSet.AsNoTracking();
         if (!string.IsNullOrEmpty(query))
         {
             companiesQuery = companiesQuery.Where(p => p.Name.Contains(query) || p.Document.Number.Contains(query));
