@@ -1,15 +1,13 @@
-﻿using EMS.WebApp.MVC.Business.DomainObjects;
-using EMS.WebApp.MVC.Extensions;
+﻿using EMS.WebApp.MVC.Extensions;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+namespace EMS.WebApp.MVC.Business.Models;
 
 public class UserViewModel
 {
     public Guid Id { get; set; }
     public Guid CompanyId { get; set; }
-    public Guid TenantId { get; set; }
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Nome")]
     public string Name { get; set; }
@@ -47,11 +45,10 @@ public class UserViewModel
 
     public UserViewModel() { }
 
-    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role)
+    public UserViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, string role)
     {
         Id = id;
         CompanyId = companyId;
-        TenantId = tenantId;
         Name = name;
         LastName = lastName;
         Email = email;
@@ -60,11 +57,10 @@ public class UserViewModel
         IsActive = true;
         Role = role;
     }
-    public UserViewModel(Guid id, Guid companyId, Guid tenantId, string name, string lastName, string email, string phoneNumber, string cpf, string role, DateTime createdAt, DateTime updatedAt)
+    public UserViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, string role, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
         CompanyId = companyId;
-        TenantId = tenantId;
         Name = name;
         LastName = lastName;
         Email = email;
@@ -84,7 +80,6 @@ public class RegisterUser
 
     [DisplayName("Cargo")]
     public string Role { get; set; } = string.Empty;
-
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]

@@ -1,4 +1,6 @@
-﻿using FluentValidation.Results;
+﻿using Azure;
+using EMS.WebApp.Business.Notifications;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -6,6 +8,32 @@ namespace EMS.WebApp.MVC.Controllers;
 
 public class MainController : Controller
 {
+    private readonly INotifier _notifier;
+
+    protected MainController(INotifier notifier)
+    {
+        _notifier = notifier;
+    }
+
+    protected bool IsValidOperation()
+    {
+        return !_notifier.HasNotification();
+    }
+    protected void Notify(ValidationResult validationResult)
+    {
+        if (!validationResult.IsValid && validationResult.Errors.Any())
+        {
+            foreach (var error in validationResult.Errors)
+            {
+                Notify(error.ErrorMessage);
+            }
+        }
+    }
+
+    protected void Notify(string message)
+    {
+        _notifier.Handle(new Notification(message));
+    }
     protected bool HasErrorsInResponse(ModelStateDictionary modelState)
     {
         return !modelState.IsValid;

@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.DomainObjects;
+﻿using EMS.Core.DomainObjects;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.Localization;

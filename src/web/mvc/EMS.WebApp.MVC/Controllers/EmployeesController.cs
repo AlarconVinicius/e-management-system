@@ -1,11 +1,13 @@
-﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
-using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
-using EMS.WebApp.MVC.Business.Utils.User;
+﻿using AutoMapper;
+using EMS.WebApp.Business.Interfaces.Repositories;
+using EMS.WebApp.Business.Interfaces.Services;
+using EMS.WebApp.Business.Models;
+using EMS.WebApp.Business.Notifications;
+using EMS.WebApp.Business.Utils;
+using EMS.WebApp.MVC.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
@@ -14,27 +16,29 @@ namespace EMS.WebApp.MVC.Controllers;
 public class EmployeesController : MainController
 {
     private readonly IAspNetUser _appUser;
-    private readonly IUserService _userService;
-    private readonly IUserRepository _userRepository;
+    private readonly IEmployeeService _employeeService;
+    private readonly IEmployeeRepository _userRepository;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly IMapper _mapper;
 
-    public EmployeesController(IAspNetUser appUser, IUserService userService, IUserRepository userRepository, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeService employeeService, IEmployeeRepository userRepository, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper) : base(notifier)
     {
         _appUser = appUser;
-        _userService = userService;
+        _employeeService = employeeService;
         _userRepository = userRepository;
         _userManager = userManager;
         _roleManager = roleManager;
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
         var ps = 8;
-        var usersDb = await _userRepository.GetAllUsers(ps, page, q);
+        var usersDb = await _userRepository.GetAllPagedAsync(ps, page, q);
         var mappedUsers = new PagedViewModel<UserViewModel>
         {
-            List = usersDb.List.Select(p => new UserViewModel (p.Id, p.CompanyId, p.TenantId,p.Name, p.LastName, p.Email.Address, p.PhoneNumber, p.Cpf.Number, p.Role, p.CreatedAt, p.UpdatedAt)),
+            List = usersDb.List.Select(p => new UserViewModel (p.Id, p.CompanyId, p.Name, p.LastName, p.Email.Address, p.PhoneNumber, p.Document.Number, p.Role, p.CreatedAt, p.UpdatedAt)),
             PageIndex = usersDb.PageIndex,
             PageSize = usersDb.PageSize,
             Query = usersDb.Query,
@@ -48,12 +52,12 @@ public class EmployeesController : MainController
     [HttpGet("Details/{id}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _userRepository.GetByIdAsync(id);
         if (userDb is null)
         {
             return NotFound();
         }
-        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Document.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
 
         return View(mappedUser);
     }
@@ -67,38 +71,36 @@ public class EmployeesController : MainController
 
     //[Authorize(Roles = "Admin")]
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(UserViewModel userVM, string returnUrl = null)
+    public async Task<IActionResult> Create(UserViewModel employeeVM, string returnUrl = null)
     {
         var userId = _appUser.GetUserId();
-        var userDb = await _userRepository.GetById(userId);
+        var userDb = await _userRepository.GetByIdAsync(userId);
 
         if (ModelState.IsValid)
         {
             var user = new IdentityUser
             {
-                UserName = userVM.Email,
-                Email = userVM.Email,
+                UserName = employeeVM.Email,
+                Email = employeeVM.Email,
                 EmailConfirmed = true
             };
-            var password = $"{userVM.Cpf[..5]}@{userVM.Name[..1].ToUpper()}{userVM.LastName[..1].ToLower()}";
+            var password = $"{employeeVM.Cpf[..5]}@{employeeVM.Name[..1].ToUpper()}{employeeVM.LastName[..1].ToLower()}";
 
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
             {
                 var role = "Employee";
-                var userMapped = new UserViewModel(Guid.Parse(user.Id), userDb.CompanyId, userDb.TenantId, userVM.Name, userVM.LastName, userVM.Email, userVM.PhoneNumber, userVM.Cpf, role);
+                var userMapped = _mapper.Map<EmployeeViewModel>(user);
                 await AddUser(userMapped);
 
                 if (HasErrorsInResponse(ModelState))
                 {
                     await _userManager.DeleteAsync(user);
-                    return View(userVM);
+                    return View(employeeVM);
                 }
 
-                await _userRepository.UnitOfWork.Commit();
-
-                var tenantIdClaim = new Claim("Tenant", userMapped.TenantId.ToString());
+                var tenantIdClaim = new Claim("Tenant", userMapped.CompanyId.ToString());
                 await _userManager.AddClaimAsync(user, tenantIdClaim);
                 await AddRole(user, role);
                 TempData["Success"] = "Colaborador adicionado com sucesso!";
@@ -113,64 +115,63 @@ public class EmployeesController : MainController
             }
         }
 
-        return View(userVM);
+        return View(employeeVM);
     }
 
     [HttpGet("Edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
     {
         var userLoggedId = _appUser.GetUserId();
-        var userLoggedDb = await _userRepository.GetById(userLoggedId);
+        var userLoggedDb = await _userRepository.GetByIdAsync(userLoggedId);
 
         if (id != userLoggedId && userLoggedDb.Role != "Admin")
         {
             return RedirectToAction("Error", "Home", new { id = 403 });
         }
 
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _userRepository.GetByIdAsync(id);
         if (userDb is null)
         {
             return NotFound();
         }
 
-        UpdateUserViewModel updateUserVM;
+        EmployeeViewModel updateEmployeeVM;
         if (userLoggedDb is not null)
         {
-            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
+            updateEmployeeVM = _mapper.Map<EmployeeViewModel>(userDb);
         }
         else
         {
             return NotFound();
         }
 
-        return View(updateUserVM);
+        return View(updateEmployeeVM);
     }
 
     [HttpPost("Edit/{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, UpdateUserViewModel updateUserVM)
+    public async Task<IActionResult> Edit(Guid id, EmployeeViewModel updateEmployeeVM)
     {
-        if (id != updateUserVM.Id)
+        if (id != updateEmployeeVM.Id)
         {
             return NotFound();
         }
         ModelState.Remove("UpdateUserPasswordViewModel");
         if (!ModelState.IsValid)
         {
-            return View(updateUserVM);
+            return View(updateEmployeeVM);
         }
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _userRepository.GetByIdAsync(id);
 
         if (userDb is null)
         {
             return NotFound();
         }
-        var updateUserResult = await _userService.UpdateUser(id, updateUserVM);
-        if (!updateUserResult.IsValid)
+        await _employeeService.Update(_mapper.Map<Employee>(updateEmployeeVM));
+        if (!IsValidOperation())
         {
-            AddError(updateUserResult);
             TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
-            return View(updateUserVM);
+            return View(updateEmployeeVM);
         }
         TempData["Success"] = "Colaborador atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
@@ -180,12 +181,12 @@ public class EmployeesController : MainController
     [HttpGet("Delete/{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _userRepository.GetByIdAsync(id);
         if (userDb is null)
         {
             return NotFound();
         }
-        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.TenantId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+        var mappedUser = _mapper.Map<EmployeeViewModel>(userDb);
 
         return View(mappedUser);
     }
@@ -195,16 +196,15 @@ public class EmployeesController : MainController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _userRepository.GetByIdAsync(id);
         if (userDb is null)
         {
             return NotFound();
         }
-
-        var deleteUserResult = await _userService.DeleteUser(id);
-        if (!deleteUserResult.IsValid)
+        var mappedUser = _mapper.Map<EmployeeViewModel>(userDb);
+        await _employeeService.Delete(id);
+        if (!IsValidOperation())
         {
-            AddError(deleteUserResult);
             TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
             return RedirectToAction(nameof(Index));
         }
@@ -214,15 +214,11 @@ public class EmployeesController : MainController
 
     private async Task<bool> UserExists(Guid id)
     {
-        return await _userRepository.GetById(id) is not null;
+        return await _userRepository.GetByIdAsync(id) is not null;
     }
-    private async Task AddUser(UserViewModel userVM)
+    private async Task AddUser(EmployeeViewModel employeeVM)
     {
-        var userResult = await _userService.AddUser(userVM);
-        if (!userResult.IsValid)
-        {
-            AddError(userResult);
-        }
+        await _employeeService.Add(_mapper.Map<Employee>(employeeVM));
     }
     private async Task AddRole(IdentityUser user, string roleName)
     {

@@ -1,6 +1,8 @@
-﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+﻿using AutoMapper;
+using EMS.WebApp.Business.Interfaces.Repositories;
+using EMS.WebApp.Business.Utils;
+using EMS.WebApp.MVC.Business.Models;
 using EMS.WebApp.MVC.Business.Models.ViewModels;
-using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;
@@ -8,18 +10,20 @@ namespace EMS.WebApp.MVC.Controllers;
 public class HomeController : Controller
 {
     private readonly IAspNetUser _appUser;
-    private readonly IPlanRepository _iPlanRepository;
+    private readonly IPlanRepository _planRepository;
+    private readonly IMapper _mapper;
 
-    public HomeController(IAspNetUser appUser, IPlanRepository iPlanRepository)
+    public HomeController(IAspNetUser appUser, IPlanRepository planRepository, IMapper mapper)
     {
         _appUser = appUser;
-        _iPlanRepository = iPlanRepository;
+        _planRepository = planRepository;
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> Index()
     {
         if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Dashboard");
-        var plans = (await _iPlanRepository.GetAll()).Select(new PlanViewModel().ToViewModel);
+        var plans = _mapper.Map<List<PlanViewModel>>(await _planRepository.GetAllAsync());
         return View(plans);
     }
 

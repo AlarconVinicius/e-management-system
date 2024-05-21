@@ -1,9 +1,8 @@
-﻿using EMS.WebApp.MVC.Business.DomainObjects;
-using EMS.WebApp.MVC.Extensions;
+﻿using EMS.WebApp.MVC.Extensions;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+namespace EMS.WebApp.MVC.Business.Models;
 
 public class ClientViewModel
 {

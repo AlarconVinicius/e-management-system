@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.Models.ViewModels;
+﻿using EMS.WebApp.MVC.Business.Models;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 

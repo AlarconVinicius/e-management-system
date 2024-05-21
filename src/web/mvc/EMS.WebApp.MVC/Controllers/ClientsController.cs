@@ -1,7 +1,7 @@
-﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+﻿using EMS.WebApp.Business.Interfaces.Repositories;
+using EMS.WebApp.Business.Models;
+using EMS.WebApp.Business.Utils;
 using EMS.WebApp.MVC.Business.Models;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
-using EMS.WebApp.MVC.Business.Utils.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,19 +11,19 @@ public class ClientsController : Controller
 {
     private readonly IClientRepository _clientRepository;
     private readonly IAspNetUser _appUser;
-    private readonly IUserRepository _userRepository;
+    private readonly IEmployeeRepository _employeeRepository;
 
-    public ClientsController(IClientRepository clientRepository, IAspNetUser appUser, IUserRepository userRepository)
+    public ClientsController(IClientRepository clientRepository, IAspNetUser appUser, IEmployeeRepository employeeRepository)
     {
         _clientRepository = clientRepository;
         _appUser = appUser;
-        _userRepository = userRepository;
+        _employeeRepository = employeeRepository;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
         var ps = 8;
-        var clientDb = await _clientRepository.GetAllClients(ps, page, q);
+        var clientDb = await _clientRepository.GetAllPagedAsync(ps, page, q);
         var mappedClients = new PagedViewModel<ClientViewModel>
         {
             List = clientDb.List.Select(p => new ClientViewModel
@@ -34,7 +34,7 @@ public class ClientsController : Controller
                 LastName = p.LastName,
                 Email = p.Email.Address,
                 PhoneNumber = p.PhoneNumber,
-                Cpf = p.Cpf.Number,
+                Cpf = p.Document.Number,
                 IsActive = p.IsActive,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt
@@ -52,7 +52,7 @@ public class ClientsController : Controller
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var clientDb = await _clientRepository.GetById(id);
+        var clientDb = await _clientRepository.GetByIdAsync(id);
         if (clientDb is null)
         {
             return NotFound();
@@ -65,7 +65,7 @@ public class ClientsController : Controller
             LastName = clientDb.LastName,
             Email = clientDb.Email.Address,
             PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Cpf.Number,
+            Cpf = clientDb.Document.Number,
             IsActive = clientDb.IsActive,
             CreatedAt = clientDb.CreatedAt,
             UpdatedAt = clientDb.UpdatedAt
@@ -83,13 +83,13 @@ public class ClientsController : Controller
     public async Task<IActionResult> Create(ClientViewModel client)
     {
         var userId = _appUser.GetUserId();
-        var userDb = await _userRepository.GetById(userId);
+        var userDb = await _employeeRepository.GetByIdAsync(userId);
         var tenantId = _appUser.GetTenantId();
+        var role = "Client"; 
         if (ModelState.IsValid)
         {
-            var mappedClient = new Client(userDb.CompanyId, tenantId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, client.IsActive);
-            _clientRepository.AddClient(mappedClient);
-            await _clientRepository.UnitOfWork.Commit();
+            var mappedClient = new Client(client.Id, userDb.CompanyId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, role);
+            await _clientRepository.AddAsync(mappedClient);
             TempData["Success"] = "Cliente adicionado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
@@ -98,7 +98,7 @@ public class ClientsController : Controller
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var clientDb = await _clientRepository.GetById(id);
+        var clientDb = await _clientRepository.GetByIdAsync(id);
         if (clientDb is null)
         {
             return NotFound();
@@ -110,7 +110,7 @@ public class ClientsController : Controller
             LastName = clientDb.LastName,
             Email = clientDb.Email.Address,
             PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Cpf.Number,
+            Cpf = clientDb.Document.Number,
             IsActive = clientDb.IsActive
 
         };
@@ -130,14 +130,13 @@ public class ClientsController : Controller
         {
             try
             {
-                var clientDb = await _clientRepository.GetById(id);
+                var clientDb = await _clientRepository.GetByIdAsync(id);
                 clientDb.SetName(client.Name);
                 clientDb.SetLastName(client.LastName);
                 clientDb.SetPhoneNumber(client.PhoneNumber);
                 clientDb.SetIsActive(client.IsActive);
 
-                _clientRepository.UpdateClient(clientDb);
-                await _clientRepository.UnitOfWork.Commit();
+                await _clientRepository.UpdateAsync(clientDb);
                 TempData["Success"] = "Cliente atualizado com sucesso!";
             }
             catch (DbUpdateConcurrencyException)
@@ -158,7 +157,7 @@ public class ClientsController : Controller
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var clientDb = await _clientRepository.GetById(id);
+        var clientDb = await _clientRepository.GetByIdAsync(id);
         if (clientDb is null)
         {
             return NotFound();
@@ -171,7 +170,7 @@ public class ClientsController : Controller
             LastName = clientDb.LastName,
             Email = clientDb.Email.Address,
             PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Cpf.Number,
+            Cpf = clientDb.Document.Number,
             IsActive = clientDb.IsActive,
             CreatedAt = clientDb.CreatedAt,
             UpdatedAt = clientDb.UpdatedAt
@@ -184,21 +183,20 @@ public class ClientsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var clientDb = await _clientRepository.GetById(id);
+        var clientDb = await _clientRepository.GetByIdAsync(id);
         if (clientDb is null)
         {
             return NotFound();
         }
 
-        await _clientRepository.DeleteClient(clientDb);
+        await _clientRepository.DeleteAsync(id);
 
-        await _clientRepository.UnitOfWork.Commit();
         TempData["Success"] = "Cliente deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
     private async Task<bool> ClientExists(Guid id)
     {
-        return await _clientRepository.GetById(id) is not null;
+        return await _clientRepository.GetByIdAsync(id) is not null;
     }
 }

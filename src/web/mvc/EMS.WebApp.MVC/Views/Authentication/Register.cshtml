@@ -6,6 +6,7 @@
 <section class="section-content padding-y container">
     <h1 class="text-center fs-4">Seja bem vindo!</h1>
     <form id="signUpForm" asp-action="Register" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+        <vc:Summary></vc:Summary>
         <!-- start step indicators -->
         <div class="form-header d-flex mb-4">
             <span class="stepIndicator">Plano</span>
@@ -19,7 +20,7 @@
         <!-- step zero -->
         <div class="step">
             <h3 class="text-center mb-4">Confirmar Plano</h3>
-            <input type="hidden" asp-for="@Model.RegisterCompany.PlanId" value="@Model.Plan.Id" />
+            <input type="hidden" asp-for="@Model.RegisterCompany.Company.PlanId" value="@Model.Plan.Id" />
             <div class="card-body text-center">
                 <h4 class="title">@Model.Plan.Title</h4>
                 <p class="card-text">@Model.Plan.Subtitle</p>
@@ -43,12 +44,12 @@
         <div class="step">
             <h3 class="text-center mb-4">Dados da Empresa</h3>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.CompanyName" placeholder="Nome da Empresa" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.CompanyName" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Company.Name" placeholder="Nome da Empresa" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Company.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.CpfOrCnpj" placeholder="CPF/CNPJ" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.CpfOrCnpj" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Company.Document" placeholder="CPF/CNPJ" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Company.Document" class="text-danger"></span>
             </div>
         </div>
 
@@ -56,20 +57,20 @@
         <div class="step">
             <h3 class="text-center mb-4">Dados Pessoais</h3>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.Name" placeholder="Nome" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.Name" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Employee.Name" placeholder="Nome" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Employee.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.LastName" placeholder="Sobrenome" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.LastName" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Employee.LastName" placeholder="Sobrenome" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Employee.LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.Cpf" placeholder="CPF" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.Cpf" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Employee.Document" placeholder="CPF" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Employee.Document" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.PhoneNumber" placeholder="Celular" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.PhoneNumber" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Employee.PhoneNumber" placeholder="Celular" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Employee.PhoneNumber" class="text-danger"></span>
             </div>
         </div>
 
@@ -77,8 +78,8 @@
         <div class="step">
             <h3 class="text-center mb-4">Configurações da Conta</h3>
             <div class="form-group">
-                <input asp-for="@Model.RegisterCompany.Email" placeholder="E-mail" class="form-control" />
-                <span asp-validation-for="@Model.RegisterCompany.Email" class="text-danger"></span>
+                <input asp-for="@Model.RegisterCompany.Employee.Email" placeholder="E-mail" class="form-control" />
+                <span asp-validation-for="@Model.RegisterCompany.Employee.Email" class="text-danger"></span>
             </div>
 
             <div class="form-group">

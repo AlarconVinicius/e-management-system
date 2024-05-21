@@ -1,9 +1,9 @@
-﻿using EMS.WebApp.MVC.Data;
+﻿using EMS.WebApp.Data.Context;
+using EMS.WebApp.MVC.Data;
 using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System.Globalization;
 
 namespace EMS.WebApp.MVC.Configuration;

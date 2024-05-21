@@ -1,7 +1,9 @@
-﻿using EMS.WebApp.MVC.Business.Interfaces.Repository;
+﻿using EMS.WebApp.Business.Interfaces.Repositories;
+using EMS.WebApp.Business.Interfaces.Services;
+using EMS.WebApp.Business.Notifications;
+using EMS.WebApp.Business.Utils;
 using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
-using EMS.WebApp.MVC.Business.Utils.User;
+using EMS.WebApp.MVC.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,15 +14,15 @@ namespace EMS.WebApp.MVC.Controllers;
 public class DashboardController : MainController
 {
     private readonly IAspNetUser _appUser;
-    private readonly IUserRepository _userRepository;
-    private readonly IUserService _userService;
+    private readonly IEmployeeRepository _employeeRepository;
+    private readonly IEmployeeService _employeeService;
     private readonly IAuthService _authService;
 
-    public DashboardController(IAspNetUser appUser, IUserRepository userRepository, IUserService userService, IAuthService authService)
+    public DashboardController(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, IEmployeeService employeeService, IAuthService authService) : base(notifier)
     {
         _appUser = appUser;
-        _userRepository = userRepository;
-        _userService = userService;
+        _employeeRepository = employeeRepository;
+        _employeeService = employeeService;
         _authService = authService;
     }
 
@@ -34,12 +36,12 @@ public class DashboardController : MainController
     public async Task<IActionResult> UpdateProfile()
     {
         var id = _appUser.GetUserId();
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _employeeRepository.GetByIdAsync(id);
 
         UpdateUserViewModel updateUserVM;
         if (userDb is not null)
         {
-            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number);
+            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Document.Number);
         }
         else
         {
@@ -59,19 +61,19 @@ public class DashboardController : MainController
             return View(updateUserVM);
         }
         var id = _appUser.GetUserId();
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _employeeRepository.GetByIdAsync(id);
 
         if (userDb is null)
         {
             return NotFound();
         }
-        var updateUserResult = await _userService.UpdateUser(id, updateUserVM);
-        if (!updateUserResult.IsValid)
-        {
-            AddError(updateUserResult);
-            TempData["Failure"] = "Falha ao atualizar usuário: " + string.Join("; ", GetModelStateErrors());
-            return View(updateUserVM);
-        }
+        //var updateUserResult = await _employeeService.Update(new Employee());
+        //if (!updateUserResult.IsValid)
+        //{
+        //    AddError(updateUserResult);
+        //    TempData["Failure"] = "Falha ao atualizar usuário: " + string.Join("; ", GetModelStateErrors());
+        //    return View(updateUserVM);
+        //}
         TempData["Success"] = "Usuário atualizado com sucesso!";
         return RedirectToAction(nameof(UpdateProfile));
     }
@@ -81,11 +83,11 @@ public class DashboardController : MainController
     public async Task<IActionResult> UpdatePassword(UpdateUserViewModel updateUserPasswordVM, string returnUrl = null)
     {
         var id = _appUser.GetUserId();
-        var userDb = await _userRepository.GetById(id);
+        var userDb = await _employeeRepository.GetByIdAsync(id);
         UpdateUserViewModel updateUserVM;
         if (userDb is not null)
         {
-            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Cpf.Number)
+            updateUserVM = new UpdateUserViewModel(userDb.Id, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Document.Number)
             {
                 UpdateUserPasswordViewModel = updateUserPasswordVM.UpdateUserPasswordViewModel
             };

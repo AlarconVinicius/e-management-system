@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+namespace EMS.WebApp.MVC.Business.Models;
 
 public class ProductViewModel
 {
@@ -23,9 +23,6 @@ public class ProductViewModel
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Preço Unitário")]
     public decimal UnitaryValue { get; set; }
-
-    [DisplayName("Imagem")]
-    public string Image { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Ativo")]

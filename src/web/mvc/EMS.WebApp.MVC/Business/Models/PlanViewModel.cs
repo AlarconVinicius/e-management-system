@@ -1,4 +1,6 @@
-﻿namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+﻿using EMS.WebApp.Business.Models;
+
+namespace EMS.WebApp.MVC.Business.Models;
 
 public class PlanViewModel
 {
