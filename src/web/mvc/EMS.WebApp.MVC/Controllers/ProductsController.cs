@@ -2,8 +2,7 @@
 using EMS.WebApp.Business.Interfaces.Repositories;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Utils;
-using EMS.WebApp.MVC.Business.Models;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

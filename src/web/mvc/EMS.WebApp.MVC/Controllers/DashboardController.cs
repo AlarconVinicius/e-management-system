@@ -2,8 +2,9 @@
 using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
-using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.Identity.Business.Interfaces.Services;
+using EMS.WebApp.Identity.Business.Models;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -111,11 +112,10 @@ public class DashboardController : MainController
         {
             return NotFound();
         }
-        var updatePassword = new UpdateUserPasswordViewModel(updateUserPasswordVM.UpdateUserPasswordViewModel.Id, updateUserPasswordVM.UpdateUserPasswordViewModel.OldPassword, updateUserPasswordVM.UpdateUserPasswordViewModel.Password, updateUserPasswordVM.UpdateUserPasswordViewModel.ConfirmPassword);
-        var updatePasswordResult = await _authService.UpdatePassword(id.ToString(), updatePassword);
-        if (!updatePasswordResult.IsValid)
+        var updatePassword = new UpdateUserPassword(updateUserPasswordVM.UpdateUserPasswordViewModel.Id, updateUserPasswordVM.UpdateUserPasswordViewModel.OldPassword, updateUserPasswordVM.UpdateUserPasswordViewModel.Password, updateUserPasswordVM.UpdateUserPasswordViewModel.ConfirmPassword);
+        await _authService.UpdatePassword(updatePassword);
+        if (!IsValidOperation())
         {
-            AddError(updatePasswordResult);
             TempData["Failure"] = "Falha ao atualizar senha: " + string.Join("; ", GetModelStateErrors());
             return View("UpdateProfile", updateUserVM);
         }

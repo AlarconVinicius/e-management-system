@@ -1,4 +1,4 @@
-﻿namespace EMS.WebApp.MVC.Business.Models;
+﻿namespace EMS.WebApp.MVC.Models;
 
 public class PagedViewModel<T> : IPagedList where T : class
 {

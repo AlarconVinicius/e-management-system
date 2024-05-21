@@ -4,7 +4,7 @@ using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
-using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

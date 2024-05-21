@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.MVC.Business.Models;
+﻿using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Extensions;

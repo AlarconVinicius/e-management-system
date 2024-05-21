@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using EMS.WebApp.Business.Models;
-using EMS.WebApp.MVC.Business.Models;
+using EMS.WebApp.MVC.Models;
 
 namespace EMS.WebApp.MVC.Configuration;
 

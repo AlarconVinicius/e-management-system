@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using EMS.WebApp.Business.Interfaces.Repositories;
 using EMS.WebApp.Business.Utils;
-using EMS.WebApp.MVC.Business.Models;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;

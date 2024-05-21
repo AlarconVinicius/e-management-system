@@ -1,6 +1,6 @@
 ﻿using EMS.WebApp.Business.Models;
 
-namespace EMS.WebApp.MVC.Business.Models;
+namespace EMS.WebApp.MVC.Models;
 
 public class PlanViewModel
 {

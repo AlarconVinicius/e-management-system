@@ -1,4 +1,4 @@
-namespace EMS.WebApp.MVC.Business.Models.ViewModels;
+namespace EMS.WebApp.MVC.Models;
 
 public class ErrorViewModel
 {

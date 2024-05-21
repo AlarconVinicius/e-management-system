@@ -4,9 +4,9 @@ using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
-using EMS.WebApp.MVC.Business.Interfaces.Services;
-using EMS.WebApp.MVC.Business.Models;
-using EMS.WebApp.MVC.Business.Models.ViewModels;
+using EMS.WebApp.Identity.Business.Interfaces.Services;
+using EMS.WebApp.Identity.Business.Models;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;
@@ -100,7 +100,7 @@ public class AuthenticationController : MainController
             await _authService.DeleteUser(employeeId.ToString());
             return View(viewModel);
         }
-        var loginUser = new LoginUser
+        var loginUser = new LoginUserViewModel
         {
             Email = registerCompany.Employee.Email,
             Password = registerCompany.Password
@@ -126,7 +126,7 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login(LoginUser loginUser, string returnUrl = null!)
+    public async Task<IActionResult> Login(LoginUserViewModel loginUser, string returnUrl = null!)
     {
         if (!ModelState.IsValid)
         {
@@ -159,11 +159,9 @@ public class AuthenticationController : MainController
             Email = registerCompany.Employee.Email,
             Password = registerCompany.Password
         };
-        var userIdentityResult = await _authService.RegisterUser(identityUser);
-        if (!userIdentityResult.IsValid)
+        await _authService.RegisterUser(identityUser);
+        if (!IsValidOperation())
         {
-            Notify(userIdentityResult);
-            //AddError(userIdentityResult);
             return false;
         }
         return true;
@@ -190,12 +188,16 @@ public class AuthenticationController : MainController
     #endregion
 
     #region AuxLoginMethods
-    private async Task<bool> PerformLogin(LoginUser loginUser)
+    private async Task<bool> PerformLogin(LoginUserViewModel loginUser)
     {
-        var loginResult = await _authService.Login(loginUser);
-        if (!loginResult.IsValid)
+        var loginUserMapped = new LoginUser
         {
-            AddError(loginResult);
+            Email = loginUser.Email,
+            Password = loginUser.Password
+        };
+        await _authService.Login(loginUserMapped);
+        if (!IsValidOperation())
+        {
             return false;
         }
         return true;

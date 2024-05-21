@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EMS.WebApp.MVC.Business.Models;
+namespace EMS.WebApp.MVC.Models;
 
 public class UserViewModel
 {
@@ -73,7 +73,7 @@ public class UserViewModel
     }
 }
 
-public class RegisterUser
+public class RegisterUserViewModel
 {
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     public Guid Id { get; set; }
@@ -92,7 +92,7 @@ public class RegisterUser
     public string Password { get; set; } = string.Empty;
 }
 
-public class LoginUser
+public class LoginUserViewModel
 {
     [Required(ErrorMessage = "O campo {0} é obrigatório.")]
     [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido.")]

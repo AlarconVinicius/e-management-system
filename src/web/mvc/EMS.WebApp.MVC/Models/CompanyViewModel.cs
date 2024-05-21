@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EMS.WebApp.MVC.Business.Models;
+namespace EMS.WebApp.MVC.Models;
 
 public class CompanyViewModel
 {
