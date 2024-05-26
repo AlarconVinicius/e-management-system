@@ -35,14 +35,14 @@ public class EmployeesController : MainController
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
         var ps = 8;
-        var usersDb = await _userRepository.GetAllPagedAsync(ps, page, q);
-        var mappedUsers = new PagedViewModel<UserViewModel>
+        var employeesDb = await _userRepository.GetAllPagedAsync(ps, page, q);
+        var mappedUsers = new PagedViewModel<EmployeeViewModel>
         {
-            List = usersDb.List.Select(p => new UserViewModel (p.Id, p.CompanyId, p.Name, p.LastName, p.Email.Address, p.PhoneNumber, p.Document.Number, p.Role, p.CreatedAt, p.UpdatedAt)),
-            PageIndex = usersDb.PageIndex,
-            PageSize = usersDb.PageSize,
-            Query = usersDb.Query,
-            TotalResults = usersDb.TotalResults
+            List = _mapper.Map<List<EmployeeViewModel>>(employeesDb.List),
+            PageIndex = employeesDb.PageIndex,
+            PageSize = employeesDb.PageSize,
+            Query = employeesDb.Query,
+            TotalResults = employeesDb.TotalResults
         };
         ViewBag.Search = q;
         mappedUsers.ReferenceAction = "Index";
@@ -52,12 +52,12 @@ public class EmployeesController : MainController
     [HttpGet("Details/{id}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var userDb = await _userRepository.GetByIdAsync(id);
-        if (userDb is null)
+        var employeeDb = await _userRepository.GetByIdAsync(id);
+        if (employeeDb is null)
         {
             return NotFound();
         }
-        var mappedUser = new UserViewModel(userDb.Id, userDb.CompanyId, userDb.Name, userDb.LastName, userDb.Email.Address, userDb.PhoneNumber, userDb.Document.Number, userDb.Role, userDb.CreatedAt, userDb.UpdatedAt);
+        var mappedUser = _mapper.Map<EmployeeViewModel>(employeeDb);
 
         return View(mappedUser);
     }
@@ -71,11 +71,8 @@ public class EmployeesController : MainController
 
     //[Authorize(Roles = "Admin")]
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(UserViewModel employeeVM, string returnUrl = null)
+    public async Task<IActionResult> Create(EmployeeViewModel employeeVM, string returnUrl = null)
     {
-        var userId = _appUser.GetUserId();
-        var userDb = await _userRepository.GetByIdAsync(userId);
-
         if (ModelState.IsValid)
         {
             var user = new IdentityUser
@@ -84,13 +81,13 @@ public class EmployeesController : MainController
                 Email = employeeVM.Email,
                 EmailConfirmed = true
             };
-            var password = $"{employeeVM.Cpf[..5]}@{employeeVM.Name[..1].ToUpper()}{employeeVM.LastName[..1].ToLower()}";
+            var password = GeneratePassword(employeeVM);
 
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
             {
-                var role = "Employee";
+                var role = ERole.Employee.ToString();
                 var userMapped = _mapper.Map<EmployeeViewModel>(user);
                 await AddUser(userMapped);
 
@@ -156,7 +153,6 @@ public class EmployeesController : MainController
         {
             return NotFound();
         }
-        ModelState.Remove("UpdateUserPasswordViewModel");
         if (!ModelState.IsValid)
         {
             return View(updateEmployeeVM);
@@ -250,6 +246,11 @@ public class EmployeesController : MainController
                 }
             }
         }
+    }
+
+    private string GeneratePassword(EmployeeViewModel employeeVM)
+    {
+        return $"{employeeVM.Document[..5]}@{employeeVM.Name[..1].ToUpper()}{employeeVM.LastName[..1].ToLower()}";
     }
 
 }

@@ -1,5 +1,5 @@
 ﻿@using EMS.WebApp.MVC.Extensions;
-@model PagedViewModel<UserViewModel>
+@model PagedViewModel<EmployeeViewModel>
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Colaboradores";
@@ -61,7 +61,7 @@
                         <td>@employee.LastName</td>
                         <td>@employee.Email</td>
                         <td>@employee.PhoneNumber</td>
-                        <td>@employee.Cpf</td>
+                        <td>@employee.Document</td>
                         <td>@(employee.IsActive ? "Ativo" : "Desativado")</td>
                         <td>@this.FormatDate(employee.CreatedAt)</td>
                         <td>@this.FormatDate(employee.UpdatedAt)</td>
