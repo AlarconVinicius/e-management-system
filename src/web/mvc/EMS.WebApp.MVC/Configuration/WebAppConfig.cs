@@ -1,7 +1,4 @@
-﻿using EMS.WebApp.Business.Configuration;
-using EMS.WebApp.Data.Configuration;
-using EMS.WebApp.Data.Context;
-using EMS.WebApp.Identity.Configuration;
+﻿using EMS.WebApp.Data.Context;
 using EMS.WebApp.Identity.Data;
 using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Localization;
@@ -14,7 +11,11 @@ public static class WebAppConfig
 {
     public static void AddMvcConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllersWithViews();
+        services.AddControllersWithViews()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressModelStateInvalidFilter = true;
+                }); ;
 
         services.ConfigureApplicationCookie(options =>
         {
