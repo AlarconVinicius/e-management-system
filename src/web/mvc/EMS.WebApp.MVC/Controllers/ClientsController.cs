@@ -1,23 +1,29 @@
-﻿using EMS.WebApp.Business.Interfaces.Repositories;
+﻿using AutoMapper;
+using EMS.WebApp.Business.Interfaces.Repositories;
+using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Models;
+using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EMS.WebApp.MVC.Controllers;
 
-public class ClientsController : Controller
+public class ClientsController : MainController
 {
     private readonly IClientRepository _clientRepository;
+    private readonly IClientService _clientService;
     private readonly IAspNetUser _appUser;
     private readonly IEmployeeRepository _employeeRepository;
+    private readonly IMapper _mapper;
 
-    public ClientsController(IClientRepository clientRepository, IAspNetUser appUser, IEmployeeRepository employeeRepository)
+    public ClientsController(INotifier notifier, IClientRepository clientRepository, IAspNetUser appUser, IEmployeeRepository employeeRepository, IClientService clientService, IMapper mapper) : base(notifier)
     {
         _clientRepository = clientRepository;
         _appUser = appUser;
         _employeeRepository = employeeRepository;
+        _clientService = clientService;
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
@@ -26,19 +32,7 @@ public class ClientsController : Controller
         var clientDb = await _clientRepository.GetAllPagedAsync(ps, page, q);
         var mappedClients = new PagedViewModel<ClientViewModel>
         {
-            List = clientDb.List.Select(p => new ClientViewModel
-            {
-                Id = p.Id,
-                CompanyId = p.CompanyId,
-                Name = p.Name,
-                LastName = p.LastName,
-                Email = p.Email.Address,
-                PhoneNumber = p.PhoneNumber,
-                Cpf = p.Document.Number,
-                IsActive = p.IsActive,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }),
+            List = _mapper.Map<List<ClientViewModel>>(clientDb.List),
             PageIndex = clientDb.PageIndex,
             PageSize = clientDb.PageSize,
             Query = clientDb.Query,
@@ -57,19 +51,7 @@ public class ClientsController : Controller
         {
             return NotFound();
         }
-        var mappedClient = new ClientViewModel
-        {
-            Id = clientDb.Id,
-            CompanyId = clientDb.CompanyId,
-            Name = clientDb.Name,
-            LastName = clientDb.LastName,
-            Email = clientDb.Email.Address,
-            PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Document.Number,
-            IsActive = clientDb.IsActive,
-            CreatedAt = clientDb.CreatedAt,
-            UpdatedAt = clientDb.UpdatedAt
-        };
+        var mappedClient = _mapper.Map<ClientViewModel>(clientDb);
         return View(mappedClient);
     }
 
@@ -82,14 +64,18 @@ public class ClientsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ClientViewModel client)
     {
-        var userId = _appUser.GetUserId();
-        var userDb = await _employeeRepository.GetByIdAsync(userId);
         var tenantId = _appUser.GetTenantId();
-        var role = "Client"; 
+        var role = ERole.Client.ToString(); 
         if (ModelState.IsValid)
         {
-            var mappedClient = new Client(client.Id, userDb.CompanyId, client.Name, client.LastName, client.Email, client.PhoneNumber, client.Cpf, role);
-            await _clientRepository.AddAsync(mappedClient);
+            client.CompanyId = tenantId;
+            var mappedClient = _mapper.Map<Client>(client);
+            mappedClient.SetRole(role);
+            await _clientService.Add(mappedClient);
+            if (!IsValidOperation())
+            {
+                return View(client);
+            }
             TempData["Success"] = "Cliente adicionado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
@@ -103,53 +89,29 @@ public class ClientsController : Controller
         {
             return NotFound();
         }
-        var mappedClient = new UpdateClientViewModel
-        {
-            Id = clientDb.Id,
-            Name = clientDb.Name,
-            LastName = clientDb.LastName,
-            Email = clientDb.Email.Address,
-            PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Document.Number,
-            IsActive = clientDb.IsActive
-
-        };
+        var mappedClient = _mapper.Map<ClientViewModel>(clientDb);
         return View(mappedClient);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, UpdateClientViewModel client)
+    public async Task<IActionResult> Edit(Guid id, ClientViewModel client)
     {
         if (id != client.Id)
         {
             return NotFound();
         }
-
+        ModelState.Remove("Cpf");
         if (ModelState.IsValid)
         {
-            try
-            {
-                var clientDb = await _clientRepository.GetByIdAsync(id);
-                clientDb.SetName(client.Name);
-                clientDb.SetLastName(client.LastName);
-                clientDb.SetPhoneNumber(client.PhoneNumber);
-                clientDb.SetIsActive(client.IsActive);
+            var mappedClient = _mapper.Map<Client>(client);
+            await _clientService.Update(mappedClient);
 
-                await _clientRepository.UpdateAsync(clientDb);
-                TempData["Success"] = "Cliente atualizado com sucesso!";
-            }
-            catch (DbUpdateConcurrencyException)
+            if (!IsValidOperation())
             {
-                if (!await ClientExists(client.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return View(client);
             }
+            TempData["Success"] = "Cliente atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
         return View(client);
@@ -162,19 +124,7 @@ public class ClientsController : Controller
         {
             return NotFound();
         }
-        var mappedProduct = new ClientViewModel
-        {
-            Id = clientDb.Id,
-            CompanyId = clientDb.CompanyId,
-            Name = clientDb.Name,
-            LastName = clientDb.LastName,
-            Email = clientDb.Email.Address,
-            PhoneNumber = clientDb.PhoneNumber,
-            Cpf = clientDb.Document.Number,
-            IsActive = clientDb.IsActive,
-            CreatedAt = clientDb.CreatedAt,
-            UpdatedAt = clientDb.UpdatedAt
-        };
+        var mappedProduct = _mapper.Map<ClientViewModel>(clientDb);
 
         return View(mappedProduct);
     }
@@ -189,7 +139,12 @@ public class ClientsController : Controller
             return NotFound();
         }
 
-        await _clientRepository.DeleteAsync(id);
+        await _clientService.Delete(id);
+
+        if (!IsValidOperation())
+        {
+            return View(_mapper.Map<ClientViewModel>(clientDb));
+        }
 
         TempData["Success"] = "Cliente deletado com sucesso!";
         return RedirectToAction(nameof(Index));

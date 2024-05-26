@@ -48,6 +48,10 @@ public abstract class User : Entity
     {
         Email = new Email(email);
     }
+    public void SetRole(string role)
+    {
+        Role = role;
+    }
     public void SetIsActive(bool isActive)
     {
         IsActive = isActive;
