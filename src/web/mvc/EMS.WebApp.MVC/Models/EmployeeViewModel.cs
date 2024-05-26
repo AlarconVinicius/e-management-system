@@ -41,7 +41,7 @@ public class EmployeeViewModel
     public string Role { get; set; }
 
     [DisplayName("Ativo")]
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     [DisplayName("Data de Cadastro")]
     public DateTime CreatedAt { get; set; }

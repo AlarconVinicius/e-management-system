@@ -26,6 +26,9 @@ public class CompanyViewModel
     [DisplayName("CPF/CNPJ")]
     public string Document { get; set; }
 
+    [DisplayName("Ativo")]
+    public bool IsActive { get; set; } = true;
+
     public CompanyViewModel() { }
 
     public CompanyViewModel(Guid id, Guid planId, string name, string document, string brand = "")
