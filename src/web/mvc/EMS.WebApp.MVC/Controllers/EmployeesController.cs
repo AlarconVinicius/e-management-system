@@ -121,7 +121,7 @@ public class EmployeesController : MainController
         var userLoggedId = _appUser.GetUserId();
         var userLoggedDb = await _userRepository.GetByIdAsync(userLoggedId);
 
-        if (id != userLoggedId && userLoggedDb.Role != "Admin")
+        if (id != userLoggedId && userLoggedDb.Role != ERole.Admin)
         {
             return RedirectToAction("Error", "Home", new { id = 403 });
         }

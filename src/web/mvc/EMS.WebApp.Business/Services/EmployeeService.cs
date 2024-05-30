@@ -30,7 +30,7 @@ public class EmployeeService : MainService, IEmployeeService
 
         var employeeDb = await _employeeRepository.GetByIdAsync(employee.Id);
 
-        if (employee.Id != employeeDb.Id && employeeDb.Role != "Admin")
+        if (employee.Id != employeeDb.Id && employeeDb.Role != ERole.Admin)
         {
             Notify("Usuário não encontrado.");
             return;

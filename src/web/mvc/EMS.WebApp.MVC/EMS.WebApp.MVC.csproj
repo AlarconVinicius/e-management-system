@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\building blocks\EMS.Core\EMS.Core.csproj" />
 	  <ProjectReference Include="..\EMS.WebApp.Business\EMS.WebApp.Business.csproj" />
 	  <ProjectReference Include="..\EMS.WebApp.Data\EMS.WebApp.Data.csproj" />
 	  <ProjectReference Include="..\EMS.WebApp.Identity\EMS.WebApp.Identity.csproj" />

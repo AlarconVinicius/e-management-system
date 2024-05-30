@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EMS.Core.Enums;
 using EMS.WebApp.Business.Interfaces.Repositories;
 using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Models;
@@ -73,7 +74,7 @@ public class AuthenticationController : MainController
         registerCompany.Company.Brand = "";
         registerCompany.Employee.Id = employeeId;
         registerCompany.Employee.CompanyId = companyId;
-        registerCompany.Employee.Role = "Admin";
+        registerCompany.Employee.Role = ERoleCore.Admin;
         if (!await AddCompany(registerCompany.Company))
         {
             return View(viewModel);
@@ -155,7 +156,7 @@ public class AuthenticationController : MainController
         var identityUser = new RegisterUser
         {
             Id = registerCompany.Employee.Id,
-            Role = registerCompany.Employee.Role,
+            Role = nameof(registerCompany.Employee.Role),
             Email = registerCompany.Employee.Email,
             Password = registerCompany.Password
         };

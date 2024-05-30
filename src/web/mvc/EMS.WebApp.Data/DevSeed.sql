@@ -24,7 +24,7 @@ GO
 -- Inserindo usuários customizados
 INSERT [dbo].[Users] ([Id], [CompanyId], [Name], [LastName], [Email], [PhoneNumber], [Cpf], [Role], [IsActive], [CreatedAt], [UpdatedAt]) 
 VALUES 
-    (N'ef65d0b9-a0df-45d1-a4af-66e95679b8b5', N'3eb1ed86-802c-4355-8045-482c274ac6ca', N'Vinícius', N'Alarcon', N'alarcon@gmail.com', N'21991911558', N'64280963070', N'Admin', 1, GETUTCDATE(), GETUTCDATE());
+    (N'ef65d0b9-a0df-45d1-a4af-66e95679b8b5', N'3eb1ed86-802c-4355-8045-482c274ac6ca', N'Vinícius', N'Alarcon', N'alarcon@gmail.com', N'21991911558', N'64280963070', 1, 1, GETUTCDATE(), GETUTCDATE());
 GO
 
 -- Inserindo roles

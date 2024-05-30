@@ -21,6 +21,10 @@ public class UserMapping : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasColumnType("varchar(200)");
 
+        builder.Property(c => c.Role)
+            .IsRequired()
+            .HasColumnType("SMALLINT");
+
         builder.Property(c => c.LastName)
             .IsRequired()
             .HasColumnType("varchar(200)");

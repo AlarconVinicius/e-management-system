@@ -65,7 +65,7 @@ public class ClientsController : MainController
     public async Task<IActionResult> Create(ClientViewModel client)
     {
         var tenantId = _appUser.GetTenantId();
-        var role = ERole.Client.ToString(); 
+        var role = ERole.Client; 
         if (ModelState.IsValid)
         {
             client.CompanyId = tenantId;
@@ -95,7 +95,7 @@ public class ClientsController : MainController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, ClientViewModel client)
+    public async Task<IActionResult> Edit(Guid id, [Bind("Id,CompanyId,Name,LastName,Email,PhoneNumber,IsActive")] ClientViewModel client)
     {
         if (id != client.Id)
         {

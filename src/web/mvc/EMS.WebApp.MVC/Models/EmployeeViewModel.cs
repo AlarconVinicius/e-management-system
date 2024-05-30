@@ -1,4 +1,5 @@
-﻿using EMS.WebApp.MVC.Extensions;
+﻿using EMS.Core.Enums;
+using EMS.WebApp.MVC.Extensions;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,8 +38,8 @@ public class EmployeeViewModel
     [DisplayName("Salário")]
     public decimal Salary { get; set; }
 
-    [DisplayName("Tipo")]
-    public string Role { get; set; }
+    [DisplayName("Permissão")]
+    public ERoleCore Role { get; set; }
 
     [DisplayName("Ativo")]
     public bool IsActive { get; set; } = true;
@@ -51,7 +52,7 @@ public class EmployeeViewModel
 
 
     public EmployeeViewModel() { }
-    public EmployeeViewModel(string name, string lastName, string email, string phoneNumber, string cpf, string role, decimal salary)
+    public EmployeeViewModel(string name, string lastName, string email, string phoneNumber, string cpf, ERoleCore role, decimal salary)
     {
         Name = name;
         LastName = lastName;
@@ -62,7 +63,7 @@ public class EmployeeViewModel
         Role = role;
         Salary = salary;
     }
-    public EmployeeViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, string role, decimal salary)
+    public EmployeeViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, ERoleCore role, decimal salary)
     {
         Id = id;
         CompanyId = companyId;
@@ -75,7 +76,7 @@ public class EmployeeViewModel
         Role = role;
         Salary = salary;
     }
-    public EmployeeViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, string role, decimal salary, DateTime createdAt, DateTime updatedAt)
+    public EmployeeViewModel(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, ERoleCore role, decimal salary, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
         CompanyId = companyId;
