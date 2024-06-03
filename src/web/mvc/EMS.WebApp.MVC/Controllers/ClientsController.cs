@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using EMS.Core.Handlers;
+﻿using EMS.Core.Handlers;
 using EMS.Core.Requests.Clients;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Clients;
-using EMS.WebApp.Business.Interfaces.Repositories;
-using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Mappings;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
@@ -18,7 +15,6 @@ public class ClientsController : MainController
 {
     private readonly IClientHandler _clientHandler;
     private readonly IAspNetUser _appUser;
-    private readonly IEmployeeRepository _employeeRepository;
 
     public ClientsController(INotifier notifier, IAspNetUser appUser, IClientHandler clientHandler) : base(notifier)
     {
@@ -48,12 +44,12 @@ public class ClientsController : MainController
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var clientDb = await GetById(id);
-        if (clientDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-        return View(clientDb);
+        return View(response);
     }
 
     public IActionResult Create()
@@ -65,28 +61,29 @@ public class ClientsController : MainController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateClientRequest request)
     {
-        var role = ERole.Client; 
-        if (ModelState.IsValid)
+        var role = ERole.Client;
+        if (!ModelState.IsValid)
         {
-            request.CompanyId = GetTenant();
-            request.Role = role.MapERoleToERoleCore();
-            var result = await _clientHandler.CreateAsync(request);
-            
-            if (result != null && !result.IsSuccess)
-            {
-                Notify(result.Message);
-                TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-                return View(request);
-            }
-            if (!IsValidOperation())
-            {
-                TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-                return View(request);
-            }
-            TempData["Success"] = "Cliente adicionado com sucesso!";
-            return RedirectToAction(nameof(Index));
+            return View(request);
         }
-        return View(request);
+
+        request.CompanyId = GetTenant();
+        request.Role = role.MapERoleToERoleCore();
+        var result = await _clientHandler.CreateAsync(request);
+            
+        if (result != null && !result.IsSuccess)
+        {
+            Notify(result.Message);
+            TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
+        }
+        if (!IsValidOperation())
+        {
+            TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
+        }
+        TempData["Success"] = "Cliente adicionado com sucesso!";
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Edit(Guid id)
@@ -109,26 +106,27 @@ public class ClientsController : MainController
         {
             return NotFound();
         }
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            request.CompanyId = GetTenant();
-            var result = await _clientHandler.UpdateAsync(request);
-
-            if (result != null && !result.IsSuccess)
-            {
-                Notify(result.Message);
-                TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-                return View(request);
-            }
-            if (!IsValidOperation())
-            {
-                TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-                return View(request);
-            }
-            TempData["Success"] = "Cliente atualizado com sucesso!";
-            return RedirectToAction(nameof(Index));
+            return View(request);
         }
-        return View(request);
+
+        request.CompanyId = GetTenant();
+        var result = await _clientHandler.UpdateAsync(request);
+
+        if (result != null && !result.IsSuccess)
+        {
+            Notify(result.Message);
+            TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
+        }
+        if (!IsValidOperation())
+        {
+            TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
+        }
+        TempData["Success"] = "Cliente atualizado com sucesso!";
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Delete(Guid id)
