@@ -1,6 +1,11 @@
 ﻿using AutoMapper;
+using EMS.Core.Handlers;
+using EMS.Core.Requests.Clients;
+using EMS.Core.Responses;
+using EMS.Core.Responses.Clients;
 using EMS.WebApp.Business.Interfaces.Repositories;
 using EMS.WebApp.Business.Interfaces.Services;
+using EMS.WebApp.Business.Mappings;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
@@ -11,32 +16,29 @@ namespace EMS.WebApp.MVC.Controllers;
 
 public class ClientsController : MainController
 {
-    private readonly IClientRepository _clientRepository;
-    private readonly IClientService _clientService;
+    private readonly IClientHandler _clientHandler;
     private readonly IAspNetUser _appUser;
     private readonly IEmployeeRepository _employeeRepository;
-    private readonly IMapper _mapper;
 
-    public ClientsController(INotifier notifier, IClientRepository clientRepository, IAspNetUser appUser, IEmployeeRepository employeeRepository, IClientService clientService, IMapper mapper) : base(notifier)
+    public ClientsController(INotifier notifier, IAspNetUser appUser, IClientHandler clientHandler) : base(notifier)
     {
-        _clientRepository = clientRepository;
         _appUser = appUser;
-        _employeeRepository = employeeRepository;
-        _clientService = clientService;
-        _mapper = mapper;
+        _clientHandler = clientHandler;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
-        var ps = 8;
-        var clientDb = await _clientRepository.GetAllPagedAsync(ps, page, q);
-        var mappedClients = new PagedViewModel<ClientViewModel>
+        var ps = 10;
+        var request = new GetAllClientsRequest { PageNumber = page , PageSize = ps, Query = q};
+        var response = await _clientHandler.GetAllAsync(request);
+
+        var mappedClients = new PagedViewModel<ClientResponse>
         {
-            List = _mapper.Map<List<ClientViewModel>>(clientDb.List),
-            PageIndex = clientDb.PageIndex,
-            PageSize = clientDb.PageSize,
-            Query = clientDb.Query,
-            TotalResults = clientDb.TotalResults
+            List = response.Data,
+            PageIndex = request.PageNumber,
+            PageSize = request.PageSize,
+            Query = request.Query,
+            TotalResults = response.TotalCount
         };
         ViewBag.Search = q;
         mappedClients.ReferenceAction = "Index";
@@ -46,13 +48,12 @@ public class ClientsController : MainController
 
     public async Task<IActionResult> Details(Guid id)
     {
-        var clientDb = await _clientRepository.GetByIdAsync(id);
+        var clientDb = await GetById(id);
         if (clientDb is null)
         {
             return NotFound();
         }
-        var mappedClient = _mapper.Map<ClientViewModel>(clientDb);
-        return View(mappedClient);
+        return View(clientDb);
     }
 
     public IActionResult Create()
@@ -62,96 +63,113 @@ public class ClientsController : MainController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(ClientViewModel client)
+    public async Task<IActionResult> Create(CreateClientRequest request)
     {
-        var tenantId = _appUser.GetTenantId();
         var role = ERole.Client; 
         if (ModelState.IsValid)
         {
-            client.CompanyId = tenantId;
-            var mappedClient = _mapper.Map<Client>(client);
-            mappedClient.SetRole(role);
-            await _clientService.Add(mappedClient);
+            request.CompanyId = GetTenant();
+            request.Role = role.MapERoleToERoleCore();
+            var result = await _clientHandler.CreateAsync(request);
+            
+            if (result != null && !result.IsSuccess)
+            {
+                Notify(result.Message);
+                TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+                return View(request);
+            }
             if (!IsValidOperation())
             {
-                return View(client);
+                TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+                return View(request);
             }
             TempData["Success"] = "Cliente adicionado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
-        return View(client);
+        return View(request);
     }
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var clientDb = await _clientRepository.GetByIdAsync(id);
-        if (clientDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-        var mappedClient = _mapper.Map<ClientViewModel>(clientDb);
-        return View(mappedClient);
+        var request = new UpdateClientRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.IsActive);
+        ViewBag.Cpf = response.Data.Cpf;
+        return View(request);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, [Bind("Id,CompanyId,Name,LastName,Email,PhoneNumber,IsActive")] ClientViewModel client)
+    public async Task<IActionResult> Edit(Guid id, UpdateClientRequest request)
     {
-        if (id != client.Id)
+        if (id != request.Id)
         {
             return NotFound();
         }
-        ModelState.Remove("Cpf");
         if (ModelState.IsValid)
         {
-            var mappedClient = _mapper.Map<Client>(client);
-            await _clientService.Update(mappedClient);
+            request.CompanyId = GetTenant();
+            var result = await _clientHandler.UpdateAsync(request);
 
+            if (result != null && !result.IsSuccess)
+            {
+                Notify(result.Message);
+                TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+                return View(request);
+            }
             if (!IsValidOperation())
             {
-                return View(client);
+                TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+                return View(request);
             }
             TempData["Success"] = "Cliente atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
-        return View(client);
+        return View(request);
     }
 
     public async Task<IActionResult> Delete(Guid id)
     {
-        var clientDb = await _clientRepository.GetByIdAsync(id);
-        if (clientDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-        var mappedProduct = _mapper.Map<ClientViewModel>(clientDb);
 
-        return View(mappedProduct);
+        return View(response);
     }
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var clientDb = await _clientRepository.GetByIdAsync(id);
-        if (clientDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
 
-        await _clientService.Delete(id);
+        await _clientHandler.DeleteAsync(new DeleteClientRequest { Id = id });
 
         if (!IsValidOperation())
         {
-            return View(_mapper.Map<ClientViewModel>(clientDb));
+            TempData["Failure"] = "Falha ao deletar cliente: " + string.Join("; ", await GetNotificationErrors());
+            return View(response);
         }
 
         TempData["Success"] = "Cliente deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<bool> ClientExists(Guid id)
+    private Guid GetTenant()
     {
-        return await _clientRepository.GetByIdAsync(id) is not null;
+        return _appUser.GetTenantId();
+    }
+    private async Task<Response<ClientResponse>> GetById(Guid id)
+    {
+        return await _clientHandler.GetByIdAsync(new GetClientByIdRequest { Id = id });
     }
 }

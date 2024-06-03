@@ -1,4 +1,5 @@
-﻿@model ClientViewModel
+﻿@using EMS.Core.Requests.Clients;
+@model UpdateClientRequest
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Editar Cliente";
@@ -14,6 +15,7 @@
         <div class="row">
             <div class="col-md-4">
                 <form asp-action="Edit">
+                    <vc:Summary></vc:Summary>
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="Name" class="control-label"></label>
@@ -26,9 +28,8 @@
                         <span asp-validation-for="LastName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Cpf" class="control-label"></label>
-                        <input asp-for="Cpf" class="form-control" disabled/>
-                        <span asp-validation-for="Cpf" class="text-danger"></span>
+                        <label class="control-label">Cpf</label>
+                        <p class="form-control disabled">@ViewBag.Cpf</p>
                     </div>
                     <div class="form-group">
                         <label asp-for="Email" class="control-label"></label>

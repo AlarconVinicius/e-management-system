@@ -35,4 +35,17 @@ public class CreateClientRequest : CompaniesRequest
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
+
+    public CreateClientRequest()
+    {}
+    public CreateClientRequest(Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, ERoleCore role, bool isActive) : base(companyId)
+    {
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Cpf = cpf;
+        Role = role;
+        IsActive = isActive;
+    }
 }

@@ -27,4 +27,18 @@ public class UpdateClientRequest : CompaniesRequest
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
+
+    public UpdateClientRequest()
+    {
+        
+    }
+    public UpdateClientRequest(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, bool isActive) : base(companyId)
+    {
+        Id = id;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        IsActive = isActive;
+    }
 }

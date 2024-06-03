@@ -3,4 +3,13 @@
 public class DeleteClientRequest : CompaniesRequest
 {
     public Guid Id { get; set; }
+
+    public DeleteClientRequest()
+    {
+        
+    }
+    public DeleteClientRequest(Guid id, Guid companyId) : base(companyId)
+    {
+        Id = id;
+    }
 }

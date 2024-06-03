@@ -1,4 +1,6 @@
-﻿using EMS.WebApp.Business.Interfaces.Services;
+﻿using EMS.Core.Handlers;
+using EMS.WebApp.Business.Handlers;
+using EMS.WebApp.Business.Interfaces.Services;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Services;
 using EMS.WebApp.Business.Utils;
@@ -16,6 +18,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<IClientHandler, ClientHandler>();
 
         return services;
     }

@@ -53,7 +53,14 @@ public class MainController : Controller
         ModelState.AddModelError(string.Empty, message);
     }
 
-    protected List<string> GetModelStateErrors()
+    protected async Task<List<string>> GetNotificationErrors()
+    {
+        var errors = new List<string>();
+        var notificacoes = await Task.FromResult(_notifier.GetNotifications());
+        notificacoes.ForEach(c => ViewData.ModelState.AddModelError(string.Empty, c.Message));
+        errors.AddRange(notificacoes.Select(error => error.Message));
+        return errors;
+    }protected List<string> GetModelStateErrors()
     {
         var errors = new List<string>();
         if (!ModelState.IsValid)

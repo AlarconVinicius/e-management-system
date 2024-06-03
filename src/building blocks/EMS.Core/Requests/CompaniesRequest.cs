@@ -8,4 +8,13 @@ public abstract class CompaniesRequest : Request
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Id da Empresa")]
     public Guid CompanyId { get; set; }
+
+    protected CompaniesRequest()
+    {
+        
+    }
+    protected CompaniesRequest(Guid companyId)
+    {
+        CompanyId = companyId;
+    }
 }

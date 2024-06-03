@@ -1,9 +1,11 @@
-﻿@model ClientViewModel
+﻿@using EMS.Core.Requests.Clients;
+@model CreateClientRequest
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Adicionar Cliente";
 }
 
+<vc:Notification></vc:Notification>
 <div class="card border-0 col-md-12">
     <div class="card-header d-flex justify-content-between">
         <h5 class="card-title">
