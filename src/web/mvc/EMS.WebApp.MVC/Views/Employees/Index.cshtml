@@ -1,5 +1,6 @@
-﻿@using EMS.WebApp.MVC.Extensions;
-@model PagedViewModel<EmployeeViewModel>
+﻿@using EMS.Core.Responses.Employees;
+@using EMS.WebApp.MVC.Extensions;
+@model PagedViewModel<EmployeeResponse>
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Colaboradores";
@@ -55,7 +56,6 @@
                 @foreach (var employee in Model.List)
                 {
                     <tr>
-                        @* <td>@(itemIndex + 1)</td> *@
                         <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
                         <td>@employee.Name</td>
                         <td>@employee.LastName</td>

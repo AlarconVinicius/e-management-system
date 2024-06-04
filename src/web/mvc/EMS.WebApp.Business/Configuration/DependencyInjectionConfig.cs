@@ -19,6 +19,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<IClientHandler, ClientHandler>();
+        services.AddScoped<IEmployeeHandler, EmployeeHandler>();
         services.AddScoped<IProductHandler, ProductHandler>();
 
         return services;

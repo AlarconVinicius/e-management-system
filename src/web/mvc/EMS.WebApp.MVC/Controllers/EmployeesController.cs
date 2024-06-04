@@ -1,65 +1,61 @@
-﻿using AutoMapper;
-using EMS.WebApp.Business.Interfaces.Repositories;
-using EMS.WebApp.Business.Interfaces.Services;
+﻿using EMS.Core.Handlers;
+using EMS.Core.Requests.Employees;
+using EMS.Core.Responses;
+using EMS.Core.Responses.Employees;
+using EMS.WebApp.Business.Mappings;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
+using EMS.WebApp.Identity.Business.Interfaces.Services;
+using EMS.WebApp.Identity.Business.Models;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace EMS.WebApp.MVC.Controllers;
 
 [Authorize]
 public class EmployeesController : MainController
 {
+    private readonly IEmployeeHandler _employeeHandler;
+    private readonly IAuthService _authService;
     private readonly IAspNetUser _appUser;
-    private readonly IEmployeeService _employeeService;
-    private readonly IEmployeeRepository _userRepository;
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IMapper _mapper;
 
-    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeService employeeService, IEmployeeRepository userRepository, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper) : base(notifier)
+    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeHandler employeeHandler, IAuthService authService) : base(notifier)
     {
         _appUser = appUser;
-        _employeeService = employeeService;
-        _userRepository = userRepository;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _mapper = mapper;
+        _employeeHandler = employeeHandler;
+        _authService = authService;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
-        var ps = 8;
-        var employeesDb = await _userRepository.GetAllPagedAsync(ps, page, q);
-        var mappedUsers = new PagedViewModel<EmployeeViewModel>
+        var ps = 10;
+        var request = new GetAllEmployeesRequest { PageNumber = page, PageSize = ps, Query = q };
+        var response = await _employeeHandler.GetAllAsync(request);
+
+        var mappedClients = new PagedViewModel<EmployeeResponse>
         {
-            List = _mapper.Map<List<EmployeeViewModel>>(employeesDb.List),
-            PageIndex = employeesDb.PageIndex,
-            PageSize = employeesDb.PageSize,
-            Query = employeesDb.Query,
-            TotalResults = employeesDb.TotalResults
+            List = response.Data,
+            PageIndex = request.PageNumber,
+            PageSize = request.PageSize,
+            Query = request.Query,
+            TotalResults = response.TotalCount
         };
         ViewBag.Search = q;
-        mappedUsers.ReferenceAction = "Index";
-        return View(mappedUsers);
+        mappedClients.ReferenceAction = "Index";
+
+        return View(mappedClients);
     }
 
-    [HttpGet("Details/{id}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var employeeDb = await _userRepository.GetByIdAsync(id);
-        if (employeeDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-        var mappedUser = _mapper.Map<EmployeeViewModel>(employeeDb);
-
-        return View(mappedUser);
+        return View(response);
     }
 
     //[Authorize(Roles = "Admin")]
@@ -71,186 +67,173 @@ public class EmployeesController : MainController
 
     //[Authorize(Roles = "Admin")]
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(EmployeeViewModel employeeVM, string returnUrl = null)
+    public async Task<IActionResult> Create(CreateEmployeeRequest request, string returnUrl = null)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var user = new IdentityUser
-            {
-                UserName = employeeVM.Email,
-                Email = employeeVM.Email,
-                EmailConfirmed = true
-            };
-            var password = GeneratePassword(employeeVM);
+            return View(request);
+        }
+        Guid id = Guid.NewGuid();
+        var role = ERole.Employee;
+        request.Id = id;
+        request.CompanyId = GetTenant();
+        request.Role = role.MapERoleToERoleCore();
 
-            var result = await _userManager.CreateAsync(user, password);
+        var result = await _employeeHandler.CreateAsync(request);
 
-            if (result.Succeeded)
-            {
-                var role = ERole.Employee.ToString();
-                var userMapped = _mapper.Map<EmployeeViewModel>(user);
-                await AddUser(userMapped);
-
-                if (HasErrorsInResponse(ModelState))
-                {
-                    await _userManager.DeleteAsync(user);
-                    return View(employeeVM);
-                }
-
-                var tenantIdClaim = new Claim("Tenant", userMapped.CompanyId.ToString());
-                await _userManager.AddClaimAsync(user, tenantIdClaim);
-                await AddRole(user, role);
-                TempData["Success"] = "Colaborador adicionado com sucesso!";
-                if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index");
-
-                return LocalRedirect(returnUrl);
-            }
-
-            foreach (var error in result.Errors)
-            {
-                AddError(error.Description);
-            }
+        if (result != null && !result.IsSuccess)
+        {
+            Notify(result.Message);
+            TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
         }
 
-        return View(employeeVM);
+        if (!await AddIdentityUser(request))
+        {
+            TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
+            await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+            return View(request);
+        }
+
+        await _authService.AddOrUpdateUserClaim(request.Id.ToString(), "Tenant", request.CompanyId.ToString());
+
+        if (!IsValidOperation())
+        {
+            await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+            await _authService.DeleteUser(request.Id.ToString());
+            return View(request);
+
+        }
+        TempData["Success"] = "Colaborador adicionado com sucesso!";
+        return RedirectToAction(nameof(Index));
     }
 
-    [HttpGet("Edit/{id}")]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var userLoggedId = _appUser.GetUserId();
-        var userLoggedDb = await _userRepository.GetByIdAsync(userLoggedId);
-
-        if (id != userLoggedId && userLoggedDb.Role != ERole.Admin)
-        {
-            return RedirectToAction("Error", "Home", new { id = 403 });
-        }
-
-        var userDb = await _userRepository.GetByIdAsync(id);
-        if (userDb is null)
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-
-        EmployeeViewModel updateEmployeeVM;
-        if (userLoggedDb is not null)
-        {
-            updateEmployeeVM = _mapper.Map<EmployeeViewModel>(userDb);
-        }
-        else
-        {
-            return NotFound();
-        }
-
-        return View(updateEmployeeVM);
+        var request = new UpdateEmployeeRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.Salary, response.Data.Role, response.Data.IsActive);
+        ViewBag.Document = response.Data.Document;
+        return View(request);
     }
 
-    [HttpPost("Edit/{id}")]
+    [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, EmployeeViewModel updateEmployeeVM)
+    public async Task<IActionResult> Edit(Guid id, UpdateEmployeeRequest request)
     {
-        if (id != updateEmployeeVM.Id)
+        if (id != request.Id)
         {
             return NotFound();
         }
         if (!ModelState.IsValid)
         {
-            return View(updateEmployeeVM);
+            return View(request);
         }
-        var userDb = await _userRepository.GetByIdAsync(id);
 
-        if (userDb is null)
+        request.CompanyId = GetTenant();
+        var identityUser = await _authService.GetUserById(request.Id.ToString());
+        if (identityUser != null && identityUser.Email != request.Email)
         {
-            return NotFound();
+            await _authService.UpdateUserEmail(request.Id.ToString(), request.Email);
+            if (!IsValidOperation())
+            {
+                TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
+                return View(request);
+            }
         }
-        await _employeeService.Update(_mapper.Map<Employee>(updateEmployeeVM));
+        var result = await _employeeHandler.UpdateAsync(request);
+
+        if (result != null && !result.IsSuccess)
+        {
+            Notify(result.Message);
+            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
+        }
         if (!IsValidOperation())
         {
-            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
-            return View(updateEmployeeVM);
+            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
+            return View(request);
         }
         TempData["Success"] = "Colaborador atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet("Delete/{id}")]
+    //[Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var userDb = await _userRepository.GetByIdAsync(id);
-        if (userDb is null)
+        var identityUser = await _authService.GetUserById(id.ToString());
+        var response = await GetById(id);
+        if (response is null)
         {
             return NotFound();
         }
-        var mappedUser = _mapper.Map<EmployeeViewModel>(userDb);
+        if (identityUser is null)
+        {
+            return NotFound();
+        }
 
-        return View(mappedUser);
+        return View(response);
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPost("Delete/{id}"), ActionName("Delete")]
+    //[Authorize(Roles = "Admin")]
+    [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(Guid id)
     {
-        var userDb = await _userRepository.GetByIdAsync(id);
-        if (userDb is null)
+        var response = await GetById(id);
+        var identityUser = await _authService.GetUserById(id.ToString());
+        if (response is null)
         {
             return NotFound();
         }
-        var mappedUser = _mapper.Map<EmployeeViewModel>(userDb);
-        await _employeeService.Delete(id);
+        if (identityUser is null)
+        {
+            return NotFound();
+        }
+        await _authService.DeleteUser(id.ToString());
+        await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+
         if (!IsValidOperation())
         {
-            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", GetModelStateErrors());
-            return RedirectToAction(nameof(Index));
+            TempData["Failure"] = "Falha ao deletar colaborador: " + string.Join("; ", await GetNotificationErrors());
+            return View(response);
         }
+
         TempData["Success"] = "Colaborador deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task<bool> UserExists(Guid id)
+    private async Task<bool> AddIdentityUser(CreateEmployeeRequest request)
     {
-        return await _userRepository.GetByIdAsync(id) is not null;
-    }
-    private async Task AddUser(EmployeeViewModel employeeVM)
-    {
-        await _employeeService.Add(_mapper.Map<Employee>(employeeVM));
-    }
-    private async Task AddRole(IdentityUser user, string roleName)
-    {
-        var roleExists = await _roleManager.RoleExistsAsync(roleName);
-
-        if (!roleExists)
+        var identityUser = new RegisterUser
         {
-            var role = new IdentityRole(roleName);
-            var createRoleResult = await _roleManager.CreateAsync(role);
-
-            if (!createRoleResult.Succeeded)
-            {
-                foreach (var error in createRoleResult.Errors)
-                {
-                    AddError(error.Description);
-                }
-            }
-        }
-
-        if (user != null)
+            Id = request.Id,
+            Role = request.Role.ToString(),
+            Email = request.Email,
+            Password = GeneratePassword(request)
+        };
+        await _authService.RegisterUser(identityUser);
+        if (!IsValidOperation())
         {
-            var addToRoleResult = await _userManager.AddToRoleAsync(user, roleName);
-
-            if (!addToRoleResult.Succeeded)
-            {
-                foreach (var error in addToRoleResult.Errors)
-                {
-                    AddError(error.Description);
-                }
-            }
+            return false;
         }
+        return true;
+    }
+    private Guid GetTenant()
+    {
+        return _appUser.GetTenantId();
+    }
+    private async Task<Response<EmployeeResponse>> GetById(Guid id)
+    {
+        return await _employeeHandler.GetByIdAsync(new GetEmployeeByIdRequest { Id = id });
     }
 
-    private string GeneratePassword(EmployeeViewModel employeeVM)
+    private static string GeneratePassword(CreateEmployeeRequest request)
     {
-        return $"{employeeVM.Document[..5]}@{employeeVM.Name[..1].ToUpper()}{employeeVM.LastName[..1].ToLower()}";
+        return $"{request.Document[..5]}@{request.Name[..1].ToUpper()}{request.LastName[..1].ToLower()}";
     }
 
 }

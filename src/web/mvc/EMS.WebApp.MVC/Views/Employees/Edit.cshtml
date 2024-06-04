@@ -1,12 +1,11 @@
-﻿@model EmployeeViewModel
+﻿@using EMS.Core.Requests.Employees;
+@model UpdateEmployeeRequest
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Editar Colaborador";
 }
 
-@* <div class="mb-3">
-    <h4>Produtos</h4>
-</div> *@
+<vc:Notification></vc:Notification>
 <div class="card border-0 col-md-12">
     <div class="card-header d-flex justify-content-between">
         <h5 class="card-title">
@@ -39,9 +38,8 @@
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Document" class="control-label"></label>
-                        <input asp-for="Document" type="text" class="form-control" />
-                        <span asp-validation-for="Document" class="text-danger"></span>
+                        <label class="control-label">Documento</label>
+                        <p class="form-control disabled">@ViewBag.Document</p>
                     </div>
                     <div class="form-group form-check">
                         <label class="form-check-label">
