@@ -21,6 +21,16 @@ public class Product : Entity
         IsActive = isActive;
     }
 
+    public Product(Guid id, Guid companyId, string title, string description, decimal unitaryValue, bool isActive)
+    {
+        SetId(id);
+        CompanyId = companyId;
+        Title = title;
+        Description = description;
+        UnitaryValue = unitaryValue;
+        IsActive = isActive;
+    }
+
     #region Setters
     public void SetTitle(string title)
     {

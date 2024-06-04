@@ -1,5 +1,6 @@
-﻿@using EMS.WebApp.MVC.Extensions;
-@model PagedViewModel<ProductViewModel>
+﻿@using EMS.Core.Responses.Products;
+@using EMS.WebApp.MVC.Extensions;
+@model PagedViewModel<ProductResponse>
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Produtos";
@@ -53,7 +54,6 @@
                 @foreach (var product in Model.List)
                 {
                     <tr>
-                        @* <td>@(itemIndex + 1)</td> *@
                         <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
                         <td>@product.Title</td>
                         <td>@product.Description</td>

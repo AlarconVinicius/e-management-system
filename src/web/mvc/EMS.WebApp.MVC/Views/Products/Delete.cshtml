@@ -1,4 +1,6 @@
-﻿@model ProductViewModel
+﻿@using EMS.Core.Responses;
+@using EMS.Core.Responses.Products;
+@model Response<ProductResponse>
 
 @{
     Layout = "_LayoutAdmin";
@@ -8,7 +10,7 @@
 <div class="card border-0 col-md-12">
     <div class="card-header d-flex justify-content-between">
         <h5 class="card-title">
-            Você tem certeza que deseja deletar o Produto: @Model.Title
+            Você tem certeza que deseja deletar o Produto: @Model.Data.Title
         </h5>
     </div>
     <div class="card-body">
@@ -16,33 +18,33 @@
             <div class="col-md-4">
                 <dl class="row">
                     <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Title)
+                        @Html.DisplayNameFor(model => model.Data.Title)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Title)
+                        @Html.DisplayFor(model => model.Data.Title)
                     </dd>
                     <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Description)
+                        @Html.DisplayNameFor(model => model.Data.Description)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Description)
+                        @Html.DisplayFor(model => model.Data.Description)
                     </dd>
                     <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.UnitaryValue)
+                        @Html.DisplayNameFor(model => model.Data.UnitaryValue)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.UnitaryValue)
+                        @Html.DisplayFor(model => model.Data.UnitaryValue)
                     </dd>
                     <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.IsActive)
+                        @Html.DisplayNameFor(model => model.Data.IsActive)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.IsActive)
+                        @Html.DisplayFor(model => model.Data.IsActive)
                     </dd>
                 </dl>
 
                 <form asp-action="Delete" class="form-group mt-3">
-                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="@Model.Data.Id" />
                     <a asp-action="Index" class="btn btn-warning me-3">Voltar</a>
                     <input type="submit" value="Deletar" class="btn btn-danger" />
                 </form>
