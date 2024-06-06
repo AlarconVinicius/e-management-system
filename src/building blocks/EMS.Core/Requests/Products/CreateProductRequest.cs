@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMS.Core.Requests.Products;
+
 public class CreateProductRequest : CompaniesRequest
 { 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
@@ -21,23 +22,14 @@ public class CreateProductRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
 
-    [DisplayName("Data de Cadastro")]
-    public DateTime CreatedAt { get; set; }
 
-    [DisplayName("Data de Modificação")]
-    public DateTime UpdatedAt { get; set; }
+    public CreateProductRequest() { }
 
-
-    public CreateProductRequest()
-    { }
-
-    public CreateProductRequest(Guid companyId, string title, string description, decimal unitaryValue, bool isActive, DateTime createdAt, DateTime updatedAt) : base(companyId)
+    public CreateProductRequest(Guid companyId, string title, string description, decimal unitaryValue, bool isActive) : base(companyId)
     {
         Title = title;
         Description = description;
         UnitaryValue = unitaryValue;
         IsActive = isActive;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
     }
 }

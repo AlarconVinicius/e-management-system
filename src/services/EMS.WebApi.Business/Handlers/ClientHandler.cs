@@ -1,78 +1,88 @@
 ﻿using EMS.Core.Handlers;
+using EMS.Core.Notifications;
 using EMS.Core.Requests.Clients;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Clients;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.Core.Notifications;
 using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
+
 public class ClientHandler : MainService, IClientHandler
 {
     public readonly IClientRepository _clientRepository;
+    public readonly ICompanyRepository _companyRepository;
 
-    public ClientHandler(INotifier notifier, IAspNetUser appUser, IClientRepository clientRepository) : base(notifier, appUser)
+    public ClientHandler(INotifier notifier, IAspNetUser appUser, IClientRepository clientRepository, ICompanyRepository companyRepository) : base(notifier, appUser)
     {
         _clientRepository = clientRepository;
+        _companyRepository = companyRepository;
     }
 
-    public async Task<Response<ClientResponse>> GetByIdAsync(GetClientByIdRequest request)
+    public async Task<ClientResponse> GetByIdAsync(GetClientByIdRequest request)
     {
+        if (TenantIsEmpty()) return null;
         try
         {
-            var client = await _clientRepository.GetByIdAsync(request.Id);
+            var client = await _clientRepository.GetByIdAsync(request.Id, TenantId);
 
-            return client is null
-                ? new Response<ClientResponse>(null, 200, "Cliente não encontrado.")
-                : new Response<ClientResponse>(client.MapClientToClientResponse());
+            if (client is null)
+            {
+                Notify("Cliente não encontrado.");
+                return null;
+            }
+            return client.MapClientToClientResponse();
         }
         catch
         {
-            return new Response<ClientResponse>(null, 500, "Não foi possível recuperar o cliente.");
+            Notify("Não foi possível recuperar o cliente.");
+            return null;
         }
     }
 
-    public async Task<PagedResponse<List<ClientResponse>>> GetAllAsync(GetAllClientsRequest request)
+    public async Task<PagedResponse<ClientResponse>> GetAllAsync(GetAllClientsRequest request)
     {
+        if (TenantIsEmpty()) return null;
         try
         {
-            var clients = await _clientRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
-
-            return new PagedResponse<List<ClientResponse>>(
-                clients.List.Select(x => x.MapClientToClientResponse()).ToList(),
-                clients.TotalResults,
-                clients.PageIndex,
-                clients.PageSize);
+            return (await _clientRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, TenantId, request.Query)).MapPagedClientsToPagedResponseClients();
         }
         catch
         {
-            return new PagedResponse<List<ClientResponse>>(null, 500, "Não foi possível consultar os clientes.");
+            Notify("Não foi possível consultar os clientes.");
+            return null;
         }
     }
 
-    public async Task<Response<ClientResponse>> CreateAsync(CreateClientRequest request)
+    public async Task CreateAsync(CreateClientRequest request)
     {
         //if (!ExecuteValidation(new ClientValidation(), client)) return;
-        if (IsCpfInUse(request.Cpf, request.CompanyId)) return null;
+        if (TenantIsEmpty()) return;
+        if (IsCpfInUse(request.Document, TenantId)) return;
+        if (!CompanyExists(TenantId)) return;
+
+        request.CompanyId = TenantId;
         var clientMapped = request.MapCreateClientRequestToClient();
         try
         {
             await _clientRepository.AddAsync(clientMapped);
-            return new Response<ClientResponse>(clientMapped.MapClientToClientResponse(), 201, "Cliente criado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ClientResponse>(null, 500, "Não foi possível criar o cliente.");
+            Notify("Não foi possível criar o cliente.");
+            return;
         }
     }
 
-    public async Task<Response<ClientResponse>> UpdateAsync(UpdateClientRequest request)
+    public async Task UpdateAsync(UpdateClientRequest request)
     {
         //if (!ExecuteValidation(new ClientValidation(), client)) return;
-        if (!await UserExists(request.Id)) return null;
-        var clientDb = await _clientRepository.GetByIdAsync(request.Id);
+        if (TenantIsEmpty()) return;
+        if (!UserExists(request.Id, TenantId)) return;
+        var clientDb = await _clientRepository.GetByIdAsync(request.Id, TenantId);
 
         try
         {
@@ -88,27 +98,30 @@ public class ClientHandler : MainService, IClientHandler
 
             await _clientRepository.UpdateAsync(clientDb);
 
-            return new Response<ClientResponse>(null, 204, "Cliente atualizado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ClientResponse>(null, 500, "Não foi possível atualizar o cliente.");
+            Notify("Não foi possível atualizar o cliente.");
+            return;
         }
     }
 
-    public async Task<Response<ClientResponse>> DeleteAsync(DeleteClientRequest request)
+    public async Task DeleteAsync(DeleteClientRequest request)
     {
+        if (TenantIsEmpty()) return;
         try
         {
-            if (!await UserExists(request.Id)) return null;
+            if (!UserExists(request.Id, TenantId)) return;
 
             await _clientRepository.DeleteAsync(request.Id);
 
-            return new Response<ClientResponse>(null, 204, "Cliente deletado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ClientResponse>(null, 500, "Não foi possível deletar o cliente.");
+            Notify("Não foi possível deletar o cliente.");
+            return;
         }
     }
 
@@ -122,16 +135,25 @@ public class ClientHandler : MainService, IClientHandler
         return false;
     }
 
-    private async Task<bool> UserExists(Guid id)
+    private bool UserExists(Guid id, Guid companyId)
     {
-        var userExist = await _clientRepository.GetByIdAsync(id);
-
-        if (userExist != null)
+        if (_clientRepository.SearchAsync(f => f.Id == id && f.CompanyId == companyId).Result.Any())
         {
             return true;
         };
 
         Notify("Usuário não encontrado.");
+        return false;
+    }
+
+    private bool CompanyExists(Guid companyId)
+    {
+        if (_companyRepository.GetByIdAsync(companyId).Result is not null)
+        {
+            return true;
+        };
+
+        Notify("TenantId não encontrado.");
         return false;
     }
 }

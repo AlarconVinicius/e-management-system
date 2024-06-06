@@ -23,10 +23,7 @@ public class UpdateProductRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
 
-    public UpdateProductRequest()
-    {
-        
-    }
+    public UpdateProductRequest() { }
 
     public UpdateProductRequest(Guid id, Guid companyId, string title, string description, decimal unitaryValue, bool isActive) : base(companyId)
     {

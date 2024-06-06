@@ -9,69 +9,80 @@ using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
+
 public class ProductHandler : MainService, IProductHandler
 {
     public readonly IProductRepository _productRepository;
+    public readonly ICompanyRepository _companyRepository;
 
-    public ProductHandler(INotifier notifier, IAspNetUser appUser, IProductRepository productRepository) : base(notifier, appUser)
+    public ProductHandler(INotifier notifier, IAspNetUser appUser, IProductRepository productRepository, ICompanyRepository companyRepository) : base(notifier, appUser)
     {
         _productRepository = productRepository;
+        _companyRepository = companyRepository;
     }
 
-    public async Task<Response<ProductResponse>> GetByIdAsync(GetProductByIdRequest request)
+    public async Task<ProductResponse> GetByIdAsync(GetProductByIdRequest request)
     {
+        if (TenantIsEmpty()) return null;
         try
         {
-            var product = await _productRepository.GetByIdAsync(request.Id);
+            var product = await _productRepository.GetByIdAsync(request.Id, TenantId);
 
-            return product is null
-                ? new Response<ProductResponse>(null, 200, "Produto não encontrado.")
-                : new Response<ProductResponse>(product.MapProductToProductResponse());
+            if (product is null)
+            {
+                Notify("Produto não encontrado.");
+                return null;
+            }
+            return product.MapProductToProductResponse();
         }
         catch
         {
-            return new Response<ProductResponse>(null, 500, "Não foi possível recuperar o produto.");
+            Notify("Não foi possível recuperar o produto.");
+            return null;
         }
     }
 
-    public async Task<PagedResponse<List<ProductResponse>>> GetAllAsync(GetAllProductsRequest request)
+    public async Task<PagedResponse<ProductResponse>> GetAllAsync(GetAllProductsRequest request)
     {
+        if (TenantIsEmpty()) return null;
         try
         {
-            var products = await _productRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
-
-            return new PagedResponse<List<ProductResponse>>(
-                products.List.Select(x => x.MapProductToProductResponse()).ToList(),
-                products.TotalResults,
-                products.PageIndex,
-                products.PageSize);
+            return (await _productRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, TenantId, request.Query)).MapPagedProductsToPagedResponseProducts();
         }
         catch
         {
-            return new PagedResponse<List<ProductResponse>>(null, 500, "Não foi possível consultar os produtos.");
+            Notify("Não foi possível consultar os produtos.");
+            return null;
         }
     }
 
-    public async Task<Response<ProductResponse>> CreateAsync(CreateProductRequest request)
+    public async Task CreateAsync(CreateProductRequest request)
     {
         //if (!ExecuteValidation(new ProductValidation(), product)) return;
+        if (TenantIsEmpty()) return;
+        if (!CompanyExists(TenantId)) return;
+
+        request.CompanyId = TenantId;
         var productMapped = request.MapCreateProductRequestToProduct();
         try
         {
             await _productRepository.AddAsync(productMapped);
-            return new Response<ProductResponse>(productMapped.MapProductToProductResponse(), 201, "Produto criado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ProductResponse>(null, 500, "Não foi possível criar o produto.");
+            Notify("Não foi possível criar o produto.");
+            return;
         }
     }
 
-    public async Task<Response<ProductResponse>> UpdateAsync(UpdateProductRequest request)
+    public async Task UpdateAsync(UpdateProductRequest request)
     {
         //if (!ExecuteValidation(new ProductValidation(), product)) return;
-        if (!await ProductExists(request.Id)) return null;
-        var productDb = await _productRepository.GetByIdAsync(request.Id);
+        if (TenantIsEmpty()) return;
+        if (!ProductExists(request.Id, TenantId)) return;
+
+        var productDb = await _productRepository.GetByIdAsync(request.Id, TenantId);
 
         try
         {
@@ -82,40 +93,52 @@ public class ProductHandler : MainService, IProductHandler
 
             await _productRepository.UpdateAsync(productDb);
 
-            return new Response<ProductResponse>(null, 204, "Produto atualizado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ProductResponse>(null, 500, "Não foi possível atualizar o produto.");
+            Notify("Não foi possível atualizar o produto.");
+            return;
         }
     }
 
-    public async Task<Response<ProductResponse>> DeleteAsync(DeleteProductRequest request)
+    public async Task DeleteAsync(DeleteProductRequest request)
     {
+        if (TenantIsEmpty()) return;
         try
         {
-            if (!await ProductExists(request.Id)) return null;
+            if (!ProductExists(request.Id, TenantId)) return;
 
             await _productRepository.DeleteAsync(request.Id);
 
-            return new Response<ProductResponse>(null, 204, "Produto deletado com sucesso!");
+            return;
         }
         catch
         {
-            return new Response<ProductResponse>(null, 500, "Não foi possível deletar o produto.");
+            Notify("Não foi possível deletar o produto.");
+            return;
         }
     }
 
-    private async Task<bool> ProductExists(Guid id)
+    private bool ProductExists(Guid id, Guid companyId)
     {
-        var productExist = await _productRepository.GetByIdAsync(id);
-
-        if (productExist != null)
+        if (_productRepository.SearchAsync(f => f.Id == id && f.CompanyId == companyId).Result.Any())
         {
             return true;
         };
 
         Notify("Produto não encontrado.");
+        return false;
+    }
+
+    private bool CompanyExists(Guid companyId)
+    {
+        if (_companyRepository.GetByIdAsync(companyId).Result is not null)
+        {
+            return true;
+        };
+
+        Notify("TenantId não encontrado.");
         return false;
     }
 }

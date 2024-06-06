@@ -28,10 +28,8 @@ public class UpdateClientRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
 
-    public UpdateClientRequest()
-    {
-        
-    }
+    public UpdateClientRequest() { }
+
     public UpdateClientRequest(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, bool isActive) : base(companyId)
     {
         Id = id;

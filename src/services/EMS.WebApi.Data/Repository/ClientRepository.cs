@@ -1,55 +1,43 @@
 ﻿using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Models;
-using EMS.WebApi.Business.Utils;
 using EMS.WebApi.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace EMS.WebApi.Data.Repository;
 
 public class ClientRepository : Repository<Client>, IClientRepository
 {
-    private readonly IAspNetUser _aspNetUser;
-    private readonly Guid _tenantId;
-
-    public ClientRepository(EMSDbContext context, IAspNetUser aspNetUser) : base (context)
+    public ClientRepository(EMSDbContext context) : base (context)
     {
-        _aspNetUser = aspNetUser;
-
-        _tenantId = _aspNetUser.GetTenantId() != Guid.Empty ? _aspNetUser.GetTenantId() : Guid.Empty;
     }
 
-    public override async Task<IEnumerable<Client>> SearchAsync(Expression<Func<Client, bool>> predicate)
+    public async Task<Client> GetByIdAsync(Guid id, Guid tenantId)
     {
-        return await DbSet.AsNoTracking()
-                          .Where(p => p.CompanyId == _tenantId)
-                          .Where(predicate)
-                          .ToListAsync();
+        if (tenantId == Guid.Empty) return null;
+
+        return await DbSet.FirstOrDefaultAsync(c => c.Id == id && c.CompanyId == tenantId) ?? null;
     }
 
-    public async override Task<Client> GetByIdAsync(Guid id)
+    public async Task<PagedResult<Client>> GetAllPagedAsync(int pageSize, int pageIndex, Guid tenantId, string query = null)
     {
-        return await DbSet.Where(p => p.CompanyId == _tenantId)
-                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
-    }
+        if (tenantId == Guid.Empty) return null;
 
-    public async Task<PagedResult<Client>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
-    {
-        var clientsQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == _tenantId);
+        var responseQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == tenantId);
+
         if (!string.IsNullOrEmpty(query))
         {
-            clientsQuery = clientsQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
+            responseQuery = responseQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
         }
-        var users = await clientsQuery.OrderBy(p => p.Name)
-                                      .ThenByDescending(p => p.UpdatedAt)
-                                      .Skip(pageSize * (pageIndex - 1))
-                                      .Take(pageSize)
-                                      .ToListAsync();
-        var total = await clientsQuery.CountAsync();
+        var result = await responseQuery.OrderBy(p => p.Name)
+                                        .ThenByDescending(p => p.UpdatedAt)
+                                        .Skip(pageSize * (pageIndex - 1))
+                                        .Take(pageSize)
+                                        .ToListAsync();
+        var total = await responseQuery.CountAsync();
 
         return new PagedResult<Client>()
         {
-            List = users,
+            List = result,
             TotalResults = total,
             PageIndex = pageIndex,
             PageSize = pageSize,

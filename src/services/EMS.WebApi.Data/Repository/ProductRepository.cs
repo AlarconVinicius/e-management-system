@@ -9,48 +9,37 @@ namespace EMS.WebApi.Data.Repository;
 
 public class ProductRepository : Repository<Product>, IProductRepository
 {
-    private readonly IAspNetUser _aspNetUser;
-    private readonly Guid _tenantId;
-
-    public ProductRepository(EMSDbContext context, IAspNetUser aspNetUser) : base (context)
+    public ProductRepository(EMSDbContext context) : base (context)
     {
-        _aspNetUser = aspNetUser;
-
-        _tenantId = _aspNetUser.GetTenantId() != Guid.Empty ? _aspNetUser.GetTenantId() : Guid.Empty;
     }
 
-    public override async Task<IEnumerable<Product>> SearchAsync(Expression<Func<Product, bool>> predicate)
+    public async Task<Product> GetByIdAsync(Guid id, Guid tenantId)
     {
-        return await DbSet.AsNoTracking()
-                                .Where(p => p.CompanyId == _tenantId)
-                                .Where(predicate)
-                                .ToListAsync();
+        if (tenantId == Guid.Empty) return null;
+
+        return await DbSet.FirstOrDefaultAsync(c => c.Id == id && c.CompanyId == tenantId) ?? null;
     }
 
-    public async override Task<Product> GetByIdAsync(Guid id)
+    public async Task<PagedResult<Product>> GetAllPagedAsync(int pageSize, int pageIndex, Guid tenantId, string query = null)
     {
-        return await DbSet.Where(p => p.CompanyId == _tenantId)
-                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
-    }
+        if (tenantId == Guid.Empty) return null;
 
-    public async Task<PagedResult<Product>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null)
-    {
-        var productsQuery = DbSet.Where(p => p.CompanyId == _tenantId).AsNoTracking();
+        var responseQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == tenantId);
 
         if (!string.IsNullOrEmpty(query))
         {
-            productsQuery = productsQuery.Where(p => p.Title.Contains(query));
+            responseQuery = responseQuery.Where(p => p.Title.Contains(query));
         }
-        var users = await productsQuery.OrderBy(p => p.Title)
+        var result = await responseQuery.OrderBy(p => p.Title)
                                        .ThenByDescending(p => p.UpdatedAt)
                                        .Skip(pageSize * (pageIndex - 1))
                                        .Take(pageSize)
                                        .ToListAsync();
-        var total = await productsQuery.CountAsync();
+        var total = await responseQuery.CountAsync();
 
         return new PagedResult<Product>()
         {
-            List = users,
+            List = result,
             TotalResults = total,
             PageIndex = pageIndex,
             PageSize = pageSize,

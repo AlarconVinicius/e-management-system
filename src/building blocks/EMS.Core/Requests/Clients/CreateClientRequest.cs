@@ -4,6 +4,7 @@ using EMS.Core.Extensions;
 using EMS.Core.Enums;
 
 namespace EMS.Core.Requests.Clients;
+
 public class CreateClientRequest : CompaniesRequest
 {
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
@@ -25,8 +26,8 @@ public class CreateClientRequest : CompaniesRequest
 
     [Cpf]
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("CPF")]
-    public string Cpf { get; set; }
+    [DisplayName("Documento")]
+    public string Document { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Permissão")]
@@ -36,15 +37,15 @@ public class CreateClientRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
 
-    public CreateClientRequest()
-    {}
-    public CreateClientRequest(Guid companyId, string name, string lastName, string email, string phoneNumber, string cpf, ERoleCore role, bool isActive) : base(companyId)
+    public CreateClientRequest() { }
+
+    public CreateClientRequest(Guid companyId, string name, string lastName, string email, string phoneNumber, string document, ERoleCore role, bool isActive) : base(companyId)
     {
         Name = name;
         LastName = lastName;
         Email = email;
         PhoneNumber = phoneNumber;
-        Cpf = cpf;
+        Document = document;
         Role = role;
         IsActive = isActive;
     }

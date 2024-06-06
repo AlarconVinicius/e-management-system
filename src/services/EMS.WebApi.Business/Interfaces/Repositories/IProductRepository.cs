@@ -4,5 +4,6 @@ namespace EMS.WebApi.Business.Interfaces.Repositories;
 
 public interface IProductRepository : IRepository<Product>
 {
-    Task<PagedResult<Product>> GetAllPagedAsync(int pageSize, int pageIndex, string query = null);
+    Task<Product> GetByIdAsync(Guid id, Guid tenantId);
+    Task<PagedResult<Product>> GetAllPagedAsync(int pageSize, int pageIndex, Guid tenantId, string query = null);
 }

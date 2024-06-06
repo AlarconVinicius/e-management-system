@@ -1,4 +1,5 @@
 ﻿using EMS.Core.Requests.Products;
+using EMS.Core.Responses;
 using EMS.Core.Responses.Products;
 using EMS.WebApi.Business.Models;
 
@@ -13,17 +14,7 @@ public static class ProductMappings
             return null;
         }
 
-        return new ProductResponse
-        {
-            Id = product.Id,
-            CompanyId = product.CompanyId,
-            Title = product.Title,
-            Description = product.Description,
-            UnitaryValue = product.UnitaryValue,
-            IsActive = product.IsActive,
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
-        };
+        return new ProductResponse(product.Id, product.CompanyId, product.Title, product.Description, product.UnitaryValue, product.IsActive, product.CreatedAt, product.UpdatedAt);
     }
 
     public static Product MapProductResponseToProduct(this ProductResponse productResponse)
@@ -34,6 +25,16 @@ public static class ProductMappings
         }
         
         return new Product(productResponse.Id, productResponse.CompanyId, productResponse.Title, productResponse.Description, productResponse.UnitaryValue, productResponse.IsActive);
+    }
+
+    public static PagedResponse<ProductResponse> MapPagedProductsToPagedResponseProducts(this PagedResult<Product> product)
+    {
+        if (product == null)
+        {
+            return null;
+        }
+
+        return new PagedResponse<ProductResponse>(product.List.Select(x => x.MapProductToProductResponse()).ToList(), product.TotalResults, product.PageIndex, product.PageSize);
     }
 
     public static Product MapCreateProductRequestToProduct(this CreateProductRequest productRequest)

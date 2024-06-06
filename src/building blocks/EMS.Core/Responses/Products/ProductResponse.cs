@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace EMS.Core.Responses.Products;
+
 public class ProductResponse
 {
     [DisplayName("Id")]
@@ -32,4 +33,18 @@ public class ProductResponse
 
     [DisplayName("Data de Modificação")]
     public DateTime UpdatedAt { get; set; }
+
+    public ProductResponse() { }
+
+    public ProductResponse(Guid id, Guid companyId, string title, string description, decimal unitaryValue, bool isActive, DateTime createdAt, DateTime updatedAt)
+    {
+        Id = id;
+        CompanyId = companyId;
+        Title = title;
+        Description = description;
+        UnitaryValue = unitaryValue;
+        IsActive = isActive;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
 }
