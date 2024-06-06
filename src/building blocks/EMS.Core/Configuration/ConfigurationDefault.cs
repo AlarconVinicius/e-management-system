@@ -10,3 +10,10 @@ public static class ConfigurationDefault
     public static string FrontendUrl { get; set; } = "http://localhost:5124";
 
 }
+public class AppSettings
+{
+    public required string Secret { get; set; }
+    public required int ExpirationHours { get; set; }
+    public required string Issuer { get; set; }
+    public required string Audience { get; set; }
+}

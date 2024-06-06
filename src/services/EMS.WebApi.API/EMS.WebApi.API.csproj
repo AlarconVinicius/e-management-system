@@ -7,6 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.17">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	</ItemGroup>
@@ -15,6 +20,7 @@
 		<ProjectReference Include="..\..\building blocks\EMS.Core\EMS.Core.csproj" />
 		<ProjectReference Include="..\EMS.WebApi.Business\EMS.WebApi.Business.csproj" />
 		<ProjectReference Include="..\EMS.WebApi.Data\EMS.WebApi.Data.csproj" />
+		<ProjectReference Include="..\EMS.WebApi.Identity\EMS.WebApi.Identity.csproj" />
 	</ItemGroup>
 
 </Project>

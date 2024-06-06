@@ -30,11 +30,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{B4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{5D300D64-713D-4764-B093-A13508C2C2D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMS.WebApi.API", "src\services\EMS.WebApi.API\EMS.WebApi.API.csproj", "{1DB1F4BD-28B0-4692-8218-4ACE6D5A2283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.API", "src\services\EMS.WebApi.API\EMS.WebApi.API.csproj", "{1DB1F4BD-28B0-4692-8218-4ACE6D5A2283}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMS.WebApi.Data", "src\services\EMS.WebApi.Data\EMS.WebApi.Data.csproj", "{06B2A76C-3CF6-4106-A138-9AD55C607735}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.Data", "src\services\EMS.WebApi.Data\EMS.WebApi.Data.csproj", "{06B2A76C-3CF6-4106-A138-9AD55C607735}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMS.WebApi.Business", "src\services\EMS.WebApi.Business\EMS.WebApi.Business.csproj", "{CF07B037-3DEC-4811-982F-0F0601F3428D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.Business", "src\services\EMS.WebApi.Business\EMS.WebApi.Business.csproj", "{CF07B037-3DEC-4811-982F-0F0601F3428D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EMS.WebApi.Identity", "src\services\EMS.WebApi.Identity\EMS.WebApi.Identity.csproj", "{38F49CD7-9208-42C8-A6DB-EC540D880EBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +76,10 @@ Global
 		{CF07B037-3DEC-4811-982F-0F0601F3428D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF07B037-3DEC-4811-982F-0F0601F3428D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF07B037-3DEC-4811-982F-0F0601F3428D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{1DB1F4BD-28B0-4692-8218-4ACE6D5A2283} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 		{06B2A76C-3CF6-4106-A138-9AD55C607735} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 		{CF07B037-3DEC-4811-982F-0F0601F3428D} = {5D300D64-713D-4764-B093-A13508C2C2D8}
+		{38F49CD7-9208-42C8-A6DB-EC540D880EBB} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5397B9CE-28CB-46C1-AF0C-1BE927021AFF}

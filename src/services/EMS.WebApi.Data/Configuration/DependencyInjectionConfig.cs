@@ -12,8 +12,8 @@ public static class DependencyInjectionConfig
     public static IServiceCollection RegisterDataServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<EMSDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
-        );
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") ??
+                throw new InvalidOperationException("Connection String is not found")));
 
         services.AddScoped<EMSDbContext>();
 

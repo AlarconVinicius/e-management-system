@@ -1,5 +1,6 @@
 ﻿using EMS.Core.Configuration;
 using EMS.WebApi.Data.Context;
+using EMS.WebApi.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,12 +58,12 @@ public static class ApiConfig
     public static void CheckAndApplyDatabaseMigrations(this IApplicationBuilder app, IServiceProvider services)
     {
         using var scope = services.CreateScope();
-        //var identityDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var identityDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var emsDbContext = scope.ServiceProvider.GetRequiredService<EMSDbContext>();
-        //if (identityDbContext.Database.GetPendingMigrations().Any())
-        //{
-        //    identityDbContext.Database.Migrate();
-        //}
+        if (identityDbContext.Database.GetPendingMigrations().Any())
+        {
+            identityDbContext.Database.Migrate();
+        }
         if (emsDbContext.Database.GetPendingMigrations().Any())
         {
             emsDbContext.Database.Migrate();
