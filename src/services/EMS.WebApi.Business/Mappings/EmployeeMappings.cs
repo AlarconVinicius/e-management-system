@@ -1,4 +1,5 @@
 ﻿using EMS.Core.Requests.Employees;
+using EMS.Core.Responses;
 using EMS.Core.Responses.Employees;
 using EMS.WebApi.Business.Models;
 
@@ -13,23 +14,9 @@ public static class EmployeeMappings
             return null;
         }
 
-        return new EmployeeResponse
-        {
-            Id = employee.Id,
-            CompanyId = employee.CompanyId,
-            Name = employee.Name,
-            LastName = employee.LastName,
-            Email = employee.Email.Address,
-            PhoneNumber = employee.PhoneNumber,
-            Document = employee.Document.Number,
-            Salary = employee.Salary,
-            Role = employee.Role.MapERoleToERoleCore(),
-            IsActive = employee.IsActive,
-            CreatedAt = employee.CreatedAt,
-            UpdatedAt = employee.UpdatedAt
-        };
+        return new EmployeeResponse(employee.Id, employee.CompanyId, employee.Name, employee.LastName, employee.Email.Address, employee.PhoneNumber, employee.Document.Number, employee.Salary, employee.Role.MapERoleToERoleCore(), employee.IsActive, employee.CreatedAt, employee.UpdatedAt);
     }
-
+    
     public static Employee MapEmployeeResponseToEmployee(this EmployeeResponse employeeResponse)
     {
         if (employeeResponse == null)
@@ -39,7 +26,15 @@ public static class EmployeeMappings
 
         return new Employee(employeeResponse.Id, employeeResponse.CompanyId, employeeResponse.Name, employeeResponse.LastName, employeeResponse.Email, employeeResponse.PhoneNumber, employeeResponse.Document, employeeResponse.Role.MapERoleCoreToERole(), employeeResponse.Salary);
     }
+    public static PagedResponse<EmployeeResponse> MapPagedEmployeesToPagedResponseEmployees(this PagedResult<Employee> employees)
+    {
+        if (employees == null)
+        {
+            return null;
+        }
 
+        return new PagedResponse<EmployeeResponse>(employees.List.Select(x => x.MapEmployeeToEmployeeResponse()).ToList(), employees.TotalResults, employees.PageIndex, employees.PageSize);
+    }
     public static Employee MapCreateEmployeeRequestToEmployee(this CreateEmployeeRequest employeeRequest)
     {
         if (employeeRequest == null)

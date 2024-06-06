@@ -10,12 +10,12 @@ using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class EmployeeHandler2 : MainService, IEmployeeHandler2
+public class EmployeeHandler : MainService, IEmployeeHandler
 {
     public readonly IEmployeeRepository _employeeRepository;
     public readonly ICompanyRepository _companyRepository;
 
-    public EmployeeHandler2(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository) : base(notifier, appUser)
+    public EmployeeHandler(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository) : base(notifier, appUser)
     {
         _employeeRepository = employeeRepository;
         _companyRepository = companyRepository;
@@ -43,18 +43,12 @@ public class EmployeeHandler2 : MainService, IEmployeeHandler2
         }
     }
 
-    public async Task<PagedResponse2<List<EmployeeResponse>>> GetAllAsync(GetAllEmployeesRequest request)
+    public async Task<PagedResponse<EmployeeResponse>> GetAllAsync(GetAllEmployeesRequest request)
     {
         if (TenantIsEmpty()) return null;
         try
         {
-            var employees = await _employeeRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, TenantId, request.Query);
-
-            return new PagedResponse2<List<EmployeeResponse>>(
-                employees.List.Select(x => x.MapEmployeeToEmployeeResponse()).ToList(),
-                employees.TotalResults,
-                employees.PageIndex,
-                employees.PageSize);
+            return (await _employeeRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, TenantId, request.Query)).MapPagedEmployeesToPagedResponseEmployees();
         }
         catch
         {

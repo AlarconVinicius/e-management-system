@@ -15,30 +15,29 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     {
         if(tenantId == Guid.Empty) return null;
 
-        return await DbSet.Where(p => p.CompanyId == tenantId)
-                          .FirstOrDefaultAsync(c => c.Id == id) ?? null!;
+        return await DbSet.FirstOrDefaultAsync(c => c.Id == id && c.CompanyId == tenantId) ?? null;
     }
 
     public async Task<PagedResult<Employee>> GetAllPagedAsync(int pageSize, int pageIndex, Guid tenantId, string query = null)
     {
         if (tenantId == Guid.Empty) return null;
 
-        var employeesQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == tenantId);
+        var responseQuery = DbSet.AsNoTracking().Where(p => p.CompanyId == tenantId);
 
         if (!string.IsNullOrEmpty(query))
         {
-            employeesQuery = employeesQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
+            responseQuery = responseQuery.Where(p => p.Name.Contains(query) || p.LastName.Contains(query) || p.Email.Address.Contains(query));
         }
-        var users = await employeesQuery.OrderBy(p => p.Name)
+        var result = await responseQuery.OrderBy(p => p.Name)
                                         .ThenByDescending(p => p.UpdatedAt)
                                         .Skip(pageSize * (pageIndex - 1))
                                         .Take(pageSize)
                                         .ToListAsync();
-        var total = await employeesQuery.CountAsync();
+        var total = await responseQuery.CountAsync();
 
         return new PagedResult<Employee>()
         {
-            List = users,
+            List = result,
             TotalResults = total,
             PageIndex = pageIndex,
             PageSize = pageSize,

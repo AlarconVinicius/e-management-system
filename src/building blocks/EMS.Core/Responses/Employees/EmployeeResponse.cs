@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMS.Core.Responses.Employees;
+
 public class EmployeeResponse
 {
 
@@ -49,4 +50,22 @@ public class EmployeeResponse
 
     [DisplayName("Data de Modificação")]
     public DateTime UpdatedAt { get; set; }
+
+    public EmployeeResponse() { }
+
+    public EmployeeResponse(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string document, decimal salary, ERoleCore role, bool isActive, DateTime createdAt, DateTime updatedAt)
+    {
+        Id = id;
+        CompanyId = companyId;
+        Name = name;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+        Document = document;
+        Salary = salary;
+        Role = role;
+        IsActive = isActive;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
+    }
 }

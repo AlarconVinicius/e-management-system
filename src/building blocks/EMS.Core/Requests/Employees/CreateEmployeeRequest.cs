@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMS.Core.Requests.Employees;
+
 public class CreateEmployeeRequest : CompaniesRequest
 {
     public Guid Id { get; set; }
@@ -39,8 +40,7 @@ public class CreateEmployeeRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; } = true;
 
-    public CreateEmployeeRequest()
-    {}
+    public CreateEmployeeRequest() { }
 
     public CreateEmployeeRequest(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, string document, decimal salary, ERoleCore role, bool isActive) : base(companyId)
     {

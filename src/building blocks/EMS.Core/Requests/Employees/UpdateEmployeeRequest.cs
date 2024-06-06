@@ -34,9 +34,7 @@ public class UpdateEmployeeRequest : CompaniesRequest
     [DisplayName("Ativo")]
     public bool IsActive { get; set; }
 
-    public UpdateEmployeeRequest()
-    {
-    }
+    public UpdateEmployeeRequest() { }
 
     public UpdateEmployeeRequest(Guid id, Guid companyId, string name, string lastName, string email, string phoneNumber, decimal salary, ERoleCore role, bool isActive) : base(companyId)
     {
