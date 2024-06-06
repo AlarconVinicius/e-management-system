@@ -34,18 +34,20 @@ public class EmployeesController : MainController
         var request = new GetAllEmployeesRequest { PageNumber = page, PageSize = ps, Query = q };
         var response = await _employeeHandler.GetAllAsync(request);
 
-        var mappedClients = new PagedViewModel<EmployeeResponse>
-        {
-            List = response.Data,
-            PageIndex = request.PageNumber,
-            PageSize = request.PageSize,
-            Query = request.Query,
-            TotalResults = response.TotalCount
-        };
-        ViewBag.Search = q;
-        mappedClients.ReferenceAction = "Index";
+        //var mappedClients = new PagedViewModel<EmployeeResponse>
+        //{
+        //    List = response.Data,
+        //    PageIndex = request.PageNumber,
+        //    PageSize = request.PageSize,
+        //    Query = request.Query,
+        //    TotalResults = response.TotalCount
+        //};
+        //ViewBag.Search = q;
+        //mappedClients.ReferenceAction = "Index";
 
-        return View(mappedClients);
+        //return View(mappedClients);
+
+        return View();
     }
 
     public async Task<IActionResult> Details(Guid id)
@@ -79,31 +81,31 @@ public class EmployeesController : MainController
         request.CompanyId = GetTenant();
         request.Role = role.MapERoleToERoleCore();
 
-        var result = await _employeeHandler.CreateAsync(request);
+        //var result = await _employeeHandler.CreateAsync(request);
 
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
 
-        if (!await AddIdentityUser(request))
-        {
-            TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
-            await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
-            return View(request);
-        }
+        //if (!await AddIdentityUser(request))
+        //{
+        //    TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
+        //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+        //    return View(request);
+        //}
 
-        await _authService.AddOrUpdateUserClaim(request.Id.ToString(), "Tenant", request.CompanyId.ToString());
+        //await _authService.AddOrUpdateUserClaim(request.Id.ToString(), "Tenant", request.CompanyId.ToString());
 
-        if (!IsValidOperation())
-        {
-            await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
-            await _authService.DeleteUser(request.Id.ToString());
-            return View(request);
+        //if (!IsValidOperation())
+        //{
+        //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+        //    await _authService.DeleteUser(request.Id.ToString());
+        //    return View(request);
 
-        }
+        //}
         TempData["Success"] = "Colaborador adicionado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -115,9 +117,11 @@ public class EmployeesController : MainController
         {
             return NotFound();
         }
-        var request = new UpdateEmployeeRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.Salary, response.Data.Role, response.Data.IsActive);
-        ViewBag.Document = response.Data.Document;
-        return View(request);
+        //var request = new UpdateEmployeeRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.Salary, response.Data.Role, response.Data.IsActive);
+        //ViewBag.Document = response.Data.Document;
+        //return View(request);
+
+        return View();
     }
 
     [HttpPost]
@@ -144,19 +148,19 @@ public class EmployeesController : MainController
                 return View(request);
             }
         }
-        var result = await _employeeHandler.UpdateAsync(request);
+        //var result = await _employeeHandler.UpdateAsync(request);
 
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
         TempData["Success"] = "Colaborador atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -226,7 +230,7 @@ public class EmployeesController : MainController
     {
         return _appUser.GetTenantId();
     }
-    private async Task<Response<EmployeeResponse>> GetById(Guid id)
+    private async Task<EmployeeResponse> GetById(Guid id)
     {
         return await _employeeHandler.GetByIdAsync(new GetEmployeeByIdRequest { Id = id });
     }

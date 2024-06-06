@@ -8,7 +8,7 @@ using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Services;
 
 namespace EMS.WebApp.Business.Handlers;
-public class ProductHandler : MainService, IProductHandler
+public class ProductHandler : MainService//, IProductHandler
 {
     public readonly IProductRepository _productRepository;
 
@@ -33,23 +33,23 @@ public class ProductHandler : MainService, IProductHandler
         }
     }
 
-    public async Task<PagedResponse<List<ProductResponse>>> GetAllAsync(GetAllProductsRequest request)
-    {
-        try
-        {
-            var products = await _productRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
+    //public async Task<PagedResponse<List<ProductResponse>>> GetAllAsync(GetAllProductsRequest request)
+    //{
+    //    try
+    //    {
+    //        var products = await _productRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
 
-            return new PagedResponse<List<ProductResponse>>(
-                products.List.Select(x => x.MapProductToProductResponse()).ToList(),
-                products.TotalResults,
-                products.PageIndex,
-                products.PageSize);
-        }
-        catch
-        {
-            return new PagedResponse<List<ProductResponse>>(null, 500, "Não foi possível consultar os produtos.");
-        }
-    }
+    //        return new PagedResponse<List<ProductResponse>>(
+    //            products.List.Select(x => x.MapProductToProductResponse()).ToList(),
+    //            products.TotalResults,
+    //            products.PageIndex,
+    //            products.PageSize);
+    //    }
+    //    catch
+    //    {
+    //        return new PagedResponse<List<ProductResponse>>(null, 500, "Não foi possível consultar os produtos.");
+    //    }
+    //}
 
     public async Task<Response<ProductResponse>> CreateAsync(CreateProductRequest request)
     {

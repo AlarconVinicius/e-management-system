@@ -28,18 +28,19 @@ public class ClientsController : MainController
         var request = new GetAllClientsRequest { PageNumber = page , PageSize = ps, Query = q};
         var response = await _clientHandler.GetAllAsync(request);
 
-        var mappedClients = new PagedViewModel<ClientResponse>
-        {
-            List = response.Data,
-            PageIndex = request.PageNumber,
-            PageSize = request.PageSize,
-            Query = request.Query,
-            TotalResults = response.TotalCount
-        };
-        ViewBag.Search = q;
-        mappedClients.ReferenceAction = "Index";
+        //var mappedClients = new PagedViewModel<ClientResponse>
+        //{
+        //    List = response.Data,
+        //    PageIndex = request.PageNumber,
+        //    PageSize = request.PageSize,
+        //    Query = request.Query,
+        //    TotalResults = response.TotalCount
+        //};
+        //ViewBag.Search = q;
+        //mappedClients.ReferenceAction = "Index";
 
-        return View(mappedClients);
+        //return View(mappedClients);
+        return View();
     }
 
     public async Task<IActionResult> Details(Guid id)
@@ -69,19 +70,19 @@ public class ClientsController : MainController
 
         request.CompanyId = GetTenant();
         request.Role = role.MapERoleToERoleCore();
-        var result = await _clientHandler.CreateAsync(request);
+        //var result = await _clientHandler.CreateAsync(request);
             
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
         TempData["Success"] = "Cliente adicionado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -93,9 +94,10 @@ public class ClientsController : MainController
         {
             return NotFound();
         }
-        var request = new UpdateClientRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.IsActive);
-        ViewBag.Cpf = response.Data.Cpf;
-        return View(request);
+        //var request = new UpdateClientRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.IsActive);
+        //ViewBag.Cpf = response.Data.Cpf;
+        //return View(request);
+        return View();
     }
 
     [HttpPost]
@@ -112,19 +114,19 @@ public class ClientsController : MainController
         }
 
         request.CompanyId = GetTenant();
-        var result = await _clientHandler.UpdateAsync(request);
+        //var result = await _clientHandler.UpdateAsync(request);
 
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
         TempData["Success"] = "Cliente atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -166,7 +168,7 @@ public class ClientsController : MainController
     {
         return _appUser.GetTenantId();
     }
-    private async Task<Response<ClientResponse>> GetById(Guid id)
+    private async Task<ClientResponse> GetById(Guid id)
     {
         return await _clientHandler.GetByIdAsync(new GetClientByIdRequest { Id = id });
     }

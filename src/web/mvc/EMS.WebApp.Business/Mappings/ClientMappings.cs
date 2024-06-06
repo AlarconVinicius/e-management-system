@@ -21,7 +21,7 @@ public static class ClientMappings
             LastName = client.LastName,
             Email = client.Email.Address,
             PhoneNumber = client.PhoneNumber,
-            Cpf = client.Document.Number,
+            Document = client.Document.Number,
             Role = client.Role.MapERoleToERoleCore(),
             IsActive = client.IsActive,
             CreatedAt = client.CreatedAt,
@@ -36,7 +36,7 @@ public static class ClientMappings
             return null;
         }
 
-        return new Client(clientResponse.Id, clientResponse.CompanyId, clientResponse.Name, clientResponse.LastName, clientResponse.Email, clientResponse.PhoneNumber, clientResponse.Cpf, clientResponse.Role.MapERoleCoreToERole());
+        return new Client(clientResponse.Id, clientResponse.CompanyId, clientResponse.Name, clientResponse.LastName, clientResponse.Email, clientResponse.PhoneNumber, clientResponse.Document, clientResponse.Role.MapERoleCoreToERole());
     }
 
     public static Client MapCreateClientRequestToClient(this CreateClientRequest clientRequest)
@@ -46,6 +46,6 @@ public static class ClientMappings
             return null;
         }
 
-        return new Client(clientRequest.CompanyId, clientRequest.Name, clientRequest.LastName, clientRequest.Email, clientRequest.PhoneNumber, clientRequest.Cpf, clientRequest.Role.MapERoleCoreToERole());
+        return new Client(clientRequest.CompanyId, clientRequest.Name, clientRequest.LastName, clientRequest.Email, clientRequest.PhoneNumber, clientRequest.Document, clientRequest.Role.MapERoleCoreToERole());
     }
 }

@@ -8,7 +8,7 @@ using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Services;
 
 namespace EMS.WebApp.Business.Handlers;
-public class ClientHandler : MainService, IClientHandler
+public class ClientHandler : MainService//, IClientHandler
 {
     public readonly IClientRepository _clientRepository;
 
@@ -33,39 +33,39 @@ public class ClientHandler : MainService, IClientHandler
         }
     }
 
-    public async Task<PagedResponse<List<ClientResponse>>> GetAllAsync(GetAllClientsRequest request)
-    {
-        try
-        {
-            var clients = await _clientRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
+    //public async Task<PagedResponse<List<ClientResponse>>> GetAllAsync(GetAllClientsRequest request)
+    //{
+    //    try
+    //    {
+    //        var clients = await _clientRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
 
-            return new PagedResponse<List<ClientResponse>>(
-                clients.List.Select(x => x.MapClientToClientResponse()).ToList(),
-                clients.TotalResults,
-                clients.PageIndex,
-                clients.PageSize);
-        }
-        catch
-        {
-            return new PagedResponse<List<ClientResponse>>(null, 500, "Não foi possível consultar os clientes.");
-        }
-    }
+    //        return new PagedResponse<List<ClientResponse>>(
+    //            clients.List.Select(x => x.MapClientToClientResponse()).ToList(),
+    //            clients.TotalResults,
+    //            clients.PageIndex,
+    //            clients.PageSize);
+    //    }
+    //    catch
+    //    {
+    //        return new PagedResponse<List<ClientResponse>>(null, 500, "Não foi possível consultar os clientes.");
+    //    }
+    //}
 
-    public async Task<Response<ClientResponse>> CreateAsync(CreateClientRequest request)
-    {
-        //if (!ExecuteValidation(new ClientValidation(), client)) return;
-        if (IsCpfInUse(request.Cpf, request.CompanyId)) return null;
-        var clientMapped = request.MapCreateClientRequestToClient();
-        try
-        {
-            await _clientRepository.AddAsync(clientMapped);
-            return new Response<ClientResponse>(clientMapped.MapClientToClientResponse(), 201, "Cliente criado com sucesso!");
-        }
-        catch
-        {
-            return new Response<ClientResponse>(null, 500, "Não foi possível criar o cliente.");
-        }
-    }
+    //public async Task<Response<ClientResponse>> CreateAsync(CreateClientRequest request)
+    //{
+    //    //if (!ExecuteValidation(new ClientValidation(), client)) return;
+    //    if (IsCpfInUse(request.Cpf, request.CompanyId)) return null;
+    //    var clientMapped = request.MapCreateClientRequestToClient();
+    //    try
+    //    {
+    //        await _clientRepository.AddAsync(clientMapped);
+    //        return new Response<ClientResponse>(clientMapped.MapClientToClientResponse(), 201, "Cliente criado com sucesso!");
+    //    }
+    //    catch
+    //    {
+    //        return new Response<ClientResponse>(null, 500, "Não foi possível criar o cliente.");
+    //    }
+    //}
 
     public async Task<Response<ClientResponse>> UpdateAsync(UpdateClientRequest request)
     {

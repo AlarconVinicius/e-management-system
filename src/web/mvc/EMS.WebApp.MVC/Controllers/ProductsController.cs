@@ -28,18 +28,20 @@ public class ProductsController : MainController
         var request = new GetAllProductsRequest { PageNumber = page, PageSize = ps, Query = q };
         var response = await _productHandler.GetAllAsync(request);
 
-        var mappedProducts = new PagedViewModel<ProductResponse>
-        {
-            List = response.Data,
-            PageIndex = request.PageNumber,
-            PageSize = request.PageSize,
-            Query = request.Query,
-            TotalResults = response.TotalCount
-        };
-        ViewBag.Search = q;
-        mappedProducts.ReferenceAction = "Index";
+        //var mappedProducts = new PagedViewModel<ProductResponse>
+        //{
+        //    List = response.Data,
+        //    PageIndex = request.PageNumber,
+        //    PageSize = request.PageSize,
+        //    Query = request.Query,
+        //    TotalResults = response.TotalCount
+        //};
+        //ViewBag.Search = q;
+        //mappedProducts.ReferenceAction = "Index";
 
-        return View(mappedProducts);
+        //return View(mappedProducts);
+
+        return View();
     }
 
     public async Task<IActionResult> Details(Guid id)
@@ -66,19 +68,19 @@ public class ProductsController : MainController
             return View(request);
         }
         request.CompanyId = GetTenant();
-        var result = await _productHandler.CreateAsync(request);
+        //var result = await _productHandler.CreateAsync(request);
 
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao adicionar produto: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao adicionar produto: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao adicionar produto: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao adicionar produto: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
         TempData["Success"] = "Produto adicionado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -90,9 +92,11 @@ public class ProductsController : MainController
         {
             return NotFound();
         }
-        var request = new UpdateProductRequest(id, response.Data.CompanyId, response.Data.Title, response.Data.Description, response.Data.UnitaryValue, response.Data.IsActive);
-        
-        return View(request);
+        //var request = new UpdateProductRequest(id, response.Data.CompanyId, response.Data.Title, response.Data.Description, response.Data.UnitaryValue, response.Data.IsActive);
+
+        //return View(request);
+
+        return View();
     }
 
     [HttpPost]
@@ -109,19 +113,19 @@ public class ProductsController : MainController
         }
 
         request.CompanyId = GetTenant();
-        var result = await _productHandler.UpdateAsync(request);
+        //var result = await _productHandler.UpdateAsync(request);
 
-        if (result != null && !result.IsSuccess)
-        {
-            Notify(result.Message);
-            TempData["Failure"] = "Falha ao atualizar produto: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao atualizar produto: " + string.Join("; ", await GetNotificationErrors());
-            return View(request);
-        }
+        //if (result != null && !result.IsSuccess)
+        //{
+        //    Notify(result.Message);
+        //    TempData["Failure"] = "Falha ao atualizar produto: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao atualizar produto: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(request);
+        //}
         TempData["Success"] = "Produto atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -163,7 +167,7 @@ public class ProductsController : MainController
     {
         return _appUser.GetTenantId();
     }
-    private async Task<Response<ProductResponse>> GetById(Guid id)
+    private async Task<ProductResponse> GetById(Guid id)
     {
         return await _productHandler.GetByIdAsync(new GetProductByIdRequest { Id = id });
     }

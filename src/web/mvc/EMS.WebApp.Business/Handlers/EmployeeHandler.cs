@@ -7,7 +7,7 @@ using EMS.WebApp.Business.Mappings;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Services;
 namespace EMS.WebApp.Business.Handlers;
-public class EmployeeHandler : MainService, IEmployeeHandler
+public class EmployeeHandler : MainService//, IEmployeeHandler
 {
     public readonly IEmployeeRepository _employeeRepository;
 
@@ -32,23 +32,23 @@ public class EmployeeHandler : MainService, IEmployeeHandler
         }
     }
 
-    public async Task<PagedResponse<List<EmployeeResponse>>> GetAllAsync(GetAllEmployeesRequest request)
-    {
-        try
-        {
-            var employees = await _employeeRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
+    //public async Task<PagedResponse<List<EmployeeResponse>>> GetAllAsync(GetAllEmployeesRequest request)
+    //{
+    //    try
+    //    {
+    //        var employees = await _employeeRepository.GetAllPagedAsync(request.PageSize, request.PageNumber, request.Query);
 
-            return new PagedResponse<List<EmployeeResponse>>(
-                employees.List.Select(x => x.MapEmployeeToEmployeeResponse()).ToList(),
-                employees.TotalResults,
-                employees.PageIndex,
-                employees.PageSize);
-        }
-        catch
-        {
-            return new PagedResponse<List<EmployeeResponse>>(null, 500, "Não foi possível consultar os colaboradores.");
-        }
-    }
+    //        return new PagedResponse<List<EmployeeResponse>>(
+    //            employees.List.Select(x => x.MapEmployeeToEmployeeResponse()).ToList(),
+    //            employees.TotalResults,
+    //            employees.PageIndex,
+    //            employees.PageSize);
+    //    }
+    //    catch
+    //    {
+    //        return new PagedResponse<List<EmployeeResponse>>(null, 500, "Não foi possível consultar os colaboradores.");
+    //    }
+    //}
 
     public async Task<Response<EmployeeResponse>> CreateAsync(CreateEmployeeRequest request)
     {
