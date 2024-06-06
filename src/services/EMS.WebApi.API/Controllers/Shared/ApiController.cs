@@ -1,8 +1,9 @@
 ﻿using EMS.Core.Notifications;
-using EMS.WebApi.API.Extensions;
+using EMS.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
+using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.API.Controllers.Shared;
 
@@ -10,13 +11,27 @@ namespace EMS.WebApi.API.Controllers.Shared;
 public abstract class ApiController : ControllerBase
 {
     private readonly INotifier _notifier;
+    public readonly IAspNetUser AppUser;
+    protected Guid UserId { get; set; }
+    protected Guid TenantId;
+    protected bool IsUserAuthenticated { get; set; }
 
     protected ApiController(INotifier notifier)
     {
         _notifier = notifier;
+
+        //AppUser = appUser;
+
+        //if (appUser.IsAuthenticated())
+        //{
+        //    UserId = appUser.GetUserId();
+        //    IsUserAuthenticated = true;
+        TenantId = Guid.Parse("3eb1ed86-802c-4355-8045-482c274ac6ca");
+
+        //}
     }
 
-    protected IActionResult ResponseOk(object result) =>
+protected IActionResult ResponseOk(object result) =>
         Response(HttpStatusCode.OK, result);
 
     protected IActionResult ResponseOk() =>

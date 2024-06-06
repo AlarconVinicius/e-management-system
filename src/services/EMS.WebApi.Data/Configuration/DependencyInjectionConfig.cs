@@ -14,13 +14,14 @@ public static class DependencyInjectionConfig
         services.AddDbContext<EMSDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
         );
+
+        services.AddScoped<EMSDbContext>();
+
         services.AddScoped<IPlanRepository, PlanRepository>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-
-        services.AddScoped<EMSDbContext>();
 
         return services;
     }

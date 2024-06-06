@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace EMS.WebApi.API.Extensions;
+namespace EMS.Core.Extensions;
 
 public static class HttpExtensions
 {

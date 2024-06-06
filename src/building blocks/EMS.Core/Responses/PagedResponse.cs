@@ -3,32 +3,23 @@ using System.Text.Json.Serialization;
 
 namespace EMS.Core.Responses;
 
-public class PagedResponse<TData> : Response<TData>
+public class PagedResponse<TData>
 {
+    public IEnumerable<TData> List { get; set; }
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
+    public int TotalResults { get; set; }
+    public int TotalPages => (int)Math.Ceiling(TotalResults / (double)PageSize);
+
+    public PagedResponse() { }
+
     [JsonConstructor]
-    public PagedResponse(
-        TData data,
-        int totalCount,
-        int currentPage = 1,
-        int pageSize = ConfigurationDefault.DefaultPageSize)
-        : base(data)
+    public PagedResponse(IEnumerable<TData> list, int totalResults, int pageIndex = 1, int pageSize = ConfigurationDefault.DefaultPageSize)
     {
-        Data = data;
-        TotalCount = totalCount;
-        CurrentPage = currentPage;
+        List = list;
+        TotalResults = totalResults;
+        PageIndex = pageIndex;
         PageSize = pageSize;
     }
 
-    public PagedResponse(
-        TData data,
-        int code = ConfigurationDefault.DefaultStatusCode,
-        string message = null)
-        : base(data, code, message)
-    {
-    }
-
-    public int CurrentPage { get; set; }
-    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
-    public int PageSize { get; set; } = ConfigurationDefault.DefaultPageSize;
-    public int TotalCount { get; set; }
 }

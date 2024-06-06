@@ -1,12 +1,11 @@
 using EMS.Core.Configuration;
-using EMS.WebApi.Data.Configuration;
-using EMS.WebApi.Business.Configuration;
-using EMS.Core.Notifications;
 using EMS.WebApi.API.Configuration;
+using EMS.WebApi.Business.Configuration;
+using EMS.WebApi.Data.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddApiConfig();
 
 builder.Services.RegisterApiServices()
                 .RegisterCoreServices()
@@ -15,21 +14,16 @@ builder.Services.RegisterApiServices()
                 .RegisterBusinessServices();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerConfig();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerConfig();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.UseApiConfig(app.Environment);
 
 app.CheckAndApplyDatabaseMigrations(app.Services);
 
