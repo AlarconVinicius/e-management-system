@@ -64,6 +64,7 @@ public class EmployeeHandler : MainService, IEmployeeHandler
         if (IsCpfInUse(request.Document, TenantId)) return;
         if (!CompanyExists(TenantId)) return;
 
+        request.CompanyId = TenantId;
         var employeeMapped = request.MapCreateEmployeeRequestToEmployee();
         try
         {
@@ -82,7 +83,7 @@ public class EmployeeHandler : MainService, IEmployeeHandler
         //if (!ExecuteValidation(new EmployeeValidation(), employee)) return;
         if (TenantIsEmpty()) return;
         if (!UserExists(request.Id, TenantId)) return;
-        var employeeDb = await _employeeRepository.GetByIdAsync(request.Id);
+        var employeeDb = await _employeeRepository.GetByIdAsync(request.Id, TenantId);
 
         try
         {
