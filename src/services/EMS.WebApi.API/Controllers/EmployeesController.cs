@@ -51,7 +51,7 @@ public class EmployeesController : ApiController
     {
         if (!ModelState.IsValid)
         {
-            ResponseBadRequest(ModelState);
+            return ResponseBadRequest(ModelState);
         }
         await _employeeHandler.CreateAsync(request);
 
@@ -66,7 +66,7 @@ public class EmployeesController : ApiController
         if (id != request.Id) return ResponseBadRequest("Os IDs não correspondem.");
         if (!ModelState.IsValid)
         {
-            ResponseBadRequest(ModelState);
+            return ResponseBadRequest(ModelState);
         }
 
         await _employeeHandler.UpdateAsync(request);
