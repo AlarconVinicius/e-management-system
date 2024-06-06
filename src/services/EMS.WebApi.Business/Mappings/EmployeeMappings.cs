@@ -42,6 +42,6 @@ public static class EmployeeMappings
             return null;
         }
 
-        return new Employee(employeeRequest.CompanyId, employeeRequest.Name, employeeRequest.LastName, employeeRequest.Email, employeeRequest.PhoneNumber, employeeRequest.Document, employeeRequest.Role.MapERoleCoreToERole(), employeeRequest.Salary);
+        return new Employee(employeeRequest.Id, employeeRequest.CompanyId, employeeRequest.Name, employeeRequest.LastName, employeeRequest.Email, employeeRequest.PhoneNumber, employeeRequest.Document, employeeRequest.Role.MapERoleCoreToERole(), employeeRequest.Salary);
     }
 }
