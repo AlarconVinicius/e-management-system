@@ -78,7 +78,7 @@ public static class ApiConfig
             options.AddPolicy(ApiConfigurationDefault.CorsPolicyName,
                 policy =>
                     policy
-                        .WithOrigins(ConfigurationDefault.BackendUrl, ConfigurationDefault.BackendUrl)
+                        .WithOrigins(ConfigurationDefault.ApiUrl, ConfigurationDefault.SpaUrl, ConfigurationDefault.MvcUrl)
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
