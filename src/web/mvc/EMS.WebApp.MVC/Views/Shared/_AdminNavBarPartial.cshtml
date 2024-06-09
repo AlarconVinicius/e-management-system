@@ -1,0 +1,22 @@
+﻿@using EMS.WebApp.Business.Utils;
+@using EMS.WebApp.MVC.Extensions;
+@inject IAspNetUser AppUser
+
+<nav class="navbar navbar-expand px-3 border-bottom">
+    <button class="btn" id="sidebar-toggle" type="button">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse navbar px-3">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a href="#" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
+                    <img src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(AppUser.GetUserEmail())?d=mm&s=45" class="avatar img-fluid rounded" alt="avatar">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <a class="dropdown-item" asp-controller="Dashboard" asp-action="UpdateProfile">Perfil</a>
+                    <a class="dropdown-item" asp-controller="Authentication" asp-action="Logout">Sair</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>

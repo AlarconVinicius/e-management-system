@@ -1,0 +1,116 @@
+﻿@using EMS.WebApp.MVC.Extensions;
+@model UpdateUserViewModel;
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="mb-3">
+    <h4>Admin Dashboard</h4>
+</div>
+<vc:Notification></vc:Notification>
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                <img class="rounded-circle" src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.Email)?d=mm&s=45" alt="Profile">
+                <h3>@Model.Name</h3>
+                <h4>@Model.LastName</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body pt-3">
+                <ul class="nav nav-tabs nav-tabs-bordered">
+                    <li class="nav-item"> <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Visão Geral</button></li>
+                    <li class="nav-item"> <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar Perfil</button></li>
+                    <li class="nav-item"> <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Alterar Senha</button></li>
+                </ul>
+                <div class="tab-content pt-2">
+                    <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                        <h5 class="card-title">Detalhes do Perfil</h5>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 label ">Nome Completo</div>
+                            <div class="col-lg-9 col-md-8">@Model.Name @Model.LastName</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Telefone</div>
+                            <div class="col-lg-9 col-md-8">@Model.PhoneNumber</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 label">Email</div>
+                            <div class="col-lg-9 col-md-8">@Model.Email</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                        <form enctype="multipart/form-data" asp-action="UpdateProfile" method="post">
+                            <input type="hidden" asp-for="@Model.Id" value="@Model.Id" />
+                            <div class="row mb-3">
+                                <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Imagem de Perfil</label>
+                                <div class="col-md-8 col-lg-9">
+                                    <img src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.Email)?d=mm&s=45" alt="Profile" class="d-block mb-2">
+                                    <input type="file" id="fileInput" class="btn btn-primary btn-sm" style="display: none;">
+                                    <label for="fileInput" class="btn btn-primary btn-sm me-3" title="Upload new profile image"><i class="bi bi-upload"></i></label>
+                                    <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.Name" class="col-md-4 col-lg-3 col-form-label">Nome</label>
+                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.Name" value="@Model.Name"></div>
+                                <span asp-validation-for="@Model.Name" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.LastName" class="col-md-4 col-lg-3 col-form-label">Sobrenome</label>
+                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.LastName" value="@Model.LastName"></div>
+                                <span asp-validation-for="@Model.LastName" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.Cpf" class="col-md-4 col-lg-3 col-form-label">CPF</label>
+                                <div class="col-md-8 col-lg-9"> <p class="form-control disable" asp-for="@Model.Cpf">@Model.Cpf</p></div>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                                <div class="col-md-8 col-lg-9"> <input type="email" class="form-control" asp-for="@Model.Email" value="@Model.Email"></div>
+                                <span asp-validation-for="@Model.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="@Model.PhoneNumber" class="col-md-4 col-lg-3 col-form-label">Telefone</label>
+                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.PhoneNumber" value="@Model.PhoneNumber"></div>
+                                <span asp-validation-for="@Model.PhoneNumber" class="text-danger"></span>
+                            </div>
+                            <div class="text-center"> <button type="submit" class="btn btn-primary">Salvar</button></div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade pt-3" id="profile-change-password">
+                        <form asp-action="UpdatePassword" method="post">
+                            <input type="hidden" asp-for="@Model.UpdateUserPasswordViewModel.Id" value="@Model.Id" />
+                            <div class="row mb-3">
+                                <label asp-for="@Model.UpdateUserPasswordViewModel.OldPassword" class="col-md-4 col-lg-3 col-form-label">Senha Atual</label>
+                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordViewModel.OldPassword" type="password" class="form-control"></div>
+                                <span asp-validation-for="@Model.UpdateUserPasswordViewModel.OldPassword" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.UpdateUserPasswordViewModel.Password" class="col-md-4 col-lg-3 col-form-label">Nova Senha</label>
+                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordViewModel.Password" type="password" class="form-control"></div>
+                                <span asp-validation-for="@Model.UpdateUserPasswordViewModel.Password" class="text-danger"></span>
+                            </div>
+                            <div class="row mb-3">
+                                <label asp-for="@Model.UpdateUserPasswordViewModel.ConfirmPassword" class="col-md-4 col-lg-3 col-form-label">Confirmar Nova Senha</label>
+                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordViewModel.ConfirmPassword" type="password" class="form-control"></div>
+                                <span asp-validation-for="@Model.UpdateUserPasswordViewModel.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                            <div class="text-center"> <button type="submit" class="btn btn-primary">Alterar Senha</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

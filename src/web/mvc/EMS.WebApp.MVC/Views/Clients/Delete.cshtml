@@ -1,0 +1,66 @@
+﻿@using EMS.Core.Responses;
+@using EMS.Core.Responses.Clients;
+@model Response<ClientResponse>
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Deletar Cliente";
+}
+
+<div class="card border-0 col-md-12">
+    <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title">
+            Você tem certeza que deseja deletar o Cliente: @Model.Data.Name @Model.Data.LastName
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <dl class="row">
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.Name)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.Name)
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.LastName)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.LastName)
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.PhoneNumber)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.PhoneNumber)
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.IsActive)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.IsActive)
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.CreatedAt)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.CreatedAt)
+                    </dd>
+                    <dt class="col-sm-6">
+                        @Html.DisplayNameFor(model => model.Data.UpdatedAt)
+                    </dt>
+                    <dd class="col-sm-6">
+                        @Html.DisplayFor(model => model.Data.UpdatedAt)
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete" class="form-group mt-3<vc:Summary></vc:Summary>">
+                    <input type="hidden" asp-for="@Model.Data.Id" />
+                    <a asp-action="Index" class="btn btn-warning me-3">Voltar</a>
+                    <input type="submit" value="Deletar" class="btn btn-danger" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

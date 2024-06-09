@@ -1,0 +1,65 @@
+﻿@using EMS.Core.Responses;
+@using EMS.Core.Responses.Employees;
+@model Response<EmployeeResponse>
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Detalhes do Colaborador";
+}
+
+<div class="card border-0 col-md-12">
+    <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title">
+            Detalhes do Colaborador: @Model.Data.Name @Model.Data.LastName
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.Name)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.Name)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.LastName)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.LastName)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.Email)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.Email)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.PhoneNumber)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.PhoneNumber)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.Document)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.Document)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Data.IsActive)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Data.IsActive)
+                    </dd>
+                </dl>
+
+                <div class="form-group mt-3">
+                    <a asp-action="Index" class="btn btn-warning me-3">Voltar</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Data.Id" class="btn btn-primary">Editar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
