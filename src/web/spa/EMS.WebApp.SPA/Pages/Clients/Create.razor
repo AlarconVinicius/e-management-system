@@ -1,5 +1,7 @@
 ﻿@page "/clientes/adicionar"
+@using Microsoft.AspNetCore.Authorization
 @inherits CreateClientPage
+@attribute [Authorize]
 
 <MudText Typo="Typo.h3">Novo Cliente</MudText>
 
