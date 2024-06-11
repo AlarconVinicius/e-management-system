@@ -1,7 +1,6 @@
 using EMS.Core.Configuration;
 using EMS.WebApp.SPA;
 using EMS.WebApp.SPA.Configuration;
-using EMS.WebApp.SPA.Handlers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -13,13 +12,13 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices();
 
 builder.Services.AddHttpClient(
-                    WebConfigurationDefault.HttpClientName, 
+                    WebConfigurationDefault.HttpClientName,
                     options =>
                     {
                         options.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
                     }
                 );
 
-builder.Services.AddTransient<IClientHandler, ClientHandler>();
+builder.Services.RegisterSPAServices();
 
 await builder.Build().RunAsync();
