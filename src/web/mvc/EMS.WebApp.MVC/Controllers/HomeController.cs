@@ -1,6 +1,7 @@
-﻿using AutoMapper;
-using EMS.WebApp.Business.Interfaces.Repositories;
-using EMS.WebApp.Business.Utils;
+﻿using EMS.Core.Requests.Plans;
+using EMS.Core.Responses.Plans;
+using EMS.Core.User;
+using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,23 +10,34 @@ namespace EMS.WebApp.MVC.Controllers;
 public class HomeController : Controller
 {
     private readonly IAspNetUser _appUser;
-    private readonly IPlanRepository _planRepository;
-    private readonly IMapper _mapper;
+    private readonly IPlanHandler _planHandler;
 
-    public HomeController(IAspNetUser appUser, IPlanRepository planRepository, IMapper mapper)
+    public HomeController(IAspNetUser appUser, IPlanHandler planHandler)
     {
         _appUser = appUser;
-        _planRepository = planRepository;
-        _mapper = mapper;
+        _planHandler = planHandler;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
     {
         if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Dashboard");
-        var plans = _mapper.Map<List<PlanViewModel>>(await _planRepository.GetAllAsync());
-        return View(plans);
-    }
+        var ps = 10;
+        var request = new GetAllPlansRequest { PageNumber = page, PageSize = ps, Query = q };
+        var response = await _planHandler.GetAllAsync(request);
 
+        var mappedPlans = new PagedViewModel<PlanResponse>
+        {
+            List = response.Data.List,
+            PageIndex = response.Data.PageIndex,
+            PageSize = response.Data.PageSize,
+            Query = request.Query,
+            TotalResults = response.Data.TotalResults
+        };
+        ViewBag.Search = q;
+        mappedPlans.ReferenceAction = "Index";
+
+        return View(mappedPlans);
+    }
     public IActionResult Privacy()
     {
         return View();
