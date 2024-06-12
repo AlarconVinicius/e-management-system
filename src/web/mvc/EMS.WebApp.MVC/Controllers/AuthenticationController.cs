@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using EMS.Core.Enums;
-using EMS.WebApp.Business.Interfaces.Repositories;
-using EMS.WebApp.Business.Interfaces.Services;
-using EMS.WebApp.Business.Models;
-using EMS.WebApp.Business.Notifications;
-using EMS.WebApp.Business.Utils;
-using EMS.WebApp.Identity.Business.Interfaces.Services;
-using EMS.WebApp.Identity.Business.Models;
+using EMS.Core.Requests.Identities;
+using EMS.Core.User;
+using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +14,10 @@ public class AuthenticationController : MainController
     private readonly IEmployeeService _employeeService;
     private readonly ICompanyService _companyService;
     private readonly IAuthService _authService;
+    private readonly IIdentityHandler _identityHandler;
     private readonly IMapper _mapper;
 
-    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IEmployeeService employeeService, IAuthService authService, IMapper mapper) : base(notifier)
+    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IEmployeeService employeeService, IAuthService authService, IMapper mapper, IIdentityHandler identityHandler) : base(notifier)
     {
         _appUser = appUser;
         _planRepository = planRepository;
@@ -28,6 +25,7 @@ public class AuthenticationController : MainController
         _employeeService = employeeService;
         _authService = authService;
         _mapper = mapper;
+        _identityHandler = identityHandler;
     }
 
     [HttpGet]
@@ -101,14 +99,10 @@ public class AuthenticationController : MainController
             await _authService.DeleteUser(employeeId.ToString());
             return View(viewModel);
         }
-        var loginUser = new LoginUserViewModel
-        {
-            Email = registerCompany.Employee.Email,
-            Password = registerCompany.Password
-        };
+        var loginUser = new LoginUserRequest(registerCompany.Employee.Email, registerCompany.Password);
         if (!await PerformLogin(loginUser))
         {
-            return View(loginUser);
+            return View(registerCompany);
         }
 
         if (string.IsNullOrEmpty(returnUrl)) 
@@ -127,15 +121,15 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login(LoginUserViewModel loginUser, string returnUrl = null!)
+    public async Task<IActionResult> Login(LoginUserRequest request, string returnUrl = null!)
     {
-        if (!ModelState.IsValid)
+        ViewData["ReturnUrl"] = returnUrl;
+
+        if (!ModelState.IsValid) return View(request);
+
+        if (!await PerformLogin(request))
         {
-            return View();
-        }
-        if (!await PerformLogin(loginUser))
-        {
-            return View(loginUser);
+            return View(request);
         }
         if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Dashboard");
 
@@ -189,18 +183,14 @@ public class AuthenticationController : MainController
     #endregion
 
     #region AuxLoginMethods
-    private async Task<bool> PerformLogin(LoginUserViewModel loginUser)
+    private async Task<bool> PerformLogin(LoginUserRequest request)
     {
-        var loginUserMapped = new LoginUser
-        {
-            Email = loginUser.Email,
-            Password = loginUser.Password
-        };
-        await _authService.Login(loginUserMapped);
+        var response = await _identityHandler.LoginAsync(request);
         if (!IsValidOperation())
         {
             return false;
         }
+        await _identityHandler.PerformLogin(response.Data);
         return true;
     }
     #endregion

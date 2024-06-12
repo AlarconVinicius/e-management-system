@@ -1,8 +1,6 @@
-﻿using EMS.WebApp.Data.Context;
-using EMS.WebApp.Identity.Data;
+﻿using EMS.Core.Configuration;
 using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace EMS.WebApp.MVC.Configuration;
@@ -15,13 +13,15 @@ public static class WebAppConfig
                 .ConfigureApiBehaviorOptions(options =>
                 {
                     options.SuppressModelStateInvalidFilter = true;
-                }); ;
+                });
 
-        services.ConfigureApplicationCookie(options =>
-        {
-            options.AccessDeniedPath = "/Error/403";
-            options.LoginPath = "/login";
-        });
+        services.AddHttpClient(
+                    WebConfigurationDefault.HttpClientName,
+                    options =>
+                    {
+                        options.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
+                    }
+                );
     }
 
     public static void UseMvcConfiguration(this IApplicationBuilder app, IWebHostEnvironment env, WebApplication webApp)
@@ -41,8 +41,7 @@ public static class WebAppConfig
 
         app.UseRouting();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseIdentityConfiguration();
 
         var supportedCultures = new[] { new CultureInfo("pt-BR") };
         app.UseRequestLocalization(new RequestLocalizationOptions
@@ -61,19 +60,5 @@ public static class WebAppConfig
                 pattern: "{controller=Home}/{action=Index}/{id?}");
         });
         webApp.MapRazorPages();
-    }
-    public static void CheckAndApplyDatabaseMigrations(this IApplicationBuilder app, IServiceProvider services)
-    {
-        using var scope = services.CreateScope();
-        var identityDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var emsDbContext = scope.ServiceProvider.GetRequiredService<EMSDbContext>();
-        if (identityDbContext.Database.GetPendingMigrations().Any())
-        {
-            identityDbContext.Database.Migrate();
-        }
-        if (emsDbContext.Database.GetPendingMigrations().Any())
-        {
-            emsDbContext.Database.Migrate();
-        }
     }
 }
