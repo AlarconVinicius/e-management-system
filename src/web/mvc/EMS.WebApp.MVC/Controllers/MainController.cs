@@ -1,5 +1,4 @@
-﻿using Azure;
-using EMS.WebApp.Business.Notifications;
+﻿using EMS.Core.Notifications;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

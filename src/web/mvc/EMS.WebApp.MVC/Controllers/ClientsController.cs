@@ -1,11 +1,13 @@
-﻿using EMS.Core.Handlers;
+﻿using EMS.Core.Notifications;
 using EMS.Core.Requests.Clients;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Clients;
+using EMS.Core.User;
 using EMS.WebApp.Business.Mappings;
 using EMS.WebApp.Business.Models;
 using EMS.WebApp.Business.Notifications;
 using EMS.WebApp.Business.Utils;
+using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,19 +30,19 @@ public class ClientsController : MainController
         var request = new GetAllClientsRequest { PageNumber = page , PageSize = ps, Query = q};
         var response = await _clientHandler.GetAllAsync(request);
 
-        //var mappedClients = new PagedViewModel<ClientResponse>
-        //{
-        //    List = response.Data,
-        //    PageIndex = request.PageNumber,
-        //    PageSize = request.PageSize,
-        //    Query = request.Query,
-        //    TotalResults = response.TotalCount
-        //};
-        //ViewBag.Search = q;
-        //mappedClients.ReferenceAction = "Index";
+        var mappedClients = new PagedViewModel<ClientResponse>
+        {
+            List = response.Data.List,
+            PageIndex = response.Data.PageIndex,
+            PageSize = response.Data.PageSize,
+            Query = request.Query,
+            TotalResults = response.Data.TotalResults
+        };
+        ViewBag.Search = q;
+        mappedClients.ReferenceAction = "Index";
 
         //return View(mappedClients);
-        return View();
+        return View(mappedClients);
     }
 
     public async Task<IActionResult> Details(Guid id)

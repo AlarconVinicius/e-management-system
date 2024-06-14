@@ -12,6 +12,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IAspNetUser, AspNetUser>();
 
         services.AddScoped<ICompanyHandler, CompanyHandler>();
+        services.AddScoped<IPlanHandler, PlanHandler>();
         services.AddScoped<IEmployeeHandler, EmployeeHandler>();
         services.AddScoped<IClientHandler, ClientHandler>();
         services.AddScoped<IProductHandler, ProductHandler>();

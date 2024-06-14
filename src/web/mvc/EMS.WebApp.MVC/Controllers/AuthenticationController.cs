@@ -1,31 +1,34 @@
 ﻿using AutoMapper;
 using EMS.Core.Enums;
+using EMS.Core.Notifications;
 using EMS.Core.Requests.Identities;
+using EMS.Core.Requests.Plans;
 using EMS.Core.User;
 using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
 {
     private readonly IAspNetUser _appUser;
-    private readonly IPlanRepository _planRepository;
-    private readonly IEmployeeService _employeeService;
-    private readonly ICompanyService _companyService;
-    private readonly IAuthService _authService;
+    private readonly IPlanHandler _planHandler;
+    //private readonly IPlanRepository _planRepository;
+    //private readonly IEmployeeService _employeeService;
+    //private readonly ICompanyService _companyService;
+    //private readonly IAuthService _authService;
     private readonly IIdentityHandler _identityHandler;
-    private readonly IMapper _mapper;
 
-    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IEmployeeService employeeService, IAuthService authService, IMapper mapper, IIdentityHandler identityHandler) : base(notifier)
+    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IIdentityHandler identityHandler, IPlanHandler planHandler) : base(notifier)
     {
         _appUser = appUser;
-        _planRepository = planRepository;
-        _companyService = companyService;
-        _employeeService = employeeService;
-        _authService = authService;
-        _mapper = mapper;
+        //_planRepository = planRepository;
+        //_companyService = companyService;
+        //_employeeService = employeeService;
+        //_authService = authService;
         _identityHandler = identityHandler;
+        _planHandler = planHandler;
     }
 
     [HttpGet]
@@ -34,16 +37,14 @@ public class AuthenticationController : MainController
     {
         if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Home");
 
-        var plan = await _planRepository.GetByIdAsync(planId);
-        if (plan is null)
+        var request = new GetPlanByIdRequest(planId);
+        var planResponse = await _planHandler.GetByIdAsync(request);
+        if (planResponse is null)
             return NotFound();
-
-        var registerCompany = new RegisterCompanyViewModel();
 
         var viewModel = new PlanCompanyViewModel
         {
-            Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterCompany = registerCompany
+            Plan = planResponse.Data
         };
 
         return View(viewModel);
