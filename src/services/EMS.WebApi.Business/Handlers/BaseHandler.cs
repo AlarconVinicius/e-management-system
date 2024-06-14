@@ -1,6 +1,6 @@
 ﻿using EMS.Core.Notifications;
+using EMS.Core.User;
 using EMS.WebApi.Business.Models;
-using EMS.WebApi.Business.Utils;
 using FluentValidation;
 using FluentValidation.Results;
 

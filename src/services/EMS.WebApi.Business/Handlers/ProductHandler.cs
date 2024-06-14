@@ -3,9 +3,9 @@ using EMS.Core.Notifications;
 using EMS.Core.Requests.Products;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Products;
+using EMS.Core.User;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 

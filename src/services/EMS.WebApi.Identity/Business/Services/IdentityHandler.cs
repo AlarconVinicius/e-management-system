@@ -4,9 +4,9 @@ using EMS.Core.Notifications;
 using EMS.Core.Requests.Identities;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Identities;
+using EMS.Core.User;
 using EMS.WebApi.Business.Handlers;
 using EMS.WebApi.Business.Interfaces.Repositories;
-using EMS.WebApi.Business.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -288,7 +288,7 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
         AddStandardClaims(claims, userDb);
         AddUserRolesClaims(claims, userRoles);
 
-        claims = claims.Where(c => c.Type != "Tenant").ToList();
+        //claims = claims.Where(c => c.Type != "Tenant").ToList();
 
         var token = GenerateToken(claims);
 
