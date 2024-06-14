@@ -5,12 +5,11 @@ using EMS.Core.Responses;
 using EMS.Core.Responses.Employees;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class EmployeeHandler : MainService, IEmployeeHandler
+public class EmployeeHandler : BaseHandler, IEmployeeHandler
 {
     public readonly IEmployeeRepository _employeeRepository;
     public readonly ICompanyRepository _companyRepository;

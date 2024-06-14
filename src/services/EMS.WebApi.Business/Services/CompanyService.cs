@@ -1,4 +1,5 @@
 ﻿using EMS.Core.Notifications;
+using EMS.WebApi.Business.Handlers;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Interfaces.Services;
 using EMS.WebApi.Business.Models;
@@ -6,7 +7,7 @@ using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Services;
 
-public class CompanyService : MainService, ICompanyService
+public class CompanyService : BaseHandler, ICompanyService
 {
     public readonly ICompanyRepository _companyRepository;
 

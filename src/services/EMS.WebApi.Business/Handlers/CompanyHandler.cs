@@ -5,12 +5,11 @@ using EMS.Core.Responses;
 using EMS.Core.Responses.Companies;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class CompanyHandler : MainService, ICompanyHandler
+public class CompanyHandler : BaseHandler, ICompanyHandler
 {
     public readonly ICompanyRepository _companyRepository;
 
@@ -52,6 +51,7 @@ public class CompanyHandler : MainService, ICompanyHandler
     {
         //if (!ExecuteValidation(new CompanyValidation(), company)) return;
 
+        if (IsDocumentInUse(request.Document)) return;
         var companyMapped = request.MapCreateCompanyRequestToCompany();
         try
         {
@@ -114,6 +114,16 @@ public class CompanyHandler : MainService, ICompanyHandler
         };
 
         Notify("Companhia não encontrada.");
+        return false;
+    }
+
+    private bool IsDocumentInUse(string document)
+    {
+        if (_companyRepository.SearchAsync(f => f.Document.Number == document).Result.Any())
+        {
+            Notify("Este CPF/CNPJ já está em uso.");
+            return true;
+        };
         return false;
     }
 }

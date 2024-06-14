@@ -5,12 +5,11 @@ using EMS.Core.Responses;
 using EMS.Core.Responses.Products;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class ProductHandler : MainService, IProductHandler
+public class ProductHandler : BaseHandler, IProductHandler
 {
     public readonly IProductRepository _productRepository;
     public readonly ICompanyRepository _companyRepository;

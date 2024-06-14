@@ -1,13 +1,12 @@
-﻿using EMS.WebApi.Business.Models;
-using EMS.Core.Notifications;
+﻿using EMS.Core.Notifications;
+using EMS.WebApi.Business.Models;
+using EMS.WebApi.Business.Utils;
 using FluentValidation;
 using FluentValidation.Results;
-using EMS.WebApi.Business.Utils;
-using Microsoft.Extensions.Logging;
 
-namespace EMS.WebApi.Business.Services;
+namespace EMS.WebApi.Business.Handlers;
 
-public class MainService
+public class BaseHandler
 {
     private readonly INotifier _notifier;
     protected ValidationResult _validationResult;
@@ -16,21 +15,19 @@ public class MainService
     protected Guid TenantId = Guid.Empty;
     protected bool IsUserAuthenticated { get; set; }
 
-    protected MainService(INotifier notifier, IAspNetUser appUser)
+    protected BaseHandler(INotifier notifier, IAspNetUser appUser)
     {
         _notifier = notifier;
         _validationResult = new ValidationResult();
 
         AppUser = appUser;
 
-        //if (appUser.IsAuthenticated())
-        //{
-        //    UserId = appUser.GetUserId();
-        //    IsUserAuthenticated = true;
-        TenantId = Guid.Parse("3eb1ed86-802c-4355-8045-482c274ac6ca");
-        //TenantId = AppUser.GetTenantId() != Guid.Empty ? _aspNetUser.GetTenantId() : Guid.Empty;
-
-        //}
+        if (appUser.IsAuthenticated())
+        {
+            UserId = appUser.GetUserId();
+            IsUserAuthenticated = true;
+            TenantId = appUser.GetTenantId() != Guid.Empty ? appUser.GetTenantId() : Guid.Empty;
+        }
     }
 
     protected void Notify(ValidationResult validationResult)

@@ -4,8 +4,8 @@ using EMS.Core.Notifications;
 using EMS.Core.Requests.Identities;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Identities;
+using EMS.WebApi.Business.Handlers;
 using EMS.WebApi.Business.Interfaces.Repositories;
-using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -16,7 +16,7 @@ using System.Text;
 
 namespace EMS.WebApi.Identity.Business.Services;
 
-public class IdentityHandler : MainService, IIdentityHandler
+public class IdentityHandler : BaseHandler, IIdentityHandler
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;

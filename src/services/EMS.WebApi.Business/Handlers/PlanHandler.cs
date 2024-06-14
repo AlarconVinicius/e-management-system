@@ -5,12 +5,11 @@ using EMS.Core.Responses;
 using EMS.Core.Responses.Plans;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Services;
 using EMS.WebApi.Business.Utils;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class PlanHandler : MainService, IPlanHandler
+public class PlanHandler : BaseHandler, IPlanHandler
 {
     public readonly IPlanRepository _planRepository;
     public readonly ICompanyRepository _companyRepository;
