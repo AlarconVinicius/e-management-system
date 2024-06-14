@@ -38,4 +38,21 @@ public class Company : Entity
     {
         IsActive = status;
     }
+
+    #region Setters
+    public void SetName(string name)
+    {
+        Name = name;
+    }
+
+    public void SetBrand(string brand)
+    {
+        Brand = brand;
+    }
+
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
+    #endregion
 }
