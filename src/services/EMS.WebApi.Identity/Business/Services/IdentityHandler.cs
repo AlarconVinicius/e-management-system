@@ -156,7 +156,7 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
             Notify("Usuário não encontrado.");
             return;
         }
-        if(request.NewClaim.Type == "Tenant")
+        if(IsUserAuthenticated && request.NewClaim.Type == "Tenant")
         {
             Notify("Claim inválida.");
             return;
@@ -164,7 +164,15 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
         var userDb = await _userManager.FindByIdAsync(userId);
 
         var existingClaims = await _userManager.GetClaimsAsync(userDb);
-        var existingClaim = existingClaims.FirstOrDefault(c => c.Type != "Tenant" && c.Type == request.NewClaim.Type);
+        Claim existingClaim;
+        if (IsUserAuthenticated)
+        {
+            existingClaim = existingClaims.FirstOrDefault(c => c.Type != "Tenant" && c.Type == request.NewClaim.Type);
+        }
+        else
+        {
+            existingClaim = existingClaims.FirstOrDefault(c => c.Type == request.NewClaim.Type);
+        }
 
         if (existingClaim != null)
         {

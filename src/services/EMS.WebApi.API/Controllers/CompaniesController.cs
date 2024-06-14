@@ -60,6 +60,21 @@ public class CompaniesController : ApiController
         return IsOperationValid() ? ResponseCreated() : ResponseBadRequest();
     }
 
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
+    [HttpPost("user")]
+    public async Task<IActionResult> Post(CreateCompanyAndUserRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ResponseBadRequest(ModelState);
+        }
+        var response = await _companyHandler.CreateAsync(request);
+
+        return IsOperationValid() ? ResponseOk(response) : ResponseBadRequest();
+    }
+
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpPut("{id:guid}")]

@@ -43,6 +43,10 @@ public class BaseHandler
         _notifier.Handle(new Notification(message));
         _validationResult.Errors.Add(new ValidationFailure(string.Empty, message));
     }
+    protected bool IsOperationValid()
+    {
+        return !_notifier.HasNotification();
+    }
 
     protected bool ExecuteValidation<TV, TE>(TV validation, TE entity) where TV : AbstractValidator<TE> where TE : Entity
     {

@@ -39,7 +39,7 @@ public class UserClaim
 
     public UserClaim() { }
 
-    public UserClaim(string value, string type)
+    public UserClaim(string type, string value)
     {
         Value = value;
         Type = type;
