@@ -3,10 +3,12 @@ using EMS.Core.Handlers;
 using EMS.Core.Notifications;
 using EMS.Core.Requests.Plans;
 using EMS.WebApi.API.Controllers.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApi.API.Controllers;
 
+[Authorize]
 [Route("api/v1/plans/")]
 public class PlansController : ApiController
 {
@@ -16,6 +18,7 @@ public class PlansController : ApiController
         _planHandler = planHandler;
     }
 
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpGet("{id:guid}")]
@@ -28,6 +31,7 @@ public class PlansController : ApiController
 
     }
 
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpGet]

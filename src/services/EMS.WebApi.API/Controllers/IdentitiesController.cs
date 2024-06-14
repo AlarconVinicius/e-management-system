@@ -3,10 +3,12 @@ using EMS.Core.Handlers;
 using EMS.Core.Notifications;
 using EMS.Core.Requests.Identities;
 using EMS.WebApi.API.Controllers.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApi.API.Controllers;
 
+[Authorize]
 [Route("api/v1/identities/")]
 public class IdentitiesController : ApiController
 {
@@ -16,6 +18,7 @@ public class IdentitiesController : ApiController
         _identityHandler = identityHandler;
     }
 
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpPost("login")]
@@ -31,6 +34,7 @@ public class IdentitiesController : ApiController
         return IsOperationValid() ? ResponseOk(response) : ResponseBadRequest();
     }
 
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpPost("create")]

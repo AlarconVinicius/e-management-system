@@ -3,10 +3,12 @@ using EMS.Core.Handlers;
 using EMS.Core.Notifications;
 using EMS.Core.Requests.Employees;
 using EMS.WebApi.API.Controllers.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApi.API.Controllers;
 
+[Authorize]
 [Route("api/v1/employees/")]
 public class EmployeesController : ApiController
 {
