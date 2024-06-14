@@ -32,12 +32,7 @@ public class AspNetUser : IAspNetUser
     }
     public Guid GetTenantId()
     {
-        if (!IsAuthenticated())
-            return Guid.Empty;
-
-        var tenantClaim = ((ClaimsIdentity)HttpContext.User.Identity).FindFirst("Tenant");
-
-        return tenantClaim != null ? Guid.Parse(tenantClaim.Value) : Guid.Empty;
+        return IsAuthenticated() ? HttpContext!.User.GetTenantId() : Guid.Empty;
     }
 
     public string GetUserEmail()
