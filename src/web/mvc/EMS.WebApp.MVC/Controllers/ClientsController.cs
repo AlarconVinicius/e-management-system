@@ -1,12 +1,7 @@
 ﻿using EMS.Core.Notifications;
 using EMS.Core.Requests.Clients;
-using EMS.Core.Responses;
 using EMS.Core.Responses.Clients;
 using EMS.Core.User;
-using EMS.WebApp.Business.Mappings;
-using EMS.WebApp.Business.Models;
-using EMS.WebApp.Business.Notifications;
-using EMS.WebApp.Business.Utils;
 using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -64,27 +59,13 @@ public class ClientsController : MainController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateClientRequest request)
     {
-        var role = ERole.Client;
         if (!ModelState.IsValid)
-        {
             return View(request);
-        }
 
-        request.CompanyId = GetTenant();
-        request.Role = role.MapERoleToERoleCore();
-        //var result = await _clientHandler.CreateAsync(request);
-            
-        //if (result != null && !result.IsSuccess)
-        //{
-        //    Notify(result.Message);
-        //    TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
-        //if (!IsValidOperation())
-        //{
-        //    TempData["Failure"] = "Falha ao adicionar cliente: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
+        var result = await _clientHandler.CreateAsync(request);
+
+        if (HasErrorsInResponse(result)) return View(request);
+
         TempData["Success"] = "Cliente adicionado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -96,10 +77,9 @@ public class ClientsController : MainController
         {
             return NotFound();
         }
-        //var request = new UpdateClientRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.IsActive);
-        //ViewBag.Cpf = response.Data.Cpf;
-        //return View(request);
-        return View();
+        var request = new UpdateClientRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.IsActive);
+        ViewBag.Cpf = response.Document;
+        return View(request);
     }
 
     [HttpPost]
@@ -115,20 +95,10 @@ public class ClientsController : MainController
             return View(request);
         }
 
-        request.CompanyId = GetTenant();
-        //var result = await _clientHandler.UpdateAsync(request);
+        var result = await _clientHandler.UpdateAsync(request);
 
-        //if (result != null && !result.IsSuccess)
-        //{
-        //    Notify(result.Message);
-        //    TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
-        //if (!IsValidOperation())
-        //{
-        //    TempData["Failure"] = "Falha ao atualizar cliente: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
+        if (HasErrorsInResponse(result)) return View(request);
+
         TempData["Success"] = "Cliente atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -154,24 +124,23 @@ public class ClientsController : MainController
             return NotFound();
         }
 
-        await _clientHandler.DeleteAsync(new DeleteClientRequest { Id = id });
+        var result = await _clientHandler.DeleteAsync(new DeleteClientRequest { Id = id });
 
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao deletar cliente: " + string.Join("; ", await GetNotificationErrors());
-            return View(response);
-        }
+        if (HasErrorsInResponse(result)) return View(response);
+
+        //if (!IsValidOperation())
+        //{
+        //    TempData["Failure"] = "Falha ao deletar cliente: " + string.Join("; ", await GetNotificationErrors());
+        //    return View(response);
+        //}
 
         TempData["Success"] = "Cliente deletado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
-    private Guid GetTenant()
-    {
-        return _appUser.GetTenantId();
-    }
     private async Task<ClientResponse> GetById(Guid id)
     {
-        return await _clientHandler.GetByIdAsync(new GetClientByIdRequest { Id = id });
+        var result = await _clientHandler.GetByIdAsync(new GetClientByIdRequest(id));
+        return result.Data;
     }
 }

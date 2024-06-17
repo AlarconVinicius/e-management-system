@@ -1,8 +1,8 @@
-﻿using EMS.Core.Requests.Plans;
+﻿using EMS.Core.Configuration;
+using EMS.Core.Requests.Plans;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Plans;
 using EMS.Core.User;
-using EMS.WebApp.MVC.Configuration;
 using EMS.WebApp.MVC.Models;
 using System.Net;
 
@@ -17,10 +17,16 @@ public interface IPlanHandler
     Task<CustomHttpResponse> UpdateAsync(UpdatePlanRequest request);
 }
 
-public class PlanHandler(IAspNetUser aspNetUser, IHttpClientFactory httpClientFactory) : BaseHandler(aspNetUser), IPlanHandler
+public class PlanHandler : BaseHandler, IPlanHandler
 {
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(WebConfigurationDefault.HttpClientName);
+    private readonly HttpClient _httpClient;
     private readonly string _baseUrl = "api/v1/plans";
+    public PlanHandler(IAspNetUser aspNetUser, HttpClient httpClient) : base(aspNetUser)
+    {
+        httpClient.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
+
+        _httpClient = httpClient;
+    }
 
     public async Task<CustomHttpResponse<PlanResponse>> GetByIdAsync(GetPlanByIdRequest request)
     {
@@ -42,9 +48,7 @@ public class PlanHandler(IAspNetUser aspNetUser, IHttpClientFactory httpClientFa
 
     public async Task<CustomHttpResponse> CreateAsync(CreatePlanRequest request)
     {
-        var content = GetContent(request);
-
-        var response = await _httpClient.PostAsJsonAsync(_baseUrl, content);
+        var response = await _httpClient.PostAsJsonAsync(_baseUrl, request);
 
         if (!HandleErrorResponse(response))
         {
@@ -61,9 +65,7 @@ public class PlanHandler(IAspNetUser aspNetUser, IHttpClientFactory httpClientFa
 
     public async Task<CustomHttpResponse> UpdateAsync(UpdatePlanRequest request)
     {
-        var content = GetContent(request);
-
-        var response = await _httpClient.PutAsJsonAsync($"{_baseUrl}/{request.Id}", content);
+        var response = await _httpClient.PutAsJsonAsync($"{_baseUrl}/{request.Id}", request);
 
         if (!HandleErrorResponse(response))
         {

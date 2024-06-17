@@ -1,5 +1,4 @@
-﻿using EMS.Core.Configuration;
-using EMS.WebApp.MVC.Extensions;
+﻿using EMS.WebApp.MVC.Extensions;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
@@ -15,13 +14,14 @@ public static class WebAppConfig
                     options.SuppressModelStateInvalidFilter = true;
                 });
 
-        services.AddHttpClient(
-                    WebConfigurationDefault.HttpClientName,
-                    options =>
-                    {
-                        options.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
-                    }
-                );
+        //services.AddHttpClient(
+        //            WebConfigurationDefault.HttpClientName,
+        //            options =>
+        //            {
+        //                options.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
+        //            }
+        //        );
+        services.AddRazorPages();
     }
 
     public static void UseMvcConfiguration(this IApplicationBuilder app, IWebHostEnvironment env, WebApplication webApp)

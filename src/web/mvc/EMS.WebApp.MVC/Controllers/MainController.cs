@@ -1,4 +1,5 @@
 ﻿using EMS.Core.Notifications;
+using EMS.WebApp.MVC.Models;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -14,10 +15,10 @@ public class MainController : Controller
         _notifier = notifier;
     }
 
-    protected bool IsValidOperation()
-    {
-        return !_notifier.HasNotification();
-    }
+    //protected bool IsValidOperation()
+    //{
+    //    return !_notifier.HasNotification();
+    //}
     protected void Notify(ValidationResult validationResult)
     {
         if (!validationResult.IsValid && validationResult.Errors.Any())
@@ -33,10 +34,6 @@ public class MainController : Controller
     {
         _notifier.Handle(new Notification(message));
     }
-    protected bool HasErrorsInResponse(ModelStateDictionary modelState)
-    {
-        return !modelState.IsValid;
-    }
     protected void AddError(ValidationResult response)
     {
         if (!response.IsValid && response.Errors.Any())
@@ -46,10 +43,6 @@ public class MainController : Controller
                 ModelState.AddModelError(string.Empty, error.ErrorMessage);
             }
         }
-    }
-    protected void AddError(string message)
-    {
-        ModelState.AddModelError(string.Empty, message);
     }
 
     protected async Task<List<string>> GetNotificationErrors()
@@ -67,5 +60,33 @@ public class MainController : Controller
             errors.AddRange(ModelState.Values.SelectMany(v => v.Errors).Select(error => error.ErrorMessage));
         }
         return errors;
+    }
+
+    //MVC
+    protected bool HasErrorsInResponse(ModelStateDictionary modelState)
+    {
+        return !modelState.IsValid;
+    }
+    protected bool HasErrorsInResponse(CustomHttpResponse response)
+    {
+        if (response?.Errors?.Any() == true)
+        {
+            foreach (var mensagem in response.Errors)
+            {
+                ModelState.AddModelError(string.Empty, mensagem);
+            }
+
+            return true;
+        }
+        return false;
+    }
+    protected void AddError(string message)
+    {
+        ModelState.AddModelError(string.Empty, message);
+    }
+
+    protected bool IsValidOperation()
+    {
+        return ModelState.ErrorCount == 0;
     }
 }

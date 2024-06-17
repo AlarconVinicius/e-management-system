@@ -14,6 +14,4 @@ var app = builder.Build();
 
 app.UseMvcConfiguration(app.Environment, app);
 
-//app.CheckAndApplyDatabaseMigrations(app.Services);
-
 app.Run();

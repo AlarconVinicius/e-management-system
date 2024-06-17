@@ -1,8 +1,8 @@
-﻿using EMS.Core.Requests.Identities;
+﻿using EMS.Core.Configuration;
+using EMS.Core.Requests.Identities;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Identities;
 using EMS.Core.User;
-using EMS.WebApp.MVC.Configuration;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -25,18 +25,22 @@ public interface IIdentityHandler
     Task<CustomHttpResponse<PagedResponse<UserResponse>>> GetAllAsync(GetAllUsersRequest request);
 }
 
-public class IdentityHandler(IAspNetUser aspNetUser, IHttpClientFactory httpClientFactory, IAuthenticationService authenticationService) : BaseHandler(aspNetUser), IIdentityHandler
+public class IdentityHandler : BaseHandler, IIdentityHandler
 {
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(WebConfigurationDefault.HttpClientName);
-    private readonly IAuthenticationService _authenticationService = authenticationService;
+    private readonly HttpClient _httpClient;
+    private readonly IAuthenticationService _authenticationService;
     private readonly string _baseUrl = "api/v1/identities/login";
 
+    public IdentityHandler(IAspNetUser aspNetUser, HttpClient httpClient, IAuthenticationService authenticationService) : base(aspNetUser)
+    {
+        httpClient.BaseAddress = new Uri(ConfigurationDefault.ApiUrl);
+        _httpClient = httpClient;
+        _authenticationService = authenticationService;
+    }
 
     public async Task<CustomHttpResponse<LoginUserResponse>> LoginAsync(LoginUserRequest request)
     {
-        var content = GetContent(request);
-
-        var response = await _httpClient.PostAsJsonAsync(_baseUrl, content);
+        var response = await _httpClient.PostAsJsonAsync(_baseUrl, request);
 
         if (!HandleErrorResponse(response))
         {
@@ -81,9 +85,7 @@ public class IdentityHandler(IAspNetUser aspNetUser, IHttpClientFactory httpClie
 
     public async Task<CustomHttpResponse<LoginUserResponse>> CreateAsync(CreateUserRequest request)
     {
-        var content = GetContent(request);
-
-        var response = await _httpClient.PostAsJsonAsync(_baseUrl, content);
+        var response = await _httpClient.PostAsJsonAsync(_baseUrl, request);
 
         if (!HandleErrorResponse(response))
         {

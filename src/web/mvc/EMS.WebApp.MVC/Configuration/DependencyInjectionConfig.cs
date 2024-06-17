@@ -16,6 +16,7 @@ public static class DependencyInjectionConfig
         #region HttpServices
         services.AddHttpClient<IIdentityHandler, IdentityHandler>();
         services.AddHttpClient<IPlanHandler, PlanHandler>();
+        services.AddHttpClient<ICompanyHandler, CompanyHandler>();
         services.AddHttpClient<IClientHandler, ClientHandler>()
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
         #endregion
