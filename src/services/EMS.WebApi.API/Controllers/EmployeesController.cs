@@ -60,12 +60,42 @@ public class EmployeesController : ApiController
         return IsOperationValid() ? ResponseCreated(request.Id) : ResponseBadRequest();
     }
 
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
+    [HttpPost("user")]
+    public async Task<IActionResult> Post(CreateEmployeeAndUserRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return ResponseBadRequest(ModelState);
+        }
+        await _employeeHandler.CreateAsync(request);
+
+        return IsOperationValid() ? ResponseCreated(request.Employee.Id) : ResponseBadRequest();
+    }
+
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, UpdateEmployeeRequest request)
     {
         if (id != request.Id) return ResponseBadRequest("Os IDs não correspondem.");
+        if (!ModelState.IsValid)
+        {
+            return ResponseBadRequest(ModelState);
+        }
+
+        await _employeeHandler.UpdateAsync(request);
+
+        return IsOperationValid() ? ResponseOk() : ResponseBadRequest();
+    }
+
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomResult), StatusCodes.Status400BadRequest)]
+    [HttpPut("user/{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, UpdateEmployeeAndUserRequest request)
+    {
+        if (id != request.Employee.Id) return ResponseBadRequest("Os IDs não correspondem.");
         if (!ModelState.IsValid)
         {
             return ResponseBadRequest(ModelState);

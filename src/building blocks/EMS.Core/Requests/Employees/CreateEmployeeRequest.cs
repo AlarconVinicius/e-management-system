@@ -1,5 +1,6 @@
 ﻿using EMS.Core.Enums;
 using EMS.Core.Extensions;
+using EMS.Core.Requests.Companies;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 

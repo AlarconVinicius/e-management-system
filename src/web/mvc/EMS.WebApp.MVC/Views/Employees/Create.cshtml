@@ -1,5 +1,5 @@
 ﻿@using EMS.Core.Requests.Employees;
-@model CreateEmployeeRequest
+@model CreateEmployeeAndUserRequest
 @{
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "Adicionar Colaborador";
@@ -18,33 +18,33 @@
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="Name" class="control-label"></label>
-                        <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <label asp-for="Employee.Name" class="control-label"></label>
+                        <input asp-for="Employee.Name" class="form-control" />
+                        <span asp-validation-for="Employee.Name" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="LastName" class="control-label"></label>
-                        <input asp-for="LastName" class="form-control" />
-                        <span asp-validation-for="LastName" class="text-danger"></span>
+                        <label asp-for="Employee.LastName" class="control-label"></label>
+                        <input asp-for="Employee.LastName" class="form-control" />
+                        <span asp-validation-for="Employee.LastName" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                        <label asp-for="Employee.Email" class="control-label"></label>
+                        <input asp-for="Employee.Email" class="form-control" />
+                        <span asp-validation-for="Employee.Email" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="PhoneNumber" class="control-label"></label>
-                        <input asp-for="PhoneNumber" type="text" class="form-control" />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        <label asp-for="Employee.PhoneNumber" class="control-label"></label>
+                        <input asp-for="Employee.PhoneNumber" type="text" class="form-control" />
+                        <span asp-validation-for="Employee.PhoneNumber" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Document" class="control-label"></label>
-                        <input asp-for="Document" type="text" class="form-control" />
-                        <span asp-validation-for="Document" class="text-danger"></span>
+                        <label asp-for="Employee.Document" class="control-label"></label>
+                        <input asp-for="Employee.Document" type="text" class="form-control" />
+                        <span asp-validation-for="Employee.Document" class="text-danger"></span>
                     </div>
                     <div class="form-group form-check">
                         <label class="form-check-label">
-                            <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                            <input class="form-check-input" asp-for="Employee.IsActive" /> @Html.DisplayNameFor(model => model.Employee.IsActive)
                         </label>
                     </div>
                     <div class="form-group mt-3">
