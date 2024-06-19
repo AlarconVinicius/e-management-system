@@ -15,6 +15,7 @@ public abstract class User : Entity
     public bool IsActive { get; private set; }
 
     public Company Company { get; set; }
+    public ICollection<ServiceAppointment> ServiceAppointments { get; set; }
 
     public User() { }
     protected User(Guid companyId, string name, string lastName, string email, string phoneNumber, string document, ERole role)

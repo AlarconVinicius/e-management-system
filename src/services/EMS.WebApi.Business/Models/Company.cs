@@ -13,6 +13,8 @@ public class Company : Entity
     public Plan Plan { get; private set; }
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Product> Products { get; set; } = new List<Product>();
+    public ICollection<Service> Services { get; set; } = new List<Service>();
+    public ICollection<ServiceAppointment> ServiceAppointments { get; set; } = new List<ServiceAppointment>();
 
     public Company() { }
 
