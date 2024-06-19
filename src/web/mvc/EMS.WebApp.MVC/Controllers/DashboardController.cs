@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace EMS.WebApp.MVC.Controllers;
 
 [Authorize]
-[Route("dashboard")]
 public class DashboardController : MainController
 {
     //private readonly IAspNetUser _appUser;
