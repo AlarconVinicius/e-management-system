@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿using EMS.Core.Utils;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.Design;
 
 namespace EMS.Core.Requests.Services;
 
@@ -15,8 +15,10 @@ public class CreateServiceRequest : CompaniesRequest
     public decimal Price { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [RegularExpression(RegexUtils.TimeSpanPattern, ErrorMessage = "O campo {0} deve estar no formato hh:mm:ss.")]
+    [DefaultValue("00:10:00")]
     [DisplayName("Duração")]
-    public TimeSpan Duration { get; set; }
+    public string Duration { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Ativo")]
@@ -24,7 +26,7 @@ public class CreateServiceRequest : CompaniesRequest
 
     public CreateServiceRequest() { }
 
-    public CreateServiceRequest(Guid companyId, string name, decimal price, TimeSpan duration, bool isActive) : base(companyId)
+    public CreateServiceRequest(Guid companyId, string name, decimal price, string duration, bool isActive) : base(companyId)
     {
         Name = name;
         Price = price;
