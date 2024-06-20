@@ -16,27 +16,26 @@ public class Service : Entity
 
     public Service() { }
 
-    public Service(Guid companyId, string name, decimal price, TimeSpan duration, Company company, bool isActive)
+    public Service(Guid companyId, string name, decimal price, TimeSpan duration, bool isActive)
     {
         CompanyId = companyId;
         Name = name;
         Price = price;
         Duration = duration;
-        Company = company;
         IsActive = isActive;
     }
 
-    public Service(Guid id, Guid companyId, string name, decimal price, TimeSpan duration, Company company, bool isActive)
+    public Service(Guid id, Guid companyId, string name, decimal price, TimeSpan duration, bool isActive)
     {
         SetId(id);
         CompanyId = companyId;
         Name = name;
         Price = price;
         Duration = duration;
-        Company = company;
         IsActive = isActive;
     }
 
+    #region Setters
     public void SetName(string name)
     {
         Name = name;
@@ -51,4 +50,10 @@ public class Service : Entity
     {
         Duration = duration;
     }
+
+    public void SetIsActive(bool isActive)
+    {
+        IsActive = isActive;
+    }
+    #endregion
 }

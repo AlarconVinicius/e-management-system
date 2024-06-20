@@ -8,6 +8,10 @@ public class ServiceResponse
     [DisplayName("Id")]
     public Guid Id { get; set; }
 
+    [DisplayName("Id da Empresa")]
+    public Guid CompanyId { get; set; }
+
+
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
     [DisplayName("Nome")]
     public string Name { get; set; }
@@ -32,9 +36,10 @@ public class ServiceResponse
 
     public ServiceResponse() { }
 
-    public ServiceResponse(Guid id, string name, decimal price, TimeSpan duration, bool isActive, DateTime createdAt, DateTime updatedAt)
+    public ServiceResponse(Guid id, Guid companyId, string name, decimal price, TimeSpan duration, bool isActive, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
+        CompanyId = companyId;
         Name = name;
         Price = price;
         Duration = duration;
