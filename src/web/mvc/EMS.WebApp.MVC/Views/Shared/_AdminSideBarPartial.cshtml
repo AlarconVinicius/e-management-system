@@ -14,12 +14,6 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link" asp-controller="Products" asp-action="Index">
-                    <i class="fa-solid fa-list pe-2"></i>
-                    Produtos
-                </a>
-            </li>
-            <li class="sidebar-item">
                 <a href="#" class="sidebar-link collapsed" data-bs-target="#pages" data-bs-toggle="collapse"
                    aria-expanded="false">
                     <i class="fa-solid fa-file-lines pe-2"></i>
@@ -38,9 +32,15 @@
                 </ul>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link" asp-controller="Product" asp-action="Products">
+                <a class="sidebar-link" asp-controller="Products" asp-action="Index">
                     <i class="fa-solid fa-list pe-2"></i>
                     Produtos
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" asp-controller="Services" asp-action="Index">
+                    <i class="fa-solid fa-list pe-2"></i>
+                    Serviços
                 </a>
             </li>
         </ul>

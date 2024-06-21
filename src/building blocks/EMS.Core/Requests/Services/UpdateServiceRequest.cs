@@ -17,8 +17,8 @@ public class UpdateServiceRequest : CompaniesRequest
     public decimal Price { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [RegularExpression(RegexUtils.TimeSpanPattern, ErrorMessage = "O campo {0} deve estar no formato hh:mm:ss.")]
-    [DefaultValue("00:10:00")]
+    [RegularExpression(RegexUtils.TimeSpanWithoutHourPattern, ErrorMessage = "O campo {0} deve estar no formato hh:mm.")]
+    [DefaultValue("00:10")]
     [DisplayName("Duração")]
     public string Duration { get; set; }
 
