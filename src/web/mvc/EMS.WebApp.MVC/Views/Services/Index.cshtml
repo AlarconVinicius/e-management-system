@@ -51,21 +51,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var client in Model.List)
+                @foreach (var service in Model.List)
                 {
                     <tr>
                         <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                        <td>@client.Name</td>
-                        <td>@this.FormatCurrency(client.Price)</td>
-                        <td>@this.FormatTimeSpan(client.Duration)</td>
-                        <td>@(client.IsActive ? "Ativo" : "Desativado")</td>
-                        <td>@this.FormatDate(client.CreatedAt)</td>
-                        <td>@this.FormatDate(client.UpdatedAt)</td>
+                        <td>@service.Name</td>
+                        <td>@this.FormatCurrency(service.Price)</td>
+                        <td>@this.FormatTimeSpan(service.Duration)</td>
+                        <td>@(service.IsActive ? "Ativo" : "Desativado")</td>
+                        <td>@this.FormatDate(service.CreatedAt)</td>
+                        <td>@this.FormatDate(service.UpdatedAt)</td>
                         <td>
                             @* <a asp-controller="Services" asp-action="Block" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
-                            <a asp-controller="Services" asp-action="Details" asp-route-id="@client.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
-                            <a asp-controller="Services" asp-action="Edit" asp-route-id="@client.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a asp-controller="Services" asp-action="Delete" asp-route-id="@client.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
+                            <a asp-controller="Services" asp-action="Details" asp-route-id="@service.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
+                            <a asp-controller="Services" asp-action="Edit" asp-route-id="@service.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
+                            <a asp-controller="Services" asp-action="Delete" asp-route-id="@service.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
                         </td>
                     </tr>
                     itemIndex++;
