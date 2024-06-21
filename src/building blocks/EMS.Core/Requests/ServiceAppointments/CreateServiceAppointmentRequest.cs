@@ -1,6 +1,4 @@
 ﻿using EMS.Core.Enums;
-using EMS.Core.Extensions;
-using EMS.Core.Utils;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,19 +19,20 @@ public class CreateServiceAppointmentRequest : CompaniesRequest
     public Guid ServiceId { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Início do Agendamento")]
-    public string AppointmentStart { get; set; }
+    public DateTime AppointmentStart { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Fim do Agendamento")]
-    public string AppointmentEnd { get; set; }
+    public DateTime AppointmentEnd { get; set; }
+
     public EServiceStatusCore Status { get; set; }
 
     public CreateServiceAppointmentRequest() { }
 
-    public CreateServiceAppointmentRequest(Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, string appointmentStart, string appointmentEnd, EServiceStatusCore status) : base(companyId)
+    public CreateServiceAppointmentRequest(Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, DateTime appointmentStart, DateTime appointmentEnd, EServiceStatusCore status) : base(companyId)
     {
         EmployeeId = employeeId;
         ClientId = clientId;

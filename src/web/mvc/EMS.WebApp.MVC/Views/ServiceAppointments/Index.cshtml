@@ -1,0 +1,81 @@
+﻿@using EMS.Core.Responses.ServiceAppointments;
+@using EMS.WebApp.MVC.Extensions;
+@model PagedViewModel<ServiceAppointmentResponse>
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Agendamentos";
+    var itemIndex = 0;
+}
+
+<vc:Notification></vc:Notification>
+<div class="card border-0 col-md-12">
+    <div class="card-header d-flex justify-content-between">
+        <h5 class="card-title">
+            Agendamentos
+        </h5>
+
+        <form method="get" asp-controller="ServiceAppointments" asp-action="Index">
+            <div class="d-flex align-items-center">
+                <div class="input-group me-3">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Pesquisar"
+                           aria-label="Pesquisar"
+                           aria-describedby="pesquisar"
+                           id="q" name="q"
+                           value="@ViewBag.Search" />
+                    <button class="btn btn-outline-secondary"
+                            type="submit"
+                            id="pesquisar">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+                <a asp-controller="ServiceAppointments" asp-action="Create" class="btn btn-success align-self-center w-75">
+                    Agendar
+                </a>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Colaborador</th>
+                    <th scope="col">Serviço</th>
+                    <th scope="col">Início</th>
+                    <th scope="col">Fim</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Data de Cadastro</th>
+                    <th scope="col">Data de Modificação</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var serviceAppointment in Model.List)
+                {
+                    <tr>
+                        <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
+                        <td>@serviceAppointment.ClientName @serviceAppointment.ClientLastname</td>
+                        <td>@serviceAppointment.EmployeeName @serviceAppointment.EmployeeLastname</td>
+                        <td>@serviceAppointment.ServiceName</td>
+                        <td>@serviceAppointment.AppointmentStart</td>
+                        <td>@serviceAppointment.AppointmentEnd</td>
+                        <td>@serviceAppointment.Status.ToString()</td>
+                        <td>@this.FormatDate(serviceAppointment.CreatedAt)</td>
+                        <td>@this.FormatDate(serviceAppointment.UpdatedAt)</td>
+                        <td>
+                            @* <a asp-controller="ServiceAppointments" asp-action="Block" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
+                            <a asp-controller="ServiceAppointments" asp-action="Details" asp-route-id="@serviceAppointment.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
+                            <a asp-controller="ServiceAppointments" asp-action="Edit" asp-route-id="@serviceAppointment.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
+                            <a asp-controller="ServiceAppointments" asp-action="Delete" asp-route-id="@serviceAppointment.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
+                        </td>
+                    </tr>
+                    itemIndex++;
+                }
+            </tbody>
+        </table>
+        <vc:pagination paged-model="@Model"></vc:pagination>
+    </div>
+</div>

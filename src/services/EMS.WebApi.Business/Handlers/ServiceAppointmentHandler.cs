@@ -67,18 +67,18 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
         //if (!ExecuteValidation(new ServiceAppointmentValidation(), serviceAppointment)) return;
         if (TenantIsEmpty()) return;
         if (!CompanyExists(TenantId)) return;
-        if (!ServiceExists(request.ServiceId)) return;
-        if (!EmployeeExists(request.EmployeeId)) return;
-        if (!ClientExists(request.ClientId)) return;
+        if (!ServiceExists(request.ServiceId, TenantId)) return;
+        if (!EmployeeExists(request.EmployeeId, TenantId)) return;
+        if (!ClientExists(request.ClientId, TenantId)) return;
 
         try
         {
             var service = await _serviceRepository.GetByIdAsync(request.ServiceId, TenantId);
 
             request.CompanyId = TenantId;
-            var appointmentStart = request.AppointmentStart.ToDateTime();
+            var appointmentStart = request.AppointmentStart;
             var appointmentEnd = appointmentStart.Add(service.Duration);
-            request.AppointmentEnd = appointmentEnd.ToFormattedString();
+            request.AppointmentEnd = appointmentEnd;
 
             var conflictingAppointments = await _serviceAppointmentRepository.SearchAsync(sa =>
                 (sa.EmployeeId == request.EmployeeId || sa.ClientId == request.ClientId) &&
@@ -109,9 +109,9 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
 
         if (!CompanyExists(TenantId)) return;
         if (!ServiceAppointmentExists(request.Id, TenantId)) return;
-        if (!ServiceExists(request.ServiceId)) return;
-        if (!EmployeeExists(request.EmployeeId)) return;
-        if (!ClientExists(request.ClientId)) return;
+        if (!ServiceExists(request.ServiceId, TenantId)) return;
+        if (!EmployeeExists(request.EmployeeId, TenantId)) return;
+        if (!ClientExists(request.ClientId, TenantId)) return;
 
         var serviceAppointmentDb = await _serviceAppointmentRepository.GetByIdAsync(request.Id, TenantId);
 
@@ -119,9 +119,9 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
         {
             var service = await _serviceRepository.GetByIdAsync(request.ServiceId, TenantId);
 
-            var appointmentStart = request.AppointmentStart.ToDateTime();
+            var appointmentStart = request.AppointmentStart;
             var appointmentEnd = appointmentStart.Add(service.Duration);
-            request.AppointmentEnd = appointmentEnd.ToFormattedString();
+            request.AppointmentEnd = appointmentEnd;
 
             var conflictingAppointments = await _serviceAppointmentRepository.SearchAsync(sa =>
                 sa.Id != request.Id &&
@@ -139,8 +139,12 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
             serviceAppointmentDb.SetServiceId(request.ServiceId);
             serviceAppointmentDb.SetEmployeeId(request.EmployeeId);
             serviceAppointmentDb.SetClientId(request.ClientId);
-            serviceAppointmentDb.SetAppointmentStart(request.AppointmentStart.ToDateTime());
-            serviceAppointmentDb.SetAppointmentEnd(request.AppointmentEnd.ToDateTime());
+            serviceAppointmentDb.SetStatus(request.Status.MapEServiceStatusCoreToEServiceStatus());
+            serviceAppointmentDb.SetAppointmentStart(request.AppointmentStart);
+            serviceAppointmentDb.SetAppointmentEnd(request.AppointmentEnd);
+            serviceAppointmentDb.Employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
+            serviceAppointmentDb.Client = await _clientRepository.GetByIdAsync(request.ClientId);
+            serviceAppointmentDb.Service = await _serviceRepository.GetByIdAsync(request.ServiceId);
 
             await _serviceAppointmentRepository.UpdateAsync(serviceAppointmentDb);
 
@@ -182,9 +186,9 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
         return false;
     }
 
-    private bool EmployeeExists(Guid employeeId)
+    private bool EmployeeExists(Guid employeeId, Guid companyId)
     {
-        if (_employeeRepository.GetByIdAsync(employeeId).Result is not null)
+        if (_employeeRepository.GetByIdAsync(employeeId, companyId).Result is not null)
         {
             return true;
         };
@@ -193,9 +197,9 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
         return false;
     }
 
-    private bool ClientExists(Guid clientId)
+    private bool ClientExists(Guid clientId, Guid companyId)
     {
-        if (_clientRepository.GetByIdAsync(clientId).Result is not null)
+        if (_clientRepository.GetByIdAsync(clientId, companyId).Result is not null)
         {
             return true;
         };
@@ -204,9 +208,9 @@ public class ServiceAppointmentHandler : BaseHandler, IServiceAppointmentHandler
         return false;
     }
 
-    private bool ServiceExists(Guid serviceId)
+    private bool ServiceExists(Guid serviceId, Guid companyId)
     {
-        if (_serviceRepository.GetByIdAsync(serviceId).Result is not null)
+        if (_serviceRepository.GetByIdAsync(serviceId, companyId).Result is not null)
         {
             return true;
         };

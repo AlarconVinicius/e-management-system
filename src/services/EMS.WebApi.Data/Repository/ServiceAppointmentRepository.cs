@@ -43,10 +43,13 @@ public class ServiceAppointmentRepository : Repository<ServiceAppointment>, ISer
         {
             responseQuery = responseQuery.Where(p => p.Employee.Name.Contains(query) || p.Employee.LastName.Contains(query) || p.Client.Name.Contains(query) || p.Client.LastName.Contains(query) || p.Service.Name.Contains(query));
         }
-        var result = await responseQuery.OrderBy(p => p.AppointmentStart)
-                                       .Skip(pageSize * (pageIndex - 1))
-                                       .Take(pageSize)
-                                       .ToListAsync();
+        var result = await responseQuery.Include(sa => sa.Employee)
+                                        .Include(sa => sa.Client)
+                                        .Include(sa => sa.Service)
+                                        .OrderBy(p => p.AppointmentStart)
+                                        .Skip(pageSize * (pageIndex - 1))
+                                        .Take(pageSize)
+                                        .ToListAsync();
         var total = await responseQuery.CountAsync();
 
         return new PagedResult<ServiceAppointment>()

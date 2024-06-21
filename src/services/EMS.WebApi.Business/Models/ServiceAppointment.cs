@@ -40,19 +40,24 @@ public class ServiceAppointment : Entity
     }
 
     #region Setters
-    public void SetEmployeeId(Guid id)
+    public void SetEmployeeId(Guid employeeId)
     {
-        EmployeeId = id;
+        EmployeeId = employeeId;
     }
 
-    public void SetClientId(Guid id)
+    public void SetClientId(Guid clientId)
     {
-        ClientId = id;
+        ClientId = clientId;
     }
 
-    public void SetServiceId(Guid id)
+    public void SetServiceId(Guid serviceId)
     {
-        ServiceId = id;
+        ServiceId = serviceId;
+    }
+
+    public void SetStatus(EServiceStatus status)
+    {
+        Status = status;
     }
 
     public void SetAppointmentStart(DateTime appointmentStart)

@@ -1,5 +1,4 @@
 ﻿using EMS.Core.Enums;
-using EMS.Core.Utils;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,20 +15,34 @@ public class ServiceAppointmentResponse
     [DisplayName("Id do Colaborador")]
     public Guid EmployeeId { get; set; }
 
+    [DisplayName("Nome do Colaborador")]
+    public string EmployeeName { get; set; }
+
+    [DisplayName("Sobrenome do Colaborador")]
+    public string EmployeeLastname { get; set; }
+
     [DisplayName("Id do Cliente")]
     public Guid ClientId { get; set; }
+
+    [DisplayName("Nome do Cliente")]
+    public string ClientName { get; set; }
+
+    [DisplayName("Sobrenome do Cliente")]
+    public string ClientLastname { get; set; }
 
     [DisplayName("Id do Serviço")]
     public Guid ServiceId { get; set; }
 
+    [DisplayName("Nome do Serviço")]
+    public string ServiceName { get; set; }
 
-    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Início do Agendamento")]
-    public string AppointmentStart { get; set; }
+    public DateTime AppointmentStart { get; set; }
 
-    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Fim do Agendamento")]
-    public string AppointmentEnd { get; set; }
+    public DateTime AppointmentEnd { get; set; }
     public EServiceStatusCore Status { get; set; }
 
     [DisplayName("Data de Cadastro")]
@@ -40,13 +53,18 @@ public class ServiceAppointmentResponse
 
     public ServiceAppointmentResponse() { }
 
-    public ServiceAppointmentResponse(Guid id, Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, string appointmentStart, string appointmentEnd, EServiceStatusCore status, DateTime createdAt, DateTime updatedAt)
+    public ServiceAppointmentResponse(Guid id, Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, string employeeName, string employeeLastname, string clientName, string clientLastname, string serviceName, DateTime appointmentStart, DateTime appointmentEnd, EServiceStatusCore status, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
         CompanyId = companyId;
         EmployeeId = employeeId;
         ClientId = clientId;
         ServiceId = serviceId;
+        EmployeeName = employeeName;
+        EmployeeLastname = employeeLastname;
+        ClientName = clientName;
+        ClientLastname = clientLastname;
+        ServiceName = serviceName;
         AppointmentStart = appointmentStart;
         AppointmentEnd = appointmentEnd;
         Status = status;
