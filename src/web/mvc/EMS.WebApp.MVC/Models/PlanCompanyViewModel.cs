@@ -1,7 +1,10 @@
-﻿namespace EMS.WebApp.MVC.Models;
+﻿using EMS.Core.Requests.Companies;
+using EMS.Core.Responses.Plans;
+
+namespace EMS.WebApp.MVC.Models;
 
 public class PlanCompanyViewModel
 {
-    public PlanViewModel Plan { get; set; } = new PlanViewModel();
-    public RegisterCompanyViewModel RegisterCompany { get; set; } = new RegisterCompanyViewModel();
+    public PlanResponse Plan { get; set; }
+    public CreateCompanyAndUserRequest CreateCompanyAndUserRequest { get; set; }
 }

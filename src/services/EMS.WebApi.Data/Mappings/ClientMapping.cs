@@ -10,5 +10,8 @@ public class ClientMapping : IEntityTypeConfiguration<Client>
     {
         builder.ToTable("Clients");
 
+        builder.HasMany(c => c.ServiceAppointments)
+               .WithOne(sa => sa.Client)
+               .HasForeignKey(sa => sa.ClientId);
     }
 }

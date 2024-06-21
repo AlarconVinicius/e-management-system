@@ -1,4 +1,4 @@
-﻿using EMS.Core.Utils;
+﻿using EMS.Core.Extensions;
 
 namespace EMS.Core.DomainObjects;
 public class Cpf

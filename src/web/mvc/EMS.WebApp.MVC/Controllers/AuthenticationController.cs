@@ -1,33 +1,28 @@
 ﻿using AutoMapper;
-using EMS.Core.Enums;
-using EMS.WebApp.Business.Interfaces.Repositories;
-using EMS.WebApp.Business.Interfaces.Services;
-using EMS.WebApp.Business.Models;
-using EMS.WebApp.Business.Notifications;
-using EMS.WebApp.Business.Utils;
-using EMS.WebApp.Identity.Business.Interfaces.Services;
-using EMS.WebApp.Identity.Business.Models;
+using EMS.Core.Notifications;
+using EMS.Core.Requests.Companies;
+using EMS.Core.Requests.Identities;
+using EMS.Core.Requests.Plans;
+using EMS.Core.User;
+using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Controllers;
 public class AuthenticationController : MainController
 {
     private readonly IAspNetUser _appUser;
-    private readonly IPlanRepository _planRepository;
-    private readonly IEmployeeService _employeeService;
-    private readonly ICompanyService _companyService;
-    private readonly IAuthService _authService;
-    private readonly IMapper _mapper;
+    private readonly IPlanHandler _planHandler;
+    private readonly IIdentityHandler _identityHandler;
+    private readonly ICompanyHandler _companyHandler;
 
-    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IPlanRepository planRepository, ICompanyService companyService, IEmployeeService employeeService, IAuthService authService, IMapper mapper) : base(notifier)
+    public AuthenticationController(INotifier notifier, IAspNetUser appUser, IIdentityHandler identityHandler, IPlanHandler planHandler, ICompanyHandler companyHandler) : base(notifier)
     {
         _appUser = appUser;
-        _planRepository = planRepository;
-        _companyService = companyService;
-        _employeeService = employeeService;
-        _authService = authService;
-        _mapper = mapper;
+        _identityHandler = identityHandler;
+        _planHandler = planHandler;
+        _companyHandler = companyHandler;
     }
 
     [HttpGet]
@@ -36,16 +31,14 @@ public class AuthenticationController : MainController
     {
         if (_appUser.IsAuthenticated()) return RedirectToAction("Index", "Home");
 
-        var plan = await _planRepository.GetByIdAsync(planId);
-        if (plan is null)
+        var planRequest = new GetPlanByIdRequest(planId);
+        var planResponse = await _planHandler.GetByIdAsync(planRequest);
+        if (planResponse is null)
             return NotFound();
-
-        var registerCompany = new RegisterCompanyViewModel();
 
         var viewModel = new PlanCompanyViewModel
         {
-            Plan = new PlanViewModel().ToViewModel(plan),
-            RegisterCompany = registerCompany
+            Plan = planResponse.Data
         };
 
         return View(viewModel);
@@ -53,69 +46,33 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("nova-conta/{planId}")]
-    public async Task<IActionResult> Register(Guid planId, RegisterCompanyViewModel registerCompany, string returnUrl = null)
+    public async Task<IActionResult> Register(Guid planId, PlanCompanyViewModel request, string returnUrl = null)
     {
-        var plan = await _planRepository.GetByIdAsync(planId);
-        if (plan is null)
+        var planRequest = new GetPlanByIdRequest(planId);
+        var planResponse = await _planHandler.GetByIdAsync(planRequest);
+        if (planResponse is null)
             return NotFound();
 
-        var viewModel = new PlanCompanyViewModel
-        {
-            Plan = _mapper.Map<PlanViewModel>(plan),
-            RegisterCompany = registerCompany
-        };
+        request.Plan = planResponse.Data;
+        request.CreateCompanyAndUserRequest.Employee.Email = request.CreateCompanyAndUserRequest.User.Email;
+        request.CreateCompanyAndUserRequest.Company.PlanId = planId;
+        request.CreateCompanyAndUserRequest.Company.Brand = "";
 
+        ModelState.Remove("CreateCompanyAndUserRequest.Employee.Email");
         if (!ModelState.IsValid)
-            return View(viewModel);
+            return View(request);
 
-        Guid companyId = Guid.NewGuid();
-        Guid employeeId = Guid.NewGuid();
-        registerCompany.Company.Id = companyId;
-        registerCompany.Company.Brand = "";
-        registerCompany.Employee.Id = employeeId;
-        registerCompany.Employee.CompanyId = companyId;
-        registerCompany.Employee.Role = ERoleCore.Admin;
-        if (!await AddCompany(registerCompany.Company))
-        {
-            return View(viewModel);
-        }
-        if (!await AddEmployee(registerCompany.Employee))
-        {
-            await _companyService.Delete(companyId);
-            return View(viewModel);
-        }
+        var result = await _companyHandler.CreateAsync(request.CreateCompanyAndUserRequest);
 
-        if (!await AddIdentityUser(registerCompany))
-        {
-            await _employeeService.Delete(employeeId);
-            await _companyService.Delete(companyId);
-            return View(viewModel);
-        }
+        if (HasErrorsInResponse(result)) return View(request);
 
-        await _authService.AddOrUpdateUserClaim(employeeId.ToString(), "Tenant", companyId.ToString());
-
-        if (!IsValidOperation())
-        {
-            await _employeeService.Delete(employeeId);
-            await _companyService.Delete(companyId);
-            await _authService.DeleteUser(employeeId.ToString());
-            return View(viewModel);
-        }
-        var loginUser = new LoginUserViewModel
-        {
-            Email = registerCompany.Employee.Email,
-            Password = registerCompany.Password
-        };
-        if (!await PerformLogin(loginUser))
-        {
-            return View(loginUser);
-        }
+        await _identityHandler.PerformLogin(result.Data);
 
         if (string.IsNullOrEmpty(returnUrl)) 
             return RedirectToAction("Index", "Dashboard");
 
         return LocalRedirect(returnUrl);
-    }
+    } 
 
     [HttpGet]
     [Route("login")]
@@ -127,80 +84,38 @@ public class AuthenticationController : MainController
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login(LoginUserViewModel loginUser, string returnUrl = null!)
+    public async Task<IActionResult> Login(LoginUserRequest request, string returnUrl = null!)
     {
-        if (!ModelState.IsValid)
+        ViewData["ReturnUrl"] = returnUrl;
+
+        if (!ModelState.IsValid) return View(request);
+
+        if (!await PerformLogin(request))
         {
-            return View();
-        }
-        if (!await PerformLogin(loginUser))
-        {
-            return View(loginUser);
+            return View(request);
         }
         if (string.IsNullOrEmpty(returnUrl)) return RedirectToAction("Index", "Dashboard");
 
         return LocalRedirect(returnUrl);
     }
 
+    [Authorize]
     [HttpGet]
     [Route("sair")]
     public async Task<IActionResult> Logout()
     {
-        await _authService.Logout();
+        await _identityHandler.Logout();
         return RedirectToAction("Index", "Home");
     }
 
-    #region AuxRegisterMethods
-    private async Task<bool> AddIdentityUser(RegisterCompanyViewModel registerCompany)
-    {
-        var identityUser = new RegisterUser
-        {
-            Id = registerCompany.Employee.Id,
-            Role = nameof(registerCompany.Employee.Role),
-            Email = registerCompany.Employee.Email,
-            Password = registerCompany.Password
-        };
-        await _authService.RegisterUser(identityUser);
-        if (!IsValidOperation())
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private async Task<bool> AddCompany(CompanyViewModel company)
-    {
-        await _companyService.Add(_mapper.Map<Company>(company));
-        if (!IsValidOperation())
-        {
-            return false;
-        }
-        return true;
-    }
-    private async Task<bool> AddEmployee(EmployeeViewModel employee)
-    {
-        await _employeeService.Add(_mapper.Map<Employee>(employee));
-        if (!IsValidOperation())
-        {
-            return false;
-        }
-        return true;
-    }
-    #endregion
-
     #region AuxLoginMethods
-    private async Task<bool> PerformLogin(LoginUserViewModel loginUser)
+    private async Task<bool> PerformLogin(LoginUserRequest request)
     {
-        var loginUserMapped = new LoginUser
-        {
-            Email = loginUser.Email,
-            Password = loginUser.Password
-        };
-        await _authService.Login(loginUserMapped);
-        if (!IsValidOperation())
-        {
-            return false;
-        }
+        var response = await _identityHandler.LoginAsync(request);
+
+        if (response.Data == null) return false;
+
+        await _identityHandler.PerformLogin(response.Data);
         return true;
     }
     #endregion

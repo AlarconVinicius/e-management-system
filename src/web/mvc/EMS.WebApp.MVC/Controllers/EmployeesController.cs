@@ -1,13 +1,9 @@
-﻿using EMS.Core.Handlers;
+﻿using EMS.Core.Notifications;
 using EMS.Core.Requests.Employees;
-using EMS.Core.Responses;
+using EMS.Core.Requests.Identities;
 using EMS.Core.Responses.Employees;
-using EMS.WebApp.Business.Mappings;
-using EMS.WebApp.Business.Models;
-using EMS.WebApp.Business.Notifications;
-using EMS.WebApp.Business.Utils;
-using EMS.WebApp.Identity.Business.Interfaces.Services;
-using EMS.WebApp.Identity.Business.Models;
+using EMS.Core.User;
+using EMS.WebApp.MVC.Handlers;
 using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +14,13 @@ namespace EMS.WebApp.MVC.Controllers;
 public class EmployeesController : MainController
 {
     private readonly IEmployeeHandler _employeeHandler;
-    private readonly IAuthService _authService;
+    private readonly IIdentityHandler _identityHandler;
     private readonly IAspNetUser _appUser;
 
-    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeHandler employeeHandler, IAuthService authService) : base(notifier)
+    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeHandler employeeHandler) : base(notifier)
     {
         _appUser = appUser;
         _employeeHandler = employeeHandler;
-        _authService = authService;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
@@ -34,20 +29,18 @@ public class EmployeesController : MainController
         var request = new GetAllEmployeesRequest { PageNumber = page, PageSize = ps, Query = q };
         var response = await _employeeHandler.GetAllAsync(request);
 
-        //var mappedClients = new PagedViewModel<EmployeeResponse>
-        //{
-        //    List = response.Data,
-        //    PageIndex = request.PageNumber,
-        //    PageSize = request.PageSize,
-        //    Query = request.Query,
-        //    TotalResults = response.TotalCount
-        //};
-        //ViewBag.Search = q;
-        //mappedClients.ReferenceAction = "Index";
+        var mappedEmployees = new PagedViewModel<EmployeeResponse>
+        {
+            List = response.Data.List,
+            PageIndex = response.Data.PageIndex,
+            PageSize = response.Data.PageSize,
+            Query = request.Query,
+            TotalResults = response.Data.TotalResults
+        };
+        ViewBag.Search = q;
+        mappedEmployees.ReferenceAction = "Index";
 
-        //return View(mappedClients);
-
-        return View();
+        return View(mappedEmployees);
     }
 
     public async Task<IActionResult> Details(Guid id)
@@ -69,43 +62,24 @@ public class EmployeesController : MainController
 
     //[Authorize(Roles = "Admin")]
     [HttpPost("Create")]
-    public async Task<IActionResult> Create(CreateEmployeeRequest request, string returnUrl = null)
+    public async Task<IActionResult> Create(CreateEmployeeAndUserRequest request, string returnUrl = null)
     {
+        var password = GeneratePassword(request.Employee);
+        var newUser = new CreateUserRequest(request.Employee.Id, request.Employee.Email, password, password);
+        request.User = newUser;
+        ModelState.Remove("User");
+        ModelState.Remove("User.Email");
+        ModelState.Remove("User.Password");
+        ModelState.Remove("User.ConfirmPassword");
         if (!ModelState.IsValid)
         {
             return View(request);
         }
-        Guid id = Guid.NewGuid();
-        var role = ERole.Employee;
-        request.Id = id;
-        request.CompanyId = GetTenant();
-        request.Role = role.MapERoleToERoleCore();
 
-        //var result = await _employeeHandler.CreateAsync(request);
+        var result = await _employeeHandler.CreateAsync(request);
 
-        //if (result != null && !result.IsSuccess)
-        //{
-        //    Notify(result.Message);
-        //    TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
+        if (HasErrorsInResponse(result)) return View(request);
 
-        //if (!await AddIdentityUser(request))
-        //{
-        //    TempData["Failure"] = "Falha ao adicionar colaborador: " + string.Join("; ", await GetNotificationErrors());
-        //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
-        //    return View(request);
-        //}
-
-        //await _authService.AddOrUpdateUserClaim(request.Id.ToString(), "Tenant", request.CompanyId.ToString());
-
-        //if (!IsValidOperation())
-        //{
-        //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
-        //    await _authService.DeleteUser(request.Id.ToString());
-        //    return View(request);
-
-        //}
         TempData["Success"] = "Colaborador adicionado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
@@ -117,122 +91,108 @@ public class EmployeesController : MainController
         {
             return NotFound();
         }
-        //var request = new UpdateEmployeeRequest(id, response.Data.CompanyId, response.Data.Name, response.Data.LastName, response.Data.Email, response.Data.PhoneNumber, response.Data.Salary, response.Data.Role, response.Data.IsActive);
-        //ViewBag.Document = response.Data.Document;
-        //return View(request);
-
-        return View();
+        var employeeRequest = new UpdateEmployeeRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.Salary, response.Role, response.IsActive);
+        var userRequest = new UpdateUserEmailRequest(id, response.Email);
+        var request = new UpdateEmployeeAndUserRequest(userRequest, employeeRequest);
+        ViewBag.Document = response.Document;
+        return View(request);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Guid id, UpdateEmployeeRequest request)
+    public async Task<IActionResult> Edit(Guid id, UpdateEmployeeAndUserRequest request)
     {
-        if (id != request.Id)
-        {
-            return NotFound();
-        }
+        //if (id != request.Employee.Id)
+        //{
+        //    return NotFound();
+        //}
+        request.Employee.Id = id;
+        var newUser = new UpdateUserEmailRequest(id, request.Employee.Email);
+        request.User = newUser;
+        ModelState.Remove("User");
+        ModelState.Remove("User.Id");
+        ModelState.Remove("User.NewEmail");
         if (!ModelState.IsValid)
         {
             return View(request);
         }
 
-        request.CompanyId = GetTenant();
-        var identityUser = await _authService.GetUserById(request.Id.ToString());
-        if (identityUser != null && identityUser.Email != request.Email)
-        {
-            await _authService.UpdateUserEmail(request.Id.ToString(), request.Email);
-            if (!IsValidOperation())
-            {
-                TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
-                return View(request);
-            }
-        }
-        //var result = await _employeeHandler.UpdateAsync(request);
+        var result = await _employeeHandler.UpdateAsync(request);
 
-        //if (result != null && !result.IsSuccess)
-        //{
-        //    Notify(result.Message);
-        //    TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
-        //if (!IsValidOperation())
-        //{
-        //    TempData["Failure"] = "Falha ao atualizar colaborador: " + string.Join("; ", await GetNotificationErrors());
-        //    return View(request);
-        //}
+        if (HasErrorsInResponse(result)) return View(request);
+
         TempData["Success"] = "Colaborador atualizado com sucesso!";
         return RedirectToAction(nameof(Index));
     }
 
-    //[Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        var identityUser = await _authService.GetUserById(id.ToString());
-        var response = await GetById(id);
-        if (response is null)
-        {
-            return NotFound();
-        }
-        if (identityUser is null)
-        {
-            return NotFound();
-        }
+    ////[Authorize(Roles = "Admin")]
+    //public async Task<IActionResult> Delete(Guid id)
+    //{
+    //    var identityUser = await _authService.GetUserById(id.ToString());
+    //    var response = await GetById(id);
+    //    if (response is null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    if (identityUser is null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        return View(response);
-    }
+    //    return View(response);
+    //}
 
-    //[Authorize(Roles = "Admin")]
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(Guid id)
-    {
-        var response = await GetById(id);
-        var identityUser = await _authService.GetUserById(id.ToString());
-        if (response is null)
-        {
-            return NotFound();
-        }
-        if (identityUser is null)
-        {
-            return NotFound();
-        }
-        await _authService.DeleteUser(id.ToString());
-        await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
+    ////[Authorize(Roles = "Admin")]
+    //[HttpPost, ActionName("Delete")]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> DeleteConfirmed(Guid id)
+    //{
+    //    var response = await GetById(id);
+    //    var identityUser = await _authService.GetUserById(id.ToString());
+    //    if (response is null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    if (identityUser is null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    await _authService.DeleteUser(id.ToString());
+    //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
 
-        if (!IsValidOperation())
-        {
-            TempData["Failure"] = "Falha ao deletar colaborador: " + string.Join("; ", await GetNotificationErrors());
-            return View(response);
-        }
+    //    if (!IsValidOperation())
+    //    {
+    //        TempData["Failure"] = "Falha ao deletar colaborador: " + string.Join("; ", await GetNotificationErrors());
+    //        return View(response);
+    //    }
 
-        TempData["Success"] = "Colaborador deletado com sucesso!";
-        return RedirectToAction(nameof(Index));
-    }
+    //    TempData["Success"] = "Colaborador deletado com sucesso!";
+    //    return RedirectToAction(nameof(Index));
+    //}
 
-    private async Task<bool> AddIdentityUser(CreateEmployeeRequest request)
-    {
-        var identityUser = new RegisterUser
-        {
-            Id = request.Id,
-            Role = request.Role.ToString(),
-            Email = request.Email,
-            Password = GeneratePassword(request)
-        };
-        await _authService.RegisterUser(identityUser);
-        if (!IsValidOperation())
-        {
-            return false;
-        }
-        return true;
-    }
-    private Guid GetTenant()
-    {
-        return _appUser.GetTenantId();
-    }
+    //private async Task<bool> AddIdentityUser(CreateEmployeeRequest request)
+    //{
+    //    var identityUser = new RegisterUser
+    //    {
+    //        Id = request.Id,
+    //        Role = request.Role.ToString(),
+    //        Email = request.Email,
+    //        Password = GeneratePassword(request)
+    //    };
+    //    await _authService.RegisterUser(identityUser);
+    //    if (!IsValidOperation())
+    //    {
+    //        return false;
+    //    }
+    //    return true;
+    //}
+    //private Guid GetTenant()
+    //{
+    //    return _appUser.GetTenantId();
+    //}
     private async Task<EmployeeResponse> GetById(Guid id)
     {
-        return await _employeeHandler.GetByIdAsync(new GetEmployeeByIdRequest { Id = id });
+        return (await _employeeHandler.GetByIdAsync(new GetEmployeeByIdRequest { Id = id })).Data;
     }
 
     private static string GeneratePassword(CreateEmployeeRequest request)

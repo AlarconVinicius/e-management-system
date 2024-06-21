@@ -1,5 +1,6 @@
-﻿@using EMS.WebApp.MVC.Extensions
-@model IEnumerable<PlanViewModel>
+﻿@using EMS.Core.Responses.Plans
+@using EMS.WebApp.MVC.Extensions
+@model PagedViewModel<PlanResponse>
 
 @{
     ViewData["Title"] = "Todos os planos";
@@ -15,7 +16,7 @@
         <div class="container" style=" padding-top: 20px">
             <div class="row">
                 @{
-                    foreach (var plan in Model.OrderBy(p => p.Price))
+                    foreach (var plan in Model.List.OrderBy(p => p.Price))
                     {
                         <div class="col-md-4">
                             <div class="card card-product-grid" style="min-height: 500px">

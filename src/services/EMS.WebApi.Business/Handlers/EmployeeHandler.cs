@@ -3,22 +3,24 @@ using EMS.Core.Notifications;
 using EMS.Core.Requests.Employees;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Employees;
+using EMS.Core.User;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Services;
-using EMS.WebApi.Business.Utils;
+using EMS.WebApi.Business.Models;
 
 namespace EMS.WebApi.Business.Handlers;
 
-public class EmployeeHandler : MainService, IEmployeeHandler
+public class EmployeeHandler : BaseHandler, IEmployeeHandler
 {
     public readonly IEmployeeRepository _employeeRepository;
     public readonly ICompanyRepository _companyRepository;
+    public readonly IIdentityHandler _identityHandler;
 
-    public EmployeeHandler(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository) : base(notifier, appUser)
+    public EmployeeHandler(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository, IIdentityHandler identityHandler) : base(notifier, appUser)
     {
         _employeeRepository = employeeRepository;
         _companyRepository = companyRepository;
+        _identityHandler = identityHandler;
     }
 
     public async Task<EmployeeResponse> GetByIdAsync(GetEmployeeByIdRequest request)
@@ -78,6 +80,37 @@ public class EmployeeHandler : MainService, IEmployeeHandler
         }
     }
 
+    public async Task CreateAsync(CreateEmployeeAndUserRequest request)
+    {
+        //if (!ExecuteValidation(new CompanyValidation(), company)) return;
+        if (TenantIsEmpty()) return;
+        if (!CompanyExists(TenantId)) return;
+        if (IsCpfInUse(request.Employee.Document, TenantId)) return;
+
+        var userId = Guid.NewGuid();
+        request.Employee.Id = userId;
+        request.User.Id = userId;
+        request.Employee.CompanyId = TenantId;
+        request.Employee.Role = Core.Enums.ERoleCore.Employee;
+        var employyeeMapped = request.Employee.MapCreateEmployeeRequestToEmployee();
+        try
+        {
+            await _employeeRepository.AddAsync(employyeeMapped);
+            var result = await _identityHandler.CreateAsync(request.User);
+            if (!IsOperationValid())
+            {
+                await _employeeRepository.DeleteAsync(userId);
+                return;
+            };
+            return;
+        }
+        catch
+        {
+            Notify("Não foi possível criar o colaborador.");
+            return;
+        }
+    }
+
     public async Task UpdateAsync(UpdateEmployeeRequest request)
     {
         //if (!ExecuteValidation(new EmployeeValidation(), employee)) return;
@@ -99,6 +132,24 @@ public class EmployeeHandler : MainService, IEmployeeHandler
 
             await _employeeRepository.UpdateAsync(employeeDb);
 
+            return;
+        }
+        catch
+        {
+            Notify("Não foi possível atualizar o colaborador.");
+            return;
+        }
+    }
+
+    public async Task UpdateAsync(UpdateEmployeeAndUserRequest request)
+    {
+        try
+        {
+            await UpdateAsync(request.Employee);
+            if (IsOperationValid())
+            {
+                await _identityHandler.UpdateEmailAsync(request.User);
+            };
             return;
         }
         catch

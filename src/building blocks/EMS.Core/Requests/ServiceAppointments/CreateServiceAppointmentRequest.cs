@@ -1,0 +1,44 @@
+﻿using EMS.Core.Enums;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace EMS.Core.Requests.ServiceAppointments;
+
+public class CreateServiceAppointmentRequest : CompaniesRequest
+{
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id do Colaborador")]
+    public Guid EmployeeId { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id do Cliente")]
+    public Guid ClientId { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayName("Id do Serviço")]
+    public Guid ServiceId { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+    [DisplayName("Início do Agendamento")]
+    public DateTime AppointmentStart { get; set; }
+
+    [Required(ErrorMessage = "O campo {0} é obrigatório")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+    [DisplayName("Fim do Agendamento")]
+    public DateTime AppointmentEnd { get; set; }
+
+    public EServiceStatusCore Status { get; set; }
+
+    public CreateServiceAppointmentRequest() { }
+
+    public CreateServiceAppointmentRequest(Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, DateTime appointmentStart, DateTime appointmentEnd, EServiceStatusCore status) : base(companyId)
+    {
+        EmployeeId = employeeId;
+        ClientId = clientId;
+        ServiceId = serviceId;
+        AppointmentStart = appointmentStart;
+        AppointmentEnd = appointmentEnd;
+        Status = status;
+    }
+}

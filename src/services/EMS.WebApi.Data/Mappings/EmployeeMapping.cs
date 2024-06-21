@@ -14,6 +14,10 @@ public class EmployeeMapping : IEntityTypeConfiguration<Employee>
             .HasDefaultValue(0.0)
             .HasColumnType("decimal(18, 2)");
 
+        builder.HasMany(c => c.ServiceAppointments)
+               .WithOne(sa => sa.Employee)
+               .HasForeignKey(sa => sa.EmployeeId);
+
         builder.ToTable(t => t.HasCheckConstraint("CK_Employee_Salary", "Salary >= 0"));
     }
 }

@@ -4,9 +4,9 @@ using EMS.Core.Notifications;
 using EMS.Core.Requests.Identities;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Identities;
+using EMS.Core.User;
+using EMS.WebApi.Business.Handlers;
 using EMS.WebApi.Business.Interfaces.Repositories;
-using EMS.WebApi.Business.Services;
-using EMS.WebApi.Business.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +16,7 @@ using System.Text;
 
 namespace EMS.WebApi.Identity.Business.Services;
 
-public class IdentityHandler : MainService, IIdentityHandler
+public class IdentityHandler : BaseHandler, IIdentityHandler
 {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
@@ -156,15 +156,24 @@ public class IdentityHandler : MainService, IIdentityHandler
             Notify("Usuário não encontrado.");
             return;
         }
-        if(request.NewClaim.Type == "Tenant")
-        {
-            Notify("Claim inválida.");
-            return;
-        }
+        //if(IsUserAuthenticated && request.NewClaim.Type == "Tenant")
+        //{
+        //    Notify("Claim inválida.");
+        //    return;
+        //}
         var userDb = await _userManager.FindByIdAsync(userId);
 
         var existingClaims = await _userManager.GetClaimsAsync(userDb);
-        var existingClaim = existingClaims.FirstOrDefault(c => c.Type != "Tenant" && c.Type == request.NewClaim.Type);
+        Claim existingClaim;
+        existingClaim = existingClaims.FirstOrDefault(c => c.Type == request.NewClaim.Type);
+        //if (IsUserAuthenticated)
+        //{
+        //    existingClaim = existingClaims.FirstOrDefault(c => c.Type != "Tenant" && c.Type == request.NewClaim.Type);
+        //}
+        //else
+        //{
+        //    existingClaim = existingClaims.FirstOrDefault(c => c.Type == request.NewClaim.Type);
+        //}
 
         if (existingClaim != null)
         {
@@ -288,7 +297,7 @@ public class IdentityHandler : MainService, IIdentityHandler
         AddStandardClaims(claims, userDb);
         AddUserRolesClaims(claims, userRoles);
 
-        claims = claims.Where(c => c.Type != "Tenant").ToList();
+        //claims = claims.Where(c => c.Type != "Tenant").ToList();
 
         var token = GenerateToken(claims);
 

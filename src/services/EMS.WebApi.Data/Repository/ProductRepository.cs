@@ -1,9 +1,7 @@
 ﻿using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Models;
-using EMS.WebApi.Business.Utils;
 using EMS.WebApi.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace EMS.WebApi.Data.Repository;
 

@@ -1,4 +1,4 @@
-﻿using EMS.WebApp.Business.Notifications;
+﻿using EMS.Core.Notifications;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EMS.WebApp.MVC.Extensions;

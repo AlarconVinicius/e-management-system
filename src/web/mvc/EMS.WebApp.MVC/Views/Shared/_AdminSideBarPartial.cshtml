@@ -9,20 +9,14 @@
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link" asp-controller="Dashboard" asp-action="Index">
-                    <i class="fa-solid fa-list pe-2"></i>
+                    <i class="fa fa-desktop pe-2"></i>
                     Dashboard
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link" asp-controller="Products" asp-action="Index">
-                    <i class="fa-solid fa-list pe-2"></i>
-                    Produtos
                 </a>
             </li>
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link collapsed" data-bs-target="#pages" data-bs-toggle="collapse"
                    aria-expanded="false">
-                    <i class="fa-solid fa-file-lines pe-2"></i>
+                    <i class="fa fa-user pe-2"></i>
                     Usuários
                 </a>
                 <ul id="pages" class="sidebar-dropdown list-unstyled collapse ms-3" data-bs-parent="#sidebar">
@@ -38,9 +32,21 @@
                 </ul>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link" asp-controller="Product" asp-action="Products">
-                    <i class="fa-solid fa-list pe-2"></i>
+                <a class="sidebar-link" asp-controller="Products" asp-action="Index">
+                    <i class="fa fa-shopping-cart pe-2"></i>
                     Produtos
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" asp-controller="Services" asp-action="Index">
+                    <i class="fa fa-wrench pe-2"></i>
+                    Serviços
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" asp-controller="ServiceAppointments" asp-action="Index">
+                    <i class="fa fa-address-book pe-2"></i>
+                    Agendamentos
                 </a>
             </li>
         </ul>
