@@ -1,10 +1,10 @@
-﻿using EMS.Core.Handlers;
+﻿using EMS.Core.Extensions;
+using EMS.Core.Handlers;
 using EMS.Core.Notifications;
 using EMS.Core.Requests.Services;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Services;
 using EMS.Core.User;
-using EMS.Core.Utils;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
 
