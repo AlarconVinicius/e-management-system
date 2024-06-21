@@ -2,6 +2,7 @@
 using EMS.WebApi.Business.Models;
 using EMS.WebApi.Data.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace EMS.WebApi.Data.Repository;
 
@@ -9,6 +10,16 @@ public class ServiceAppointmentRepository : Repository<ServiceAppointment>, ISer
 {
     public ServiceAppointmentRepository(EMSDbContext context) : base (context)
     {
+    }
+
+    public override async Task<IEnumerable<ServiceAppointment>> SearchAsync(Expression<Func<ServiceAppointment, bool>> predicate)
+    {
+        return await DbSet.AsNoTracking()
+                          .Include(sa => sa.Employee)
+                          .Include(sa => sa.Client)
+                          .Include(sa => sa.Service)
+                          .Where(predicate)
+                          .ToListAsync();
     }
 
     public async Task<ServiceAppointment> GetByIdAsync(Guid id, Guid tenantId)

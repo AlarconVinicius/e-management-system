@@ -26,4 +26,43 @@ public class ServiceAppointment : Entity
         AppointmentEnd = appointmentEnd;
         Status = status;
     }
+
+    public ServiceAppointment(Guid id, Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, DateTime appointmentStart, DateTime appointmentEnd, EServiceStatus status)
+    {
+        SetId(id);
+        CompanyId = companyId;
+        EmployeeId = employeeId;
+        ClientId = clientId;
+        ServiceId = serviceId;
+        AppointmentStart = appointmentStart;
+        AppointmentEnd = appointmentEnd;
+        Status = status;
+    }
+
+    #region Setters
+    public void SetEmployeeId(Guid id)
+    {
+        EmployeeId = id;
+    }
+
+    public void SetClientId(Guid id)
+    {
+        ClientId = id;
+    }
+
+    public void SetServiceId(Guid id)
+    {
+        ServiceId = id;
+    }
+
+    public void SetAppointmentStart(DateTime appointmentStart)
+    {
+        AppointmentStart = appointmentStart;
+    }
+
+    public void SetAppointmentEnd(DateTime appointmentEnd)
+    {
+        AppointmentEnd = appointmentEnd;
+    }
+    #endregion
 }

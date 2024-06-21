@@ -1,5 +1,7 @@
 ﻿using EMS.Core.Enums;
+using EMS.Core.Utils;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace EMS.Core.Responses.ServiceAppointments;
 
@@ -7,6 +9,9 @@ public class ServiceAppointmentResponse
 {
     [DisplayName("Id")]
     public Guid Id { get; set; }
+
+    [DisplayName("Id da Empresa")]
+    public Guid CompanyId { get; set; }
 
     [DisplayName("Id do Colaborador")]
     public Guid EmployeeId { get; set; }
@@ -17,11 +22,14 @@ public class ServiceAppointmentResponse
     [DisplayName("Id do Serviço")]
     public Guid ServiceId { get; set; }
 
-    [DisplayName("Início do Agendamento")]
-    public DateTime AppointmentStart { get; set; }
 
+    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
+    [DisplayName("Início do Agendamento")]
+    public string AppointmentStart { get; set; }
+
+    [RegularExpression(RegexUtils.DateTimeWithHourPattern, ErrorMessage = "Formato inválido. Use dd/MM/yyyy HH:mm:ss")]
     [DisplayName("Fim do Agendamento")]
-    public DateTime AppointmentEnd { get; set; }
+    public string AppointmentEnd { get; set; }
     public EServiceStatusCore Status { get; set; }
 
     [DisplayName("Data de Cadastro")]
@@ -32,9 +40,10 @@ public class ServiceAppointmentResponse
 
     public ServiceAppointmentResponse() { }
 
-    public ServiceAppointmentResponse(Guid id, Guid employeeId, Guid clientId, Guid serviceId, DateTime appointmentStart, DateTime appointmentEnd, EServiceStatusCore status, DateTime createdAt, DateTime updatedAt)
+    public ServiceAppointmentResponse(Guid id, Guid companyId, Guid employeeId, Guid clientId, Guid serviceId, string appointmentStart, string appointmentEnd, EServiceStatusCore status, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
+        CompanyId = companyId;
         EmployeeId = employeeId;
         ClientId = clientId;
         ServiceId = serviceId;
