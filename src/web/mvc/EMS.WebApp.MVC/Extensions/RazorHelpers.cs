@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -35,5 +36,27 @@ public static class RazorHelpers
     public static string FormatDate(this RazorPage page, DateTime value)
     {
         return value.ToString("dd/MM/yyyy");
+    }
+
+    public static string FormatTimeSpan(this RazorPage page, TimeSpan value)
+    {
+        if (value.Hours > 0)
+        {
+            return $"{value.Hours}h {value.Minutes}min";
+        }
+        return $"{value.Minutes}min";
+    }
+
+    public static string FormatTimeSpanString(this RazorPage page, string timeSpanString)
+    {
+        if (TimeSpan.TryParseExact(timeSpanString, @"hh\:mm\:ss", CultureInfo.InvariantCulture, out TimeSpan timeSpan))
+        {
+            if (timeSpan.Hours > 0)
+            {
+                return $"{timeSpan.Hours}h {timeSpan.Minutes}min";
+            }
+            return $"{timeSpan.Minutes}min";
+        }
+        return "Formato inválido";
     }
 }
