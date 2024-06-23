@@ -43,6 +43,8 @@ public class ServiceAppointmentResponse
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Fim do Agendamento")]
     public DateTime AppointmentEnd { get; set; }
+
+    [DisplayName("Status")]
     public EServiceStatusCore Status { get; set; }
 
     [DisplayName("Data de Cadastro")]

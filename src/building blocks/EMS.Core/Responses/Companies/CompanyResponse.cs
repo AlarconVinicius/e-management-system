@@ -19,7 +19,7 @@ public class CompanyResponse
     [DisplayName("CPF/CNPJ")]
     public string Document { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; } = true;
 
     [DisplayName("Data de Cadastro")]

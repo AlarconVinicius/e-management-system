@@ -29,6 +29,8 @@ public class UpdateServiceAppointmentRequest : CompaniesRequest
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [DisplayName("Fim do Agendamento")]
     public DateTime AppointmentEnd { get; set; }
+
+    [DisplayName("Status")]
     public EServiceStatusCore Status { get; set; }
 
     public UpdateServiceAppointmentRequest() { }

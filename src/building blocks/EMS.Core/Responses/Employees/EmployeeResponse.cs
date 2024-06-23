@@ -42,7 +42,7 @@ public class EmployeeResponse
     [DisplayName("Permissão")]
     public ERoleCore Role { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     [DisplayName("Data de Cadastro")]

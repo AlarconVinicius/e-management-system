@@ -31,7 +31,7 @@ public class UpdateEmployeeRequest : CompaniesRequest
     [DisplayName("Permissão")]
     public ERoleCore Role { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     public UpdateEmployeeRequest() { }

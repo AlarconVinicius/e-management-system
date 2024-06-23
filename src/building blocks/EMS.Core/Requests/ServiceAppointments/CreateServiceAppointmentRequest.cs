@@ -28,6 +28,8 @@ public class CreateServiceAppointmentRequest : CompaniesRequest
     [DisplayName("Fim do Agendamento")]
     public DateTime AppointmentEnd { get; set; }
 
+
+    [DisplayName("Status")]
     public EServiceStatusCore Status { get; set; }
 
     public CreateServiceAppointmentRequest() { }
