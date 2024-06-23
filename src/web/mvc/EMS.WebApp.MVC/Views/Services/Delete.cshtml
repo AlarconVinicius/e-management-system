@@ -69,7 +69,6 @@
                     </ul>
                 </div>
                 <div class="mt-3">
-                    @* <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-submit me-2">Editar</a> *@
                     <form asp-action="Delete">
                         <a asp-action="Index" class="btn btn-cancel">Voltar</a>
                         <input type="hidden" asp-for="@Model.Id" />
@@ -80,13 +79,3 @@
         </div>
     </div>
 </div>
-
-
-                <div class="mt-3">
-                    @* <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-submit me-2">Editar</a> *@
-                    <form asp-action="Delete">
-                        <a asp-action="Index" class="btn btn-cancel">Voltar</a>
-                        <input type="hidden" asp-for="@Model.Id" />
-                        <input type="submit" value="Deletar" class="btn btn-submit me-2" />
-                    </form>
-                </div>
