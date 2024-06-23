@@ -13,7 +13,7 @@
         <h4>Serviços</h4>
     </div>
     <div class="page-btn">
-        <a asp-controller="Services" asp-action="Create" class="btn btn-added">
+        <a asp-action="Create" class="btn btn-added">
             <img src="~/template_admin_2/img/icons/plus.svg"
                  class="me-2"
                  alt="img" />Adicionar Serviço
@@ -80,7 +80,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var service in Model.List)
+                    @foreach (var item in Model.List)
                     {
                         <tr>
                             @* <td>
@@ -90,56 +90,28 @@
                             </label>
                         </td> *@
                             <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                            <td>@service.Name</td>
-                            <td>@this.FormatCurrency(service.Price)</td>
-                            <td>@this.FormatTimeSpan(service.Duration)</td>
-                            <td><span class="badges @(service.IsActive ? "bg-lightgreen" : "bg-lightred")">@(service.IsActive ? "Ativo" : "Inativo")</span></td>
-                            <td>@this.FormatDate(service.CreatedAt)</td>
-                            <td>@this.FormatDate(service.UpdatedAt)</td>
+                            <td>@item.Name</td>
+                            <td>@this.FormatCurrency(item.Price)</td>
+                            <td>@this.FormatTimeSpan(item.Duration)</td>
+                            <td><span class="badges @(item.IsActive ? "bg-lightgreen" : "bg-lightred")">@(item.IsActive ? "Ativo" : "Inativo")</span></td>
+                            <td>@this.FormatDate(item.CreatedAt)</td>
+                            <td>@this.FormatDate(item.UpdatedAt)</td>
                             <td>
-                                <a class="me-3" asp-controller="Services" asp-action="Details" asp-route-id="@service.Id" asp-route-id="@service.Id">
+                                <a class="me-3" asp-action="Details" asp-route-id="@item.Id" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/eye.svg" alt="img" />
                                 </a>
-                                <a class="me-3" asp-controller="Services" asp-action="Edit" asp-route-id="@service.Id">
+                                <a class="me-3" asp-action="Edit" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/edit.svg" alt="img" />
                                 </a>
-                                <a class="me-3 confirm-text" asp-controller="Services" asp-action="Delete" asp-route-id="@service.Id">
+                                <a class="me-3 confirm-text" asp-action="Delete" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/delete.svg" alt="img" />
                                 </a>
                             </td>
                         </tr>
+                        itemIndex++;
                     }
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-@* 
-<form method="get" asp-controller="Services" asp-action="Index">
-    <div class="d-flex align-items-center">
-        <div class="input-group me-3">
-            <input type="text"
-                    class="form-control"
-                    placeholder="Pesquisar"
-                    aria-label="Pesquisar"
-                    aria-describedby="pesquisar"
-                    id="q" name="q"
-                    value="@ViewBag.Search" />
-            <button class="btn btn-outline-secondary"
-                    type="submit"
-                    id="pesquisar">
-                <i class="fa fa-search"></i>
-            </button>
-        </div>
-        <a asp-controller="Services" asp-action="Create" class="btn btn-success align-self-center w-75">
-            Adicionar Serviço
-        </a>
-    </div>
-</form>
-   
-<div class="card-body">
-    <table class="table">
-            
-    </table>
-    <vc:pagination paged-model="@Model"></vc:pagination>
-</div>*@

@@ -13,7 +13,7 @@
         <h4>Clientes</h4>
     </div>
     <div class="page-btn">
-        <a asp-controller="Clients" asp-action="Create" class="btn btn-added">
+        <a asp-action="Create" class="btn btn-added">
             <img src="~/template_admin_2/img/icons/plus.svg"
                  class="me-2"
                  alt="img" />Adicionar Cliente
@@ -26,7 +26,7 @@
         <div class="table-top">
             <div class="search-set">
                 <div class="search-input">
-                    <form method="get" asp-controller="Clients" asp-action="Index">
+                    <form method="get" asp-action="Index">
                         <div class="input-group">
                             <input type="search" name="q" class="form-control form-control-sm" placeholder="Search..." value="@ViewBag.Search">
                             <button class="btn btn-searchset" type="submit">
@@ -71,6 +71,7 @@
                         <th>Sobrenome</th>
                         <th>E-mail</th>
                         <th>Celular</th>
+                        <th>CPF</th>
                         <th>Status</th>
                         <th>Data de Cadastro</th>
                         <th>Data de Modificação</th>
@@ -78,29 +79,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var service in Model.List)
+                    @foreach (var item in Model.List)
                     {
                         <tr>
                             <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                            <td>@service.Name</td>
-                            <td>@service.LastName</td>
-                            <td>@service.Email</td>
-                            <td>@service.PhoneNumber</td>
-                            <td><span class="badges @(service.IsActive ? "bg-lightgreen" : "bg-lightred")">@(service.IsActive ? "Ativo" : "Inativo")</span></td>
-                            <td>@this.FormatDate(service.CreatedAt)</td>
-                            <td>@this.FormatDate(service.UpdatedAt)</td>
+                            <td>@item.Name</td>
+                            <td>@item.LastName</td>
+                            <td>@item.Email</td>
+                            <td>@item.PhoneNumber</td>
+                            <td>@item.Document</td>
+                            <td><span class="badges @(item.IsActive ? "bg-lightgreen" : "bg-lightred")">@(item.IsActive ? "Ativo" : "Inativo")</span></td>
+                            <td>@this.FormatDate(item.CreatedAt)</td>
+                            <td>@this.FormatDate(item.UpdatedAt)</td>
                             <td>
-                                <a class="me-3" asp-controller="Clients" asp-action="Details" asp-route-id="@service.Id" asp-route-id="@service.Id">
+                                <a class="me-3" asp-action="Details" asp-route-id="@item.Id" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/eye.svg" alt="img" />
                                 </a>
-                                <a class="me-3" asp-controller="Clients" asp-action="Edit" asp-route-id="@service.Id">
+                                <a class="me-3" asp-action="Edit" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/edit.svg" alt="img" />
                                 </a>
-                                <a class="me-3 confirm-text" asp-controller="Clients" asp-action="Delete" asp-route-id="@service.Id">
+                                <a class="me-3 confirm-text" asp-action="Delete" asp-route-id="@item.Id">
                                     <img src="~/template_admin_2/img/icons/delete.svg" alt="img" />
                                 </a>
                             </td>
                         </tr>
+                        itemIndex++;
                     }
                 </tbody>
             </table>
