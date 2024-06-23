@@ -6301,6 +6301,10 @@ span.select2-container.select2-container--default.select2-container--open {
     min-width: 80px
 }
 
+    .badges.bg-lightblue {
+        background: #007bff;
+    }
+
     .badges.bg-lightgreen {
         background: #28c76f
     }
