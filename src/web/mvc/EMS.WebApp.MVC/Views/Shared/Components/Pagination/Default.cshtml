@@ -1,21 +1,26 @@
 ﻿@model IPagedList
 
-<nav>
-    <ul class="pagination justify-content-center">
-        @{
-            for (var i = 1; i < Model.TotalPages + 1; i++)
-            {
-                if (i == Model.PageIndex)
+<div class="d-flex justify-content-end align-items-center mt-4 mb-2">
+    <div>
+        <span class="dataTables_info">@Model.FirstItemIndex - @Model.LastItemIndex de @Model.TotalResults itens</span>
+    </div>
+    <nav class="ms-3">
+        <ul class="pagination">
+            @{
+                for (var i = 1; i < Model.TotalPages + 1; i++)
                 {
-                    <li class="page-item active">
-                        <a class="page-link" asp-action="@Model.ReferenceAction" asp-route-page="@i" asp-route-q="@Model.Query">@i <span class="sr-only">(current)</span></a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="@Model.ReferenceAction" asp-route-page="@i" asp-route-q="@Model.Query">@i</a></li>
+                    if (i == Model.PageIndex)
+                    {
+                        <li class="page-item active">
+                            <a class="page-link" asp-action="@Model.ReferenceAction" asp-route-page="@i" asp-route-q="@Model.Query">@i <span class="sr-only">(current)</span></a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="@Model.ReferenceAction" asp-route-page="@i" asp-route-q="@Model.Query">@i</a></li>
+                    }
                 }
             }
-        }
-    </ul>
-</nav>
+        </ul>
+    </nav>
+</div> 
