@@ -36,7 +36,7 @@ public static class RazorHelpers
 
     public static string FormatDate(this RazorPage page, DateTime value)
     {
-        return value.ToString("dd/MM/yyyy");
+        return value.ToString("dd MMM yy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     public static string FormatTimeSpan(this RazorPage page, TimeSpan value)
