@@ -81,7 +81,7 @@
                         <th>Status</th>
                         <th>Data de Cadastro</th>
                         <th>Data de Modificação</th>
-                        <th>Ações</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,16 +97,37 @@
                             <td><span class="badges @this.GetStatusColor(item.Status)">@item.Status.ToString()</span></td>
                             <td>@this.FormatDate(item.CreatedAt)</td>
                             <td>@this.FormatDate(item.UpdatedAt)</td>
-                            <td>
-                                <a class="me-3" asp-action="Details" asp-route-id="@item.Id" asp-route-id="@item.Id">
-                                    <img src="~/template_admin_2/img/icons/eye.svg" alt="img" />
+                            <td class="text-center">
+                                <a class="action-set"
+                                   href="javascript:void(0);"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="true">
+                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                 </a>
-                                <a class="me-3" asp-action="Edit" asp-route-id="@item.Id">
-                                    <img src="~/template_admin_2/img/icons/edit.svg" alt="img" />
-                                </a>
-                                <a class="me-3 confirm-text" asp-action="Delete" asp-route-id="@item.Id">
-                                    <img src="~/template_admin_2/img/icons/delete.svg" alt="img" />
-                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/eye1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Detalhes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/edit.svg"
+                                                 class="me-2"
+                                                 alt="img" />Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="dropdown-item confirm-text">
+                                            <img src="~/template_admin_2/img/icons/delete1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Deletar
+                                        </a>
+                                    </li>
+                                </ul>
                             </td>
                         </tr>
                         itemIndex++;
