@@ -126,21 +126,15 @@ public class EmployeesController : MainController
     }
 
     ////[Authorize(Roles = "Admin")]
-    //public async Task<IActionResult> Delete(Guid id)
-    //{
-    //    var identityUser = await _authService.GetUserById(id.ToString());
-    //    var response = await GetById(id);
-    //    if (response is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    if (identityUser is null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    return View(response);
-    //}
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var response = await GetById(id);
+        if (response is null)
+        {
+            return NotFound();
+        }
+        return View(response);
+    }
 
     ////[Authorize(Roles = "Admin")]
     //[HttpPost, ActionName("Delete")]
