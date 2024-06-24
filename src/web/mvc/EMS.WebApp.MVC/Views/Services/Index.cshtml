@@ -23,116 +23,110 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="table-top">
-            <div class="search-set">
-                <div class="search-input">
-                    <a class="btn btn-searchset">
-                        <img src="~/template_admin_2/img/icons/search-white.svg" alt="img" />
-                    </a>
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-input">
+                        <form method="get" asp-action="Index">
+                            <div class="input-group">
+                                <input type="search" name="q" class="form-control form-control-sm" placeholder="Search..." value="@ViewBag.Search">
+                                <button class="btn btn-searchset" type="submit">
+                                    <img src="~/template_admin_2/img/icons/search-white.svg" alt="img" />
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <a data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="pdf">
+                                <img src="~/template_admin_2/img/icons/pdf.svg" alt="img" />
+                            </a>
+                        </li>
+                        <li>
+                            <a data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="excel">
+                                <img src="~/template_admin_2/img/icons/excel.svg" alt="img" />
+                            </a>
+                        </li>
+                        <li>
+                            <a data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="print">
+                                <img src="~/template_admin_2/img/icons/printer.svg" alt="img" />
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="wordset">
-                <ul>
-                    <li>
-                        <a data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           title="pdf">
-                            <img src="~/template_admin_2/img/icons/pdf.svg" alt="img" />
-                        </a>
-                    </li>
-                    <li>
-                        <a data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           title="excel">
-                            <img src="~/template_admin_2/img/icons/excel.svg" alt="img" />
-                        </a>
-                    </li>
-                    <li>
-                        <a data-bs-toggle="tooltip"
-                           data-bs-placement="top"
-                           title="print">
-                            <img src="~/template_admin_2/img/icons/printer.svg" alt="img" />
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table datanew">
-                <thead>
-                    <tr>
-                        @* <th>
-                            <label class="checkboxs">
-                                <input type="checkbox" id="select-all" />
-                                <span class="checkmarks"></span>
-                            </label>
-                        </th> *@
-
-                        <th>#</th>
-                        <th>Nome</th>
-                        <th>Preço</th>
-                        <th>Duração</th>
-                        <th>Status</th>
-                        <th>Data de Cadastro</th>
-                        <th>Data de Modificação</th>
-                        <th class="text-center">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.List)
-                    {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
                         <tr>
-                            @* <td>
-                            <label class="checkboxs">
-                                <input type="checkbox" />
-                                <span class="checkmarks"></span>
-                            </label>
-                        </td> *@
-                            <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                            <td>@item.Name</td>
-                            <td>@this.FormatCurrency(item.Price)</td>
-                            <td>@this.FormatTimeSpan(item.Duration)</td>
-                            <td><span class="badges @(item.IsActive ? "bg-lightgreen" : "bg-lightred")">@(item.IsActive ? "Ativo" : "Inativo")</span></td>
-                            <td>@this.FormatDate(item.CreatedAt)</td>
-                            <td>@this.FormatDate(item.UpdatedAt)</td>
-                            <td class="text-center">
-                                <a class="action-set"
-                                   href="javascript:void(0);"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="true">
-                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
-                                            <img src="~/template_admin_2/img/icons/eye1.svg"
-                                                 class="me-2"
-                                                 alt="img" />Detalhes
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
-                                            <img src="~/template_admin_2/img/icons/edit.svg"
-                                                 class="me-2"
-                                                 alt="img" />Editar
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a asp-action="Delete" asp-route-id="@item.Id"
-                                           class="dropdown-item confirm-text">
-                                            <img src="~/template_admin_2/img/icons/delete1.svg"
-                                                 class="me-2"
-                                                 alt="img" />Deletar
-                                        </a>
-                                    </li>
-                                </ul>
-                            </td>
+                            <th>#</th>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                            <th>Duração</th>
+                            <th>Status</th>
+                            <th>Data de Cadastro</th>
+                            <th>Data de Modificação</th>
+                            <th class="text-center">Ações</th>
                         </tr>
-                        itemIndex++;
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.List)
+                        {
+                            <tr>
+                                <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
+                                <td>@item.Name</td>
+                                <td>@this.FormatCurrency(item.Price)</td>
+                                <td>@this.FormatTimeSpan(item.Duration)</td>
+                                <td><span class="badges @(item.IsActive ? "bg-lightgreen" : "bg-lightred")">@(item.IsActive ? "Ativo" : "Inativo")</span></td>
+                                <td>@this.FormatDate(item.CreatedAt)</td>
+                                <td>@this.FormatDate(item.UpdatedAt)</td>
+                                <td class="text-center">
+                                    <a class="action-set"
+                                       href="javascript:void(0);"
+                                       data-bs-toggle="dropdown"
+                                       aria-expanded="true">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                                <img src="~/template_admin_2/img/icons/eye1.svg"
+                                                     class="me-2"
+                                                     alt="img" />Detalhes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
+                                                <img src="~/template_admin_2/img/icons/edit.svg"
+                                                     class="me-2"
+                                                     alt="img" />Editar
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-action="Delete" asp-route-id="@item.Id"
+                                               class="dropdown-item confirm-text">
+                                                <img src="~/template_admin_2/img/icons/delete1.svg"
+                                                     class="me-2"
+                                                     alt="img" />Deletar
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            itemIndex++;
+                        }
+                    </tbody>
+                </table>
+                <vc:pagination paged-model="@Model"></vc:pagination>
+            </div>
         </div>
     </div>
 </div>
