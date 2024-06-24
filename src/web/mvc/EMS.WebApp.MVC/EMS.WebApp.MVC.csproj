@@ -21,4 +21,11 @@
 	  <ProjectReference Include="..\..\..\building blocks\EMS.Core\EMS.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="Views\Employees\UpdateProfile.cshtml">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>

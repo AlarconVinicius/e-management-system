@@ -125,6 +125,71 @@ public class EmployeesController : MainController
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> UpdateProfile()
+    {
+        var id = _appUser.GetUserIdByJwt();
+        var response = await GetById(id);
+        if (response is null)
+        {
+            return NotFound();
+        }
+        var employeeRequest = new UpdateEmployeeRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.Salary, response.Role, response.IsActive);
+        var userRequest = new UpdateUserEmailRequest(id, response.Email);
+        var employeeUserrequest = new UpdateEmployeeAndUserRequest(userRequest, employeeRequest);
+        var passwordRequest = new UpdateUserPasswordRequest();
+        var request = new EmployeeAndUserViewModel(employeeUserrequest, passwordRequest);
+        ViewBag.Document = response.Document;
+        return View(request);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateProfile(EmployeeAndUserViewModel request, string returnUrl = null)
+    {
+        var id = request.UpdateEmployeeAndUserRequest.Employee.Id;
+        //request.UpdateEmployeeAndUserRequest.Employee.Id = id;
+        var newUser = new UpdateUserEmailRequest(id, request.UpdateEmployeeAndUserRequest.Employee.Email);
+        request.UpdateEmployeeAndUserRequest.User = newUser;
+        ModelState.Remove("UpdateEmployeeAndUserRequest.User");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.User.Id");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.User.NewEmail");
+        ModelState.Remove("UpdateUserPasswordRequest.OldPassword");
+        ModelState.Remove("UpdateUserPasswordRequest.NewPassword");
+        ModelState.Remove("UpdateUserPasswordRequest.ConfirmNewPassword");
+        if (!ModelState.IsValid)
+        {
+            return View(request);
+        }
+
+        var result = await _employeeHandler.UpdateAsync(request.UpdateEmployeeAndUserRequest);
+
+        if (HasErrorsInResponse(result)) return View(request);
+
+        TempData["Success"] = "Perfil atualizado com sucesso!";
+        return RedirectToAction(nameof(UpdateProfile));
+        //ModelState.Remove("UpdateUserPasswordViewModel");
+        //if (!ModelState.IsValid)
+        //{
+        //    return View(updateUserVM);
+        //}
+        //var id = _appUser.GetUserId();
+        //var userDb = await _employeeHandler.GetByIdAsync(id);
+
+        //if (userDb is null)
+        //{
+        //    return NotFound();
+        //}
+        ////var updateUserResult = await _employeeHandler.Update(new Employee());
+        ////if (!updateUserResult.IsValid)
+        ////{
+        ////    AddError(updateUserResult);
+        ////    TempData["Failure"] = "Falha ao atualizar usuário: " + string.Join("; ", GetModelStateErrors());
+        ////    return View(updateUserVM);
+        ////}
+        //TempData["Success"] = "Usuário atualizado com sucesso!";
+        //return RedirectToAction(nameof(UpdateProfile));
+    }
+
     ////[Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
