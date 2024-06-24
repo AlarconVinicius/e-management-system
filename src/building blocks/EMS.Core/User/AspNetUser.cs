@@ -6,6 +6,7 @@ public interface IAspNetUser
 {
     string Name { get; }
     Guid GetUserId();
+    Guid GetUserIdByJwt();
     Guid GetTenantId();
     string GetUserEmail();
     string GetUserToken();
@@ -29,6 +30,10 @@ public class AspNetUser : IAspNetUser
     public Guid GetUserId()
     {
         return IsAuthenticated() ? Guid.Parse(HttpContext!.User.GetUserId()) : Guid.Empty;
+    }
+    public Guid GetUserIdByJwt()
+    {
+        return IsAuthenticated() ? Guid.Parse(HttpContext!.User.GetUserIdByJwt()) : Guid.Empty;
     }
     public Guid GetTenantId()
     {
