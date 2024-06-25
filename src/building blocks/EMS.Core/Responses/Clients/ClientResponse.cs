@@ -33,7 +33,7 @@ public class ClientResponse
     [DisplayName("Permissão")]
     public ERoleCore Role { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     [DisplayName("Data de Cadastro")]

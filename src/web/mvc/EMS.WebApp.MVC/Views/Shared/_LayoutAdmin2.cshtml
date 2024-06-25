@@ -1,0 +1,82 @@
+﻿<!DOCTYPE HTML>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="POS - Bootstrap Admin Template">
+    <meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
+    <meta name="author" content="Dreamguys - Bootstrap Admin Template">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>@ViewData["Title"] - Admin E-Management System</title>
+
+    <link rel="shortcut icon" type="image/jpg" href="~/template_admin_2/img/logo/favicon.ico" />
+
+    <link rel="stylesheet" href="~/template_admin_2/css/bootstrap.min.css">
+
+    @RenderSection("Styles", required: false)
+
+    <link rel="stylesheet" href="~/template_admin_2/css/animate.css">
+
+    <link rel="stylesheet" href="~/template_admin_2/css/dataTables.bootstrap4.min.css">
+
+    <link rel="stylesheet" href="~/template_admin_2/plugins/fontawesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="~/template_admin_2/plugins/fontawesome/css/all.min.css">
+
+    <link rel="stylesheet" href="~/template_admin_2/css/style.css">
+</head>
+<body>
+    <div id="global-loader">
+        <div class="whirly-loader"></div>
+    </div>
+
+    <div class="main-wrapper">
+        <partial name="_AdminNavBarPartial2" />
+
+        <partial name="_AdminSideBarPartial2" />
+
+        <div class="page-wrapper">
+            <div class="content">
+                @RenderBody()
+                @* <footer class="footer border-top px-3">
+                <div class="container-fluid">
+                <div class="row text-muted mt-2">
+                <div class="col-6 text-start">
+                <p class="mb-0">
+                <a href="#" class="text-muted">
+                <strong>E-Management System</strong>
+                </a>
+                </p>
+                </div>
+                <div class="col-6 text-end">
+                <p class="text-muted">
+                Desenvolvido por -
+                <a target="_blank" href="https://www.linkedin.com/in/vin%C3%ADcius-alarcon-52a8a820a/">Alarcon Vinícius</a>
+                </p>
+                </div>
+                </div>
+                </div>
+                </footer> *@
+            </div>
+        </div>
+    </div>
+    <script src="~/template_admin_2/js/jquery-3.6.0.min.js"></script>
+
+    <script src="~/template_admin_2/js/feather.min.js"></script>
+
+    <script src="~/template_admin_2/js/jquery.slimscroll.min.js"></script>
+
+    <script src="~/template_admin_2/js/jquery.dataTables.min.js"></script>
+    <script src="~/template_admin_2/js/dataTables.bootstrap4.min.js"></script>
+
+    <script src="~/template_admin_2/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/template_admin_2/plugins/apexchart/apexcharts.min.js"></script>
+    <script src="~/template_admin_2/plugins/apexchart/chart-data.js"></script>
+
+    <script src="~/template_admin_2/js/script.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

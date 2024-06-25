@@ -17,7 +17,7 @@ public class UpdateCompanyRequest : Request
     [DisplayName("Logo da Empresa")]
     public string Brand { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; } = true;
 
     public UpdateCompanyRequest() { }

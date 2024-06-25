@@ -22,7 +22,7 @@ public class CreatePlanRequest : Request
     public string Benefits { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     public CreatePlanRequest() { }

@@ -38,7 +38,7 @@ public class CreateEmployeeRequest : CompaniesRequest
     [DisplayName("Permissão")]
     public ERoleCore Role { get; set; } = ERoleCore.Employee;
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; } = true;
 
     public CreateEmployeeRequest() { }

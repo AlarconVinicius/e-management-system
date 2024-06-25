@@ -1,8 +1,25 @@
-﻿using System.ComponentModel;
+﻿using EMS.Core.Requests.Employees;
+using EMS.Core.Requests.Identities;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace EMS.WebApp.MVC.Models;
 
+public class EmployeeAndUserViewModel
+{
+    public UpdateEmployeeAndUserRequest UpdateEmployeeAndUserRequest { get; set; }
+    public UpdateUserPasswordRequest UpdateUserPasswordRequest { get; set; }
+
+    public EmployeeAndUserViewModel()
+    {
+        
+    }
+    public EmployeeAndUserViewModel(UpdateEmployeeAndUserRequest updateEmployeeAndUserRequest, UpdateUserPasswordRequest updateUserPasswordRequest)
+    {
+        UpdateEmployeeAndUserRequest = updateEmployeeAndUserRequest;
+        UpdateUserPasswordRequest = updateUserPasswordRequest;
+    }
+}
 
 public class UpdateUserViewModel
 {

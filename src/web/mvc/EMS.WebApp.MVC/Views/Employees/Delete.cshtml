@@ -1,66 +1,89 @@
 ﻿@using EMS.Core.Responses;
 @using EMS.Core.Responses.Employees;
-@model Response<EmployeeResponse>
+@using EMS.WebApp.MVC.Extensions
+@model EmployeeResponse
 
 @{
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Deletar Colaborador";
 }
-
-<vc:Notification></vc:Notification>
-<div class="card border-0 col-md-12">
-    <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title">
-            Você tem certeza que deseja deletar o Colaborador: @Model.Data.Name @Model.Data.LastName
-        </h5>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Detalhes do Colaborador: @Model.Name @Model.LastName</h4>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <dl class="row">
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.Name)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.Name)
-                    </dd>
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.LastName)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.LastName)
-                    </dd>
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.Email)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.Email)
-                    </dd>
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.PhoneNumber)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.PhoneNumber)
-                    </dd>
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.Document)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.Document)
-                    </dd>
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Data.IsActive)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Data.IsActive)
-                    </dd>
-                </dl>
+</div>
 
-                <form asp-action="Delete" class="form-group mt-3">
-                    <input type="hidden" asp-for="@Model.Data.Id" />
-                    <a asp-action="Index" class="btn btn-warning me-3">Voltar</a>
-                    <input type="submit" value="Deletar" class="btn btn-danger" />
-                </form>
+<div class="row">
+    <div class="col-lg-8 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="productdetails">
+                    <ul class="product-bar">
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.Name)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.LastName)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.LastName)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.PhoneNumber)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.PhoneNumber)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.Document)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.Document)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.IsActive)
+                            </h4>
+                            <h6>
+                                @(Model.IsActive ? "Ativo" : "Inativo")
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.CreatedAt)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.CreatedAt)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.UpdatedAt)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.UpdatedAt)
+                            </h6>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <form asp-action="Delete">
+                        <a asp-action="Index" class="btn btn-cancel">Voltar</a>
+                        @* <input type="hidden" asp-for="@Model.Id" /> *@
+                        @* <input type="submit" value="Deletar" class="btn btn-submit me-2" /> *@
+                    </form>
+                </div>
             </div>
         </div>
     </div>

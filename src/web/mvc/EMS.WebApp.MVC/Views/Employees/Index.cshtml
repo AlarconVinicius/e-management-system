@@ -2,80 +2,132 @@
 @using EMS.WebApp.MVC.Extensions;
 @model PagedViewModel<EmployeeResponse>
 @{
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Colaboradores";
     var itemIndex = 0;
 }
-
 <vc:Notification></vc:Notification>
-<div class="card border-0 col-md-12">
-    <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title">
-            Colaboradores
-        </h5>
-
-        <form method="get" asp-controller="Employees" asp-action="Index">
-                <div class="d-flex align-items-center">
-                    <div class="input-group me-3">
-                        <input type="text"
-                               class="form-control"
-                               placeholder="Pesquisar"
-                               aria-label="Pesquisar"
-                               aria-describedby="pesquisar"
-                               id="q" name="q"
-                               value="@ViewBag.Search" />
-                        <button class="btn btn-outline-secondary"
-                                type="submit"
-                                id="pesquisar">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-                    <a asp-controller="Employees" asp-action="Create" class="btn btn-success align-self-center w-75">
-                        Adicionar Colaborador
-                    </a>
-                </div>
-        </form>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Colaboradores</h4>
     </div>
+    <div class="page-btn">
+        <a asp-action="Create" class="btn btn-added">
+            <img src="~/template_admin_2/img/icons/plus.svg"
+                 class="me-2"
+                 alt="img" />Adicionar Colaborador
+        </a>
+    </div>
+</div>
+
+<div class="card">
     <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Sobrenome</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Celular</th>
-                    <th scope="col">CPF</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Data de Cadastro</th>
-                    <th scope="col">Data de Modificação</th>
-                    <th scope="col">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var employee in Model.List)
-                {
+        <div class="table-top">
+            <div class="search-set">
+                <div class="search-input">
+                    <form method="get" asp-action="Index">
+                        <div class="input-group">
+                            <input type="search" name="q" class="form-control form-control-sm" placeholder="Search..." value="@ViewBag.Search">
+                            <button class="btn btn-searchset" type="submit">
+                                <img src="~/template_admin_2/img/icons/search-white.svg" alt="img" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="wordset">
+                <ul>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="pdf">
+                            <img src="~/template_admin_2/img/icons/pdf.svg" alt="img" />
+                        </a>
+                    </li>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="excel">
+                            <img src="~/template_admin_2/img/icons/excel.svg" alt="img" />
+                        </a>
+                    </li>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="print">
+                            <img src="~/template_admin_2/img/icons/printer.svg" alt="img" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
                     <tr>
-                        <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                        <td>@employee.Name</td>
-                        <td>@employee.LastName</td>
-                        <td>@employee.Email</td>
-                        <td>@employee.PhoneNumber</td>
-                        <td>@employee.Document</td>
-                        <td>@(employee.IsActive ? "Ativo" : "Desativado")</td>
-                        <td>@this.FormatDate(employee.CreatedAt)</td>
-                        <td>@this.FormatDate(employee.UpdatedAt)</td>
-                        <td>
-                            @* <a href="#" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
-                            <a asp-controller="Employees" asp-action="Details" asp-route-id="@employee.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
-                            <a asp-controller="Employees" asp-action="Edit" asp-route-id="@employee.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a asp-controller="Employees" asp-action="Delete" asp-route-id="@employee.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
-                        </td>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>Sobrenome</th>
+                        <th>E-mail</th>
+                        <th>Celular</th>
+                        <th>CPF</th>
+                        <th>Status</th>
+                        <th>Data de Cadastro</th>
+                        <th>Data de Modificação</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                    itemIndex++;
-                }
-            </tbody>
-        </table>
-        <vc:pagination paged-model="@Model"></vc:pagination>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.List)
+                    {
+                        <tr>
+                            <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
+                            <td>@item.Name</td>
+                            <td>@item.LastName</td>
+                            <td>@item.Email</td>
+                            <td>@item.PhoneNumber</td>
+                            <td>@item.Document</td>
+                            <td><span class="badges @(item.IsActive ? "bg-lightgreen" : "bg-lightred")">@(item.IsActive ? "Ativo" : "Inativo")</span></td>
+                            <td>@this.FormatDate(item.CreatedAt)</td>
+                            <td>@this.FormatDate(item.UpdatedAt)</td>
+                            <td class="text-center">
+                                <a class="action-set"
+                                   href="javascript:void(0);"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="true">
+                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/eye1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Detalhes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/edit.svg"
+                                                 class="me-2"
+                                                 alt="img" />Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="dropdown-item confirm-text">
+                                            <img src="~/template_admin_2/img/icons/delete1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Deletar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        itemIndex++;
+                    }
+                </tbody>
+            </table>
+            <vc:pagination paged-model="@Model"></vc:pagination>
+        </div>
     </div>
 </div>

@@ -20,7 +20,7 @@ public class UpdateProductRequest : CompaniesRequest
     public decimal UnitaryValue { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     public UpdateProductRequest() { }

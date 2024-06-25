@@ -29,7 +29,7 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
 {
     private readonly HttpClient _httpClient;
     private readonly IAuthenticationService _authenticationService;
-    private readonly string _baseUrl = "api/v1/identities/login";
+    private readonly string _baseUrl = "api/v1/identities";
 
     public IdentityHandler(IAspNetUser aspNetUser, HttpClient httpClient, IAuthenticationService authenticationService) : base(aspNetUser)
     {
@@ -40,7 +40,7 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
 
     public async Task<CustomHttpResponse<LoginUserResponse>> LoginAsync(LoginUserRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync(_baseUrl, request);
+        var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/login", request);
 
         if (!HandleErrorResponse(response))
         {
@@ -85,7 +85,7 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
 
     public async Task<CustomHttpResponse<LoginUserResponse>> CreateAsync(CreateUserRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync(_baseUrl, request);
+        var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/create", request);
 
         if (!HandleErrorResponse(response))
         {
@@ -100,9 +100,16 @@ public class IdentityHandler : BaseHandler, IIdentityHandler
         throw new NotImplementedException();
     }
 
-    public Task<CustomHttpResponse> UpdatePasswordAsync(UpdateUserPasswordRequest request)
+    public async Task<CustomHttpResponse> UpdatePasswordAsync(UpdateUserPasswordRequest request)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PutAsJsonAsync($"{_baseUrl}/update/password", request);
+
+        if (!HandleErrorResponse(response))
+        {
+            return await DeserializeResponseObject<CustomHttpResponse>(response);
+        }
+
+        return await DeserializeResponseObject<CustomHttpResponse>(response);
     }
 
     public Task<CustomHttpResponse> AddOrUpdateUserClaimAsync(AddOrUpdateUserClaimRequest request)

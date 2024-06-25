@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Razor;
+﻿using EMS.Core.Enums;
+using Microsoft.AspNetCore.Mvc.Razor;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -35,7 +36,7 @@ public static class RazorHelpers
 
     public static string FormatDate(this RazorPage page, DateTime value)
     {
-        return value.ToString("dd/MM/yyyy");
+        return value.ToString("dd MMM yy HH:mm", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     public static string FormatTimeSpan(this RazorPage page, TimeSpan value)
@@ -58,5 +59,16 @@ public static class RazorHelpers
             return $"{timeSpan.Minutes}min";
         }
         return "Formato inválido";
+    }
+    public static string GetStatusColor(this RazorPage page, EServiceStatusCore status)
+    {
+        return status switch
+        {
+            EServiceStatusCore.Scheduled => "bg-lightblue",
+            EServiceStatusCore.InProgress => "bg-lightyellow",
+            EServiceStatusCore.Completed => "bg-lightgreen",
+            EServiceStatusCore.Cancelled => "bg-lightred",
+            _ => "bg-lightgray"
+        };
     }
 }

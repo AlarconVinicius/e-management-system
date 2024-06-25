@@ -19,7 +19,7 @@ public class PlanResponse
     [DisplayName("Benefícios")]
     public string Benefits { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     [DisplayName("Data de Cadastro")]

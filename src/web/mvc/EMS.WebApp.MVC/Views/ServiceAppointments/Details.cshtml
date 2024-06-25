@@ -1,74 +1,93 @@
 ﻿@using EMS.Core.Enums
 @using EMS.Core.Responses.ServiceAppointments;
+@using EMS.WebApp.MVC.Extensions
 @model ServiceAppointmentResponse
 
 @{
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Detalhes do Agendamento";
 }
-
-<div class="card border-0 col-md-12">
-    <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title">
-            Detalhes do Agendamento:  @Model.AppointmentStart  —  @Model.AppointmentEnd
-        </h5>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Detalhes do Agendamento:  @this.FormatDate(Model.AppointmentStart)  —  @this.FormatDate(Model.AppointmentEnd)</h4>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <dl class="row">
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.ClientName)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.ClientName) @Html.DisplayFor(model => model.ClientLastname)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.EmployeeName)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.EmployeeName) @Html.DisplayFor(model => model.EmployeeLastname)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.ServiceName)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.ServiceName)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.AppointmentStart)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.AppointmentStart)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.AppointmentEnd)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.AppointmentEnd)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.Status)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Enum.GetName(typeof(EServiceStatusCore), Model.Status)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.CreatedAt)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.CreatedAt)
-                    </dd>
-                    <dt class="col-sm-6">
-                        @Html.DisplayNameFor(model => model.UpdatedAt)
-                    </dt>
-                    <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.UpdatedAt)
-                    </dd>
-                </dl>
-                <div class="form-group mt-3">
-                    <a asp-action="Index" class="btn btn-warning me-3">Voltar</a>
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="productdetails">
+                    <ul class="product-bar">
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.ClientName)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.ClientName) @Html.DisplayFor(model => model.ClientLastname)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.EmployeeName)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.EmployeeName) @Html.DisplayFor(model => model.EmployeeLastname)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.ServiceName)
+                            </h4>
+                            <h6>
+                                @Html.DisplayFor(model => model.ServiceName)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.AppointmentStart)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.AppointmentStart)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.AppointmentEnd)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.AppointmentEnd)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.Status)
+                            </h4>
+                            <h6>
+                                @Enum.GetName(typeof(EServiceStatusCore), Model.Status)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.CreatedAt)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.CreatedAt)
+                            </h6>
+                        </li>
+                        <li>
+                            <h4>
+                                @Html.DisplayNameFor(model => model.UpdatedAt)
+                            </h4>
+                            <h6>
+                                @this.FormatDate(Model.UpdatedAt)
+                            </h6>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <a asp-action="Index" class="btn btn-cancel">Voltar</a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-submit me-2">Editar</a>
                 </div>
             </div>
         </div>

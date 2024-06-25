@@ -22,7 +22,7 @@ public class CreateCompanyRequest : Request
     [DisplayName("CPF/CNPJ")]
     public string Document { get; set; }
 
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; } = true;
 
     public CreateCompanyRequest() { }

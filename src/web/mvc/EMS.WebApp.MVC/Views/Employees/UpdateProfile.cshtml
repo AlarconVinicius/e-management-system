@@ -1,0 +1,140 @@
+﻿@using EMS.WebApp.MVC.Extensions;
+@model EmployeeAndUserViewModel;
+@{
+    Layout = "_LayoutAdmin2";
+    ViewData["Title"] = "Perfil";
+}
+<vc:Notification></vc:Notification>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Perfil</h4>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="profile-set">
+            <div class="profile-head"></div>
+            <div class="profile-top">
+                <div class="profile-content">
+                    <div class="profile-contentimg">
+                        @* <img src="~/template_admin_2/img/customer/customer5.jpg" *@
+                        <img src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.UpdateEmployeeAndUserRequest.Employee.Email)?d=mm&s=150"
+                             alt="img"
+                             id="blah" />
+                        <div class="profileupload">
+                            <input type="file" id="imgInp" />
+                            <a href="javascript:void(0);">
+                                <img src="~/template_admin_2/img/icons/edit-set.svg" alt="img" />
+                            </a>
+                        </div>
+                    </div>
+                    <div class="profile-contentname">
+                        <h2>@Model.UpdateEmployeeAndUserRequest.Employee.Name @Model.UpdateEmployeeAndUserRequest.Employee.LastName</h2>
+                        <h4>Atualize sua foto e detalhes pessoais.</h4>
+                    </div>
+                </div>
+                <div class="ms-auto">
+                    <a href="javascript:void(0);" class="btn btn-submit me-2" onclick="document.getElementById('updateProfileForm').submit();">Salvar</a>
+                    <a href="javascript:void(0);" class="btn btn-cancel">Cancelar</a>
+                </div>
+            </div>
+        </div>
+        <form asp-action="UpdateProfile" method="post">
+            <input type="hidden" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Id" value="@Model.UpdateEmployeeAndUserRequest.Employee.Id" />
+            <div class="row">
+                <vc:Summary></vc:Summary>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name">Nome</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName">Sobrenome</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" class="form-control" value="@ViewBag.Document" disabled>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email">Email</label>
+                        <input type="email" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber">Telefone</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-between">
+                    <div>
+                        <a asp-action="Index" class="btn btn-cancel me-2">Voltar</a>
+                        <button type="submit" class="btn btn-submit me-2">Atualizar Perfil</button>
+                    </div>
+                    <a asp-action="Index" class="btn btn-submit bg-lightblue ms-auto" data-bs-toggle="modal" data-bs-target="#upd_password">Atualizar Senha</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+<div id="upd_password" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Atualizar Senha</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UpdatePassword" method="post">
+                    <input type="hidden" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Id" value="@Model.UpdateEmployeeAndUserRequest.Employee.Id" />
+                    <div class="row">
+                        <vc:Summary></vc:Summary>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.OldPassword">Senha Atual</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.OldPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.OldPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.NewPassword">Nova Senha</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.NewPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.NewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <a class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancelar</a>
+                            <button type="submit" class="btn btn-submit">Atualizar Senha</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

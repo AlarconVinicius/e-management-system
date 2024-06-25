@@ -78,7 +78,7 @@ public class ClientsController : MainController
             return NotFound();
         }
         var request = new UpdateClientRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.IsActive);
-        ViewBag.Cpf = response.Document;
+        ViewBag.Document = response.Document;
         return View(request);
     }
 

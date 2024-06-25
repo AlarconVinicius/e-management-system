@@ -25,7 +25,7 @@ public class UpdateClientRequest : CompaniesRequest
     public string PhoneNumber { get; set; }
 
     [Required(ErrorMessage = "O campo {0} é obrigatório")]
-    [DisplayName("Ativo")]
+    [DisplayName("Status")]
     public bool IsActive { get; set; }
 
     public UpdateClientRequest() { }

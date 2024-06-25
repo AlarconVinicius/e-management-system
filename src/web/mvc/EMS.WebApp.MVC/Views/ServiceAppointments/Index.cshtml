@@ -2,80 +2,324 @@
 @using EMS.WebApp.MVC.Extensions;
 @model PagedViewModel<ServiceAppointmentResponse>
 @{
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Agendamentos";
     var itemIndex = 0;
 }
 
+@section Styles {
+    @{
+        <link rel="stylesheet"
+              href="~/template_admin_2/plugins/fullcalendar/fullcalendar.min.css" />
+    }
+}
 <vc:Notification></vc:Notification>
-<div class="card border-0 col-md-12">
-    <div class="card-header d-flex justify-content-between">
-        <h5 class="card-title">
-            Agendamentos
-        </h5>
-
-        <form method="get" asp-controller="ServiceAppointments" asp-action="Index">
-            <div class="d-flex align-items-center">
-                <div class="input-group me-3">
-                    <input type="text"
-                           class="form-control"
-                           placeholder="Pesquisar"
-                           aria-label="Pesquisar"
-                           aria-describedby="pesquisar"
-                           id="q" name="q"
-                           value="@ViewBag.Search" />
-                    <button class="btn btn-outline-secondary"
-                            type="submit"
-                            id="pesquisar">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </div>
-                <a asp-controller="ServiceAppointments" asp-action="Create" class="btn btn-success align-self-center w-75">
-                    Agendar
-                </a>
-            </div>
-        </form>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Agendamentos</h4>
     </div>
-    <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Colaborador</th>
-                    <th scope="col">Serviço</th>
-                    <th scope="col">Início</th>
-                    <th scope="col">Fim</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Data de Cadastro</th>
-                    <th scope="col">Data de Modificação</th>
-                    <th scope="col">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var serviceAppointment in Model.List)
-                {
-                    <tr>
-                        <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
-                        <td>@serviceAppointment.ClientName @serviceAppointment.ClientLastname</td>
-                        <td>@serviceAppointment.EmployeeName @serviceAppointment.EmployeeLastname</td>
-                        <td>@serviceAppointment.ServiceName</td>
-                        <td>@serviceAppointment.AppointmentStart</td>
-                        <td>@serviceAppointment.AppointmentEnd</td>
-                        <td>@serviceAppointment.Status.ToString()</td>
-                        <td>@this.FormatDate(serviceAppointment.CreatedAt)</td>
-                        <td>@this.FormatDate(serviceAppointment.UpdatedAt)</td>
-                        <td>
-                            @* <a asp-controller="ServiceAppointments" asp-action="Block" class="btn btn-info me-3"><span class="fa fa-unlock"></span></a> *@
-                            <a asp-controller="ServiceAppointments" asp-action="Details" asp-route-id="@serviceAppointment.Id" class="btn btn-info me-3"><span class="fa fa-eye"></span></a>
-                            <a asp-controller="ServiceAppointments" asp-action="Edit" asp-route-id="@serviceAppointment.Id" class="btn btn-warning me-3"><span class="fa fa-pencil-alt"></span></a>
-                            <a asp-controller="ServiceAppointments" asp-action="Delete" asp-route-id="@serviceAppointment.Id" class="btn btn-danger"><span class="fa fa-trash"></span></a>
-                        </td>
-                    </tr>
-                    itemIndex++;
-                }
-            </tbody>
-        </table>
-        <vc:pagination paged-model="@Model"></vc:pagination>
+    <div class="page-btn">
+        <a asp-action="Create" class="btn btn-added">
+            <img src="~/template_admin_2/img/icons/plus.svg"
+                 class="me-2"
+                 alt="img" />Agendar
+        </a>
     </div>
 </div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-top">
+            <div class="search-set">
+                <div class="search-input">
+                    <form method="get" asp-action="Index">
+                        <div class="input-group">
+                            <input type="search" name="q" class="form-control form-control-sm" placeholder="Search..." value="@ViewBag.Search">
+                            <button class="btn btn-searchset" type="submit">
+                                <img src="~/template_admin_2/img/icons/search-white.svg" alt="img" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="wordset">
+                <ul>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="pdf">
+                            <img src="~/template_admin_2/img/icons/pdf.svg" alt="img" />
+                        </a>
+                    </li>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="excel">
+                            <img src="~/template_admin_2/img/icons/excel.svg" alt="img" />
+                        </a>
+                    </li>
+                    <li>
+                        <a data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="print">
+                            <img src="~/template_admin_2/img/icons/printer.svg" alt="img" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Colaborador</th>
+                        <th>Serviço</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Status</th>
+                        <th>Data de Cadastro</th>
+                        <th>Data de Modificação</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.List)
+                    {
+                        <tr>
+                            <td>@(Model.PageSize * (Model.PageIndex - 1) + itemIndex + 1)</td>
+                            <td>@item.ClientName @item.ClientLastname</td>
+                            <td>@item.EmployeeName @item.EmployeeLastname</td>
+                            <td>@item.ServiceName</td>
+                            <td>@this.FormatDate(item.AppointmentStart)</td>
+                            <td>@this.FormatDate(item.AppointmentEnd)</td>
+                            <td><span class="badges @this.GetStatusColor(item.Status)">@item.Status.ToString()</span></td>
+                            <td>@this.FormatDate(item.CreatedAt)</td>
+                            <td>@this.FormatDate(item.UpdatedAt)</td>
+                            <td class="text-center">
+                                <a class="action-set"
+                                   href="javascript:void(0);"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="true">
+                                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/eye1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Detalhes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="dropdown-item">
+                                            <img src="~/template_admin_2/img/icons/edit.svg"
+                                                 class="me-2"
+                                                 alt="img" />Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a asp-action="Delete" asp-route-id="@item.Id"
+                                           class="dropdown-item confirm-text">
+                                            <img src="~/template_admin_2/img/icons/delete1.svg"
+                                                 class="me-2"
+                                                 alt="img" />Deletar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        itemIndex++;
+                    }
+                </tbody>
+            </table>
+            <vc:pagination paged-model="@Model"></vc:pagination>
+        </div>
+    </div>
+</div>
+
+@* **************************************************************************************************CALENDAR************************************************************************************************** *@
+
+<div class="page-header">
+    <div class="row align-items-center w-100">
+        <div class="col-lg-10 col-sm-12">
+            <h3 class="page-title">Calendar</h3>
+        </div>
+        <div class="col-lg-2 col-sm-12">
+            <a href="javascript:void(0);"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#add_event">Create Event</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3 col-md-4">
+        <h4 class="card-title">Drag & Drop Event</h4>
+        <div id="calendar-events" class="mb-3">
+            <div class="calendar-events" data-class="bg-info">
+                <i class="fas fa-circle text-info"></i> My Event One
+            </div>
+            <div class="calendar-events" data-class="bg-success">
+                <i class="fas fa-circle text-success"></i> My Event Two
+            </div>
+            <div class="calendar-events" data-class="bg-danger">
+                <i class="fas fa-circle text-danger"></i> My Event Three
+            </div>
+            <div class="calendar-events" data-class="bg-warning">
+                <i class="fas fa-circle text-warning"></i> My Event Four
+            </div>
+        </div>
+        <div class="checkbox mb-3">
+            <input id="drop-remove" type="checkbox" />
+            <label for="drop-remove"> Remove after drop </label>
+        </div>
+        <a href="javascript:void(0);"
+            data-bs-toggle="modal"
+            data-bs-target="#add_new_event"
+            class="btn mb-3 btn-primary btn-block w-100">
+            <i class="fas fa-plus"></i> Add Category
+        </a>
+    </div>
+    <div class="col-lg-9 col-md-8">
+        <div class="card bg-white">
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="add_event" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Event</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Event Name <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label>Event Date <span class="text-danger">*</span></label>
+                        <div class="cal-icon">
+                            <input class="form-control" type="text" />
+                        </div>
+                    </div>
+                    <div class="submit-section">
+                        <button class="btn btn-primary submit-btn">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal custom-modal fade none-border" id="my_event">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Event</h4>
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-hidden="true">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer justify-content-center">
+                <button type="button"
+                        class="btn btn-success save-event submit-btn">
+                    Create event
+                </button>
+                <button type="button"
+                        class="btn btn-danger delete-event submit-btn"
+                        data-dismiss="modal">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal custom-modal fade" id="add_new_event">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Category</h4>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-hidden="true">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Category Name</label>
+                        <input class="form-control form-white"
+                               placeholder="Enter name"
+                               type="text"
+                               name="category-name" />
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Choose Category Color</label>
+                        <select class="form-control form-white"
+                                data-placeholder="Choose a color..."
+                                name="category-color">
+                            <option value="success">Success</option>
+                            <option value="danger">Danger</option>
+                            <option value="info">Info</option>
+                            <option value="primary">Primary</option>
+                            <option value="warning">Warning</option>
+                            <option value="inverse">Inverse</option>
+                        </select>
+                    </div>
+                    <div class="submit-section">
+                        <button type="button"
+                                class="btn btn-primary save-category submit-btn"
+                                data-dismiss="modal">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        <script src="~/template_admin_2/js/jquery-3.6.0.min.js"></script>
+
+
+        <script src="~/template_admin_2/js/feather.min.js"></script>
+
+        <script src="~/template_admin_2/plugins/moment/moment.min.js"></script>
+
+        <script src="~/template_admin_2/js/jquery.slimscroll.min.js"></script>
+
+        <script src="~/template_admin_2/js/jquery.dataTables.min.js"></script>
+        <script src="~/template_admin_2/js/dataTables.bootstrap4.min.js"></script>
+
+        <script src="~/template_admin_2/js/jquery-ui.min.js"></script>
+        <script src="~/template_admin_2/plugins/fullcalendar/fullcalendar.min.js"></script>
+        <script src="~/template_admin_2/plugins/fullcalendar/jquery.fullcalendar.js"></script>
+
+        <script src="~/template_admin_2/js/bootstrap.bundle.min.js"></script>
+
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
