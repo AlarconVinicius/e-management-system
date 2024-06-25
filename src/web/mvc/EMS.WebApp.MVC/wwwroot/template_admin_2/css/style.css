@@ -582,7 +582,15 @@ strong {
         background: #fe820e;
         color: #fff
     }
+.btn-submit.bg-lightblue {
+    background: #007bff !important;
+    color: #fff;
+}
 
+    .btn-submit.bg-lightblue:hover {
+        background: #0056b3!important;
+        color: #fff;
+    }
 @media(max-width:991px) {
     .btn-submit {
         min-width: auto;
