@@ -1,74 +1,16 @@
-﻿@{
+﻿@model DashboardViewModel
+
+@{
     Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Dashboard";
 }
 
 <div class="row">
-    <div class="col-lg-3 col-sm-6 col-12">
-        <div class="dash-widget">
-            <div class="dash-widgetimg">
-                <span>
-                    <img src="~/template_admin_2/img/icons/dash1.svg" alt="img" />
-                </span>
-            </div>
-            <div class="dash-widgetcontent">
-                <h5>
-                    $<span class="counters" data-count="307144.00">$307,144.00</span>
-                </h5>
-                <h6>Total Purchase Due</h6>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6 col-12">
-        <div class="dash-widget dash1">
-            <div class="dash-widgetimg">
-                <span>
-                    <img src="~/template_admin_2/img/icons/dash2.svg" alt="img" />
-                </span>
-            </div>
-            <div class="dash-widgetcontent">
-                <h5>
-                    $<span class="counters" data-count="4385.00">$4,385.00</span>
-                </h5>
-                <h6>Total Sales Due</h6>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6 col-12">
-        <div class="dash-widget dash2">
-            <div class="dash-widgetimg">
-                <span>
-                    <img src="~/template_admin_2/img/icons/dash3.svg" alt="img" />
-                </span>
-            </div>
-            <div class="dash-widgetcontent">
-                <h5>
-                    $<span class="counters" data-count="385656.50">385,656.50</span>
-                </h5>
-                <h6>Total Sale Amount</h6>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-sm-6 col-12">
-        <div class="dash-widget dash3">
-            <div class="dash-widgetimg">
-                <span>
-                    <img src="~/template_admin_2/img/icons/dash4.svg" alt="img" />
-                </span>
-            </div>
-            <div class="dash-widgetcontent">
-                <h5>
-                    $<span class="counters" data-count="40000.00">400.00</span>
-                </h5>
-                <h6>Total Sale Amount</h6>
-            </div>
-        </div>
-    </div>
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count">
             <div class="dash-counts">
-                <h4>100</h4>
-                <h5>Customers</h5>
+                <h4>@Model.TotalClientes</h4>
+                <h5>Clientes</h5>
             </div>
             <div class="dash-imgs">
                 <i data-feather="user"></i>
@@ -78,241 +20,151 @@
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das1">
             <div class="dash-counts">
-                <h4>100</h4>
-                <h5>Suppliers</h5>
+                <h4>@Model.TotalColaboradores</h4>
+                <h5>Colaboradores</h5>
             </div>
             <div class="dash-imgs">
-                <i data-feather="user-check"></i>
+                <i data-feather="user"></i>
             </div>
         </div>
     </div>
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das2">
             <div class="dash-counts">
-                <h4>100</h4>
-                <h5>Purchase Invoice</h5>
+                <h4>@Model.TotalServicos</h4>
+                <h5>Serviços</h5>
             </div>
             <div class="dash-imgs">
-                <i data-feather="file-text"></i>
+                <i data-feather="shopping-cart"></i>
             </div>
         </div>
     </div>
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das3">
             <div class="dash-counts">
-                <h4>105</h4>
-                <h5>Sales Invoice</h5>
+                <h4>@Model.TotalAgendamentos</h4>
+                <h5>Total de Agendamentos</h5>
             </div>
             <div class="dash-imgs">
-                <i data-feather="file"></i>
+                <i data-feather="calendar"></i>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<div class="row mt-lg-5">
     <div class="col-lg-7 col-sm-12 col-12 d-flex">
         <div class="card flex-fill">
             <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Purchase & Sales</h5>
+                <h5 class="card-title mb-0">Retenção de Agendamentos</h5>
                 <div class="graph-sets">
                     <ul>
-                        <li>
-                            <span>Sales</span>
-                        </li>
-                        <li>
-                            <span>Purchase</span>
-                        </li>
+                        <li><span>Realizado</span></li>
+                        <li><span>Cancelado</span></li>
                     </ul>
                     <div class="dropdown">
-                        <button class="btn btn-white btn-sm dropdown-toggle"
-                                type="button"
-                                id="dropdownMenuButton"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            2022
-                            <img src="~/template_admin_2/img/icons/dropdown.svg"
-                                 alt="img"
-                                 class="ms-2" />
+                        <button class="btn btn-white btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            @Model.AnoSelecionado
+                            <img src="~/template_admin_2/img/icons/dropdown.svg" alt="img" class="ms-2" />
                         </button>
-                        <ul class="dropdown-menu"
-                            aria-labelledby="dropdownMenuButton">
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item">2022</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item">2021</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item">2020</a>
-                            </li>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            @foreach (var ano in Model.AnosDisponiveis)
+                            {
+                                <li>
+                                    <a href="@Url.Action("Index", new { ano = ano })" class="dropdown-item">@ano</a>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                <div id="sales_charts"></div>
+                <div id="appointment_retention_chart"></div>
             </div>
         </div>
     </div>
     <div class="col-lg-5 col-sm-12 col-12 d-flex">
         <div class="card flex-fill">
             <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Recently Added Products</h4>
+                <h4 class="card-title mb-0">Status dos Colaboradores</h4>
                 <div class="dropdown">
-                    <a href="javascript:void(0);"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false"
-                       class="dropset">
+                    <a href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="false" class="dropset">
                         <i class="fa fa-ellipsis-v"></i>
                     </a>
-                    <ul class="dropdown-menu"
-                        aria-labelledby="dropdownMenuButton">
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <li>
-                            <a href="productlist.html" class="dropdown-item">Product List</a>
-                        </li>
-                        <li>
-                            <a href="addproduct.html" class="dropdown-item">Product Add</a>
+                            <a href="productlist.html" class="dropdown-item">Colaboradores</a>
                         </li>
                     </ul>
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive dataview">
-                    <table class="table datatable">
-                        <thead>
-                            <tr>
-                                <th>Sno</th>
-                                <th>Products</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td class="productimgname">
-                                    <a href="productlist.html" class="product-img">
-                                        <img src="~/template_admin_2/img/product/product22.jpg"
-                                             alt="product" />
-                                    </a>
-                                    <a href="productlist.html">Apple Earpods</a>
-                                </td>
-                                <td>$891.2</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td class="productimgname">
-                                    <a href="productlist.html" class="product-img">
-                                        <img src="~/template_admin_2/img/product/product23.jpg"
-                                             alt="product" />
-                                    </a>
-                                    <a href="productlist.html">iPhone 11</a>
-                                </td>
-                                <td>$668.51</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td class="productimgname">
-                                    <a href="productlist.html" class="product-img">
-                                        <img src="~/template_admin_2/img/product/product24.jpg"
-                                             alt="product" />
-                                    </a>
-                                    <a href="productlist.html">samsung</a>
-                                </td>
-                                <td>$522.29</td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td class="productimgname">
-                                    <a href="productlist.html" class="product-img">
-                                        <img src="~/template_admin_2/img/product/product6.jpg"
-                                             alt="product" />
-                                    </a>
-                                    <a href="productlist.html">Macbook Pro</a>
-                                </td>
-                                <td>$291.01</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div id="status_employee_chart"></div>
             </div>
         </div>
     </div>
 </div>
-<div class="card mb-0">
-    <div class="card-body">
-        <h4 class="card-title">Expired Products</h4>
-        <div class="table-responsive dataview">
-            <table class="table datatable">
-                <thead>
-                    <tr>
-                        <th>SNo</th>
-                        <th>Product Code</th>
-                        <th>Product Name</th>
-                        <th>Brand Name</th>
-                        <th>Category Name</th>
-                        <th>Expiry Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><a href="javascript:void(0);">IT0001</a></td>
-                        <td class="productimgname">
-                            <a class="product-img" href="productlist.html">
-                                <img src="~/template_admin_2/img/product/product2.jpg"
-                                     alt="product" />
-                            </a>
-                            <a href="productlist.html">Orange</a>
-                        </td>
-                        <td>N/D</td>
-                        <td>Fruits</td>
-                        <td>12-12-2022</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><a href="javascript:void(0);">IT0002</a></td>
-                        <td class="productimgname">
-                            <a class="product-img" href="productlist.html">
-                                <img src="~/template_admin_2/img/product/product3.jpg"
-                                     alt="product" />
-                            </a>
-                            <a href="productlist.html">Pineapple</a>
-                        </td>
-                        <td>N/D</td>
-                        <td>Fruits</td>
-                        <td>25-11-2022</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><a href="javascript:void(0);">IT0003</a></td>
-                        <td class="productimgname">
-                            <a class="product-img" href="productlist.html">
-                                <img src="~/template_admin_2/img/product/product4.jpg"
-                                     alt="product" />
-                            </a>
-                            <a href="productlist.html">Stawberry</a>
-                        </td>
-                        <td>N/D</td>
-                        <td>Fruits</td>
-                        <td>19-11-2022</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td><a href="javascript:void(0);">IT0004</a></td>
-                        <td class="productimgname">
-                            <a class="product-img" href="productlist.html">
-                                <img src="~/template_admin_2/img/product/product5.jpg"
-                                     alt="product" />
-                            </a>
-                            <a href="productlist.html">Avocat</a>
-                        </td>
-                        <td>N/D</td>
-                        <td>Fruits</td>
-                        <td>20-11-2022</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+
+@section Scripts {
+
+    @{
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script>
+            if ($("#appointment_retention_chart").length > 0) {
+                var options = {
+                    series: [
+                        { name: "Realizado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Realizado))) },
+                        { name: "Cancelado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Cancelado))) },
+                    ],
+                    colors: ["#28C76F", "#EA5455"],
+                    chart: {
+                        type: "bar",
+                        height: 300,
+                        stacked: true,
+                        zoom: { enabled: true },
+                    },
+                    responsive: [
+                        {
+                            breakpoint: 280,
+                            options: { legend: { position: "bottom", offsetY: 0 } },
+                        },
+                    ],
+                    plotOptions: {
+                        bar: { horizontal: false, columnWidth: "20%", endingShape: "rounded" },
+                    },
+                    xaxis: {
+                        categories: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Mes))),
+                    },
+                    legend: { position: "right", offsetY: 40 },
+                    fill: { opacity: 1 },
+                };
+                var chart = new ApexCharts(
+                    document.querySelector("#appointment_retention_chart"),
+                    options
+                );
+                chart.render();
+            }
+
+            if ($("#status_employee_chart").length > 0) {
+                var donutChart = {
+                    chart: { height: 350, type: "donut", toolbar: { show: false } },
+                    series: @Html.Raw(Json.Serialize(Model.StatusColaboradores)),
+                    labels: ['Ativos', 'Inativos'],
+                    colors: ["#28C76F", "#EA5455"],
+                    responsive: [
+                        {
+                            breakpoint: 480,
+                            options: { chart: { width: 200 }, legend: { position: "bottom" } },
+                        },
+                    ],
+                };
+                var donut = new ApexCharts(
+                    document.querySelector("#status_employee_chart"),
+                    donutChart
+                );
+                donut.render();
+            }
+        </script>
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

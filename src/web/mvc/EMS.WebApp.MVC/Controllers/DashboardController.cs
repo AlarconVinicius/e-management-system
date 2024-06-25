@@ -1,4 +1,5 @@
 ﻿using EMS.Core.Notifications;
+using EMS.WebApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,9 +23,31 @@ public class DashboardController : MainController
     //    _authService = authService;
     //}
 
-    public ActionResult Index()
+    public IActionResult Index(int? ano)
     {
-        return View();
+        var model = new DashboardViewModel
+        {
+            TotalClientes = 50,
+            TotalColaboradores = 5,
+            TotalServicos = 20,
+            TotalAgendamentos = 105,
+            AppointmentRetention = new List<AppointmentRetentionData>
+            {
+                new AppointmentRetentionData { Mes = "Jan", Realizado = 50, Cancelado = 21 },
+                new AppointmentRetentionData { Mes = "Feb", Realizado = 45, Cancelado = 54 },
+                new AppointmentRetentionData { Mes = "Mar", Realizado = 60, Cancelado = 45 },
+                new AppointmentRetentionData { Mes = "Apr", Realizado = 70, Cancelado = 35 },
+                new AppointmentRetentionData { Mes = "May", Realizado = 50, Cancelado = 21 },
+                new AppointmentRetentionData { Mes = "Jun", Realizado = 45, Cancelado = 54 },
+                new AppointmentRetentionData { Mes = "Jul", Realizado = 60, Cancelado = 45 },
+                new AppointmentRetentionData { Mes = "Aug", Realizado = 70, Cancelado = 35 }
+            },
+            StatusColaboradores = new List<int> { 3, 1 },
+            AnosDisponiveis = new List<int> { 2022, 2021, 2020 },
+            AnoSelecionado = ano ?? 2022
+        };
+
+        return View(model);
     }
 
     //[HttpGet]
