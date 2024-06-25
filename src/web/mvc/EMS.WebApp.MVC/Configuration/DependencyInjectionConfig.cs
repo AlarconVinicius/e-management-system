@@ -14,7 +14,8 @@ public static class DependencyInjectionConfig
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         #region HttpServices
-        services.AddHttpClient<IIdentityHandler, IdentityHandler>();
+        services.AddHttpClient<IIdentityHandler, IdentityHandler>()
+                .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
         services.AddHttpClient<IPlanHandler, PlanHandler>();
         services.AddHttpClient<ICompanyHandler, CompanyHandler>();
         services.AddHttpClient<IEmployeeHandler, EmployeeHandler>()

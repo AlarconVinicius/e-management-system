@@ -8,7 +8,7 @@ namespace EMS.WebApp.MVC.Models;
 public class EmployeeAndUserViewModel
 {
     public UpdateEmployeeAndUserRequest UpdateEmployeeAndUserRequest { get; set; }
-    public UpdateUserPasswordRequest UpdateUserPasswordRequest { get; set; } = new UpdateUserPasswordRequest();
+    public UpdateUserPasswordRequest UpdateUserPasswordRequest { get; set; }
 
     public EmployeeAndUserViewModel()
     {

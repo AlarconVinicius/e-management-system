@@ -17,10 +17,11 @@ public class EmployeesController : MainController
     private readonly IIdentityHandler _identityHandler;
     private readonly IAspNetUser _appUser;
 
-    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeHandler employeeHandler) : base(notifier)
+    public EmployeesController(INotifier notifier, IAspNetUser appUser, IEmployeeHandler employeeHandler, IIdentityHandler identityHandler) : base(notifier)
     {
         _appUser = appUser;
         _employeeHandler = employeeHandler;
+        _identityHandler = identityHandler;
     }
 
     public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] string q = null)
@@ -172,30 +173,36 @@ public class EmployeesController : MainController
     public async Task<IActionResult> UpdatePassword(EmployeeAndUserViewModel request, string returnUrl = null)
     {
         ModelState.Remove("UpdateEmployeeAndUserRequest");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.Employee.Name");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.Employee.LastName");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.Employee.Email");
+        ModelState.Remove("UpdateEmployeeAndUserRequest.Employee.PhoneNumber");
+
+        var id = _appUser.GetUserIdByJwt();
+        request.UpdateUserPasswordRequest.Id = id;
+        var response = await GetById(id);
+        if (response is null)
+        {
+            return NotFound();
+        }
+        var employeeRequest = new UpdateEmployeeRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.Salary, response.Role, response.IsActive);
+        var userRequest = new UpdateUserEmailRequest(id, response.Email);
+        var employeeUserrequest = new UpdateEmployeeAndUserRequest(userRequest, employeeRequest);
+        request.UpdateEmployeeAndUserRequest.Employee = employeeRequest;
+        request.UpdateEmployeeAndUserRequest.User = userRequest;
+        ViewBag.Document = response.Document;
         if (!ModelState.IsValid)
         {
-            var id = _appUser.GetUserIdByJwt();
-            var response = await GetById(id);
-            if (response is null)
-            {
-                return NotFound();
-            }
-            var employeeRequest = new UpdateEmployeeRequest(id, response.CompanyId, response.Name, response.LastName, response.Email, response.PhoneNumber, response.Salary, response.Role, response.IsActive);
-            var userRequest = new UpdateUserEmailRequest(id, response.Email);
-            var employeeUserrequest = new UpdateEmployeeAndUserRequest(userRequest, employeeRequest);
-            var passwordRequest = new UpdateUserPasswordRequest();
-            request.UpdateEmployeeAndUserRequest.Employee = employeeRequest;
-            request.UpdateEmployeeAndUserRequest.User = userRequest;
-            //var request = new EmployeeAndUserViewModel(employeeUserrequest, passwordRequest);
-            ViewBag.Document = response.Document;
-            return View(request);
+            return View("UpdateProfile", request);
+        }
+        var result = await _identityHandler.UpdatePasswordAsync(request.UpdateUserPasswordRequest);
+
+        if (HasErrorsInResponse(result))
+        {
+            return View("UpdateProfile", request);
         }
 
-        var result = await _employeeHandler.UpdateAsync(request.UpdateEmployeeAndUserRequest);
-
-        if (HasErrorsInResponse(result)) return View(request);
-
-        TempData["Success"] = "Perfil atualizado com sucesso!";
+        TempData["Success"] = "Senha atualizada com sucesso!";
         return RedirectToAction(nameof(UpdateProfile));
     }
 
