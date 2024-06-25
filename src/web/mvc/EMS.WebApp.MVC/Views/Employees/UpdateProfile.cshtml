@@ -2,114 +2,139 @@
 @model EmployeeAndUserViewModel;
 @{
     Layout = "_LayoutAdmin2";
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Perfil";
 }
-
-<div class="mb-3">
-    <h4>Admin Dashboard</h4>
-</div>
 <vc:Notification></vc:Notification>
-<div class="row">
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                <img class="rounded-circle" src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.UpdateEmployeeAndUserRequest.Employee.Email)?d=mm&s=45" alt="Profile">
-                <h3>@Model.UpdateEmployeeAndUserRequest.Employee.Name</h3>
-                <h4>@Model.UpdateEmployeeAndUserRequest.Employee.LastName</h4>
-            </div>
-        </div>
+<div class="page-header">
+    <div class="page-title">
+        <h4>Perfil</h4>
     </div>
-    <div class="col-xl-8">
-        <div class="card">
-            <div class="card-body pt-3">
-                <ul class="nav nav-tabs nav-tabs-bordered">
-                    <li class="nav-item"> <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Visão Geral</button></li>
-                    <li class="nav-item"> <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar Perfil</button></li>
-                    <li class="nav-item"> <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Alterar Senha</button></li>
-                </ul>
-                <div class="tab-content pt-2">
-                    <div class="tab-pane fade show active profile-overview" id="profile-overview">
-                        <h5 class="card-title">Detalhes do Perfil</h5>
-                        <div class="row">
-                            <div class="col-lg-3 col-md-4 label ">Nome Completo</div>
-                            <div class="col-lg-9 col-md-8">@Model.UpdateEmployeeAndUserRequest.Employee.Name @Model.UpdateEmployeeAndUserRequest.Employee.LastName</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-3 col-md-4 label">Telefone</div>
-                            <div class="col-lg-9 col-md-8">@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-3 col-md-4 label">Email</div>
-                            <div class="col-lg-9 col-md-8">@Model.UpdateEmployeeAndUserRequest.Employee.Email</div>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-                        <form enctype="multipart/form-data" asp-action="UpdateProfile" method="post">
-                            <input type="hidden" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Id" value="@Model.UpdateEmployeeAndUserRequest.Employee.Id" />
-                            <div class="row mb-3">
-                                <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Imagem de Perfil</label>
-                                <div class="col-md-8 col-lg-9">
-                                    <img src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.UpdateEmployeeAndUserRequest.Employee.Email)?d=mm&s=45" alt="Profile" class="d-block mb-2">
-                                    <input type="file" id="fileInput" class="btn btn-primary btn-sm" style="display: none;">
-                                    <label for="fileInput" class="btn btn-primary btn-sm me-3" title="Upload new profile image"><i class="bi bi-upload"></i></label>
-                                    <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" class="col-md-4 col-lg-3 col-form-label">Nome</label>
-                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" value="@Model.UpdateEmployeeAndUserRequest.Employee.Name"></div>
-                                <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" class="text-danger"></span>
-                            </div>
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" class="col-md-4 col-lg-3 col-form-label">Sobrenome</label>
-                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" value="@Model.UpdateEmployeeAndUserRequest.Employee.LastName"></div>
-                                <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" class="text-danger"></span>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-md-4 col-lg-3 col-form-label">CPF</label>
-                                <div class="col-md-8 col-lg-9"> < class="form-control disable" value="@ViewBag.Document"/></div>
-                            </div>
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-                                <div class="col-md-8 col-lg-9"> <input type="email" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" value="@Model.UpdateEmployeeAndUserRequest.Employee.Email"></div>
-                                <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" class="text-danger"></span>
-                            </div>
+</div>
 
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" class="col-md-4 col-lg-3 col-form-label">Telefone</label>
-                                <div class="col-md-8 col-lg-9"> <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" value="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber"></div>
-                                <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" class="text-danger"></span>
-                            </div>
-                            <div class="text-center"> <button type="submit" class="btn btn-primary">Salvar</button></div>
-                        </form>
+<div class="card">
+    <div class="card-body">
+        <div class="profile-set">
+            <div class="profile-head"></div>
+            <div class="profile-top">
+                <div class="profile-content">
+                    <div class="profile-contentimg">
+                        @* <img src="~/template_admin_2/img/customer/customer5.jpg" *@
+                        <img src="https://s.gravatar.com/avatar/@this.HashEmailForGravatar(@Model.UpdateEmployeeAndUserRequest.Employee.Email)?d=mm&s=150"
+                             alt="img"
+                             id="blah" />
+                        <div class="profileupload">
+                            <input type="file" id="imgInp" />
+                            <a href="javascript:void(0);">
+                                <img src="~/template_admin_2/img/icons/edit-set.svg" alt="img" />
+                            </a>
+                        </div>
                     </div>
-                    <div class="tab-pane fade pt-3" id="profile-change-password">
-                        <form asp-action="UpdatePassword" method="post">
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateUserPasswordRequest.OldPassword" class="col-md-4 col-lg-3 col-form-label">Senha Atual</label>
-                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordRequest.OldPassword" type="password" class="form-control"></div>
-                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.OldPassword" class="text-danger"></span>
-                            </div>
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateUserPasswordRequest.NewPassword" class="col-md-4 col-lg-3 col-form-label">Nova Senha</label>
-                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordRequest.NewPassword" type="password" class="form-control"></div>
-                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.NewPassword" class="text-danger"></span>
-                            </div>
-                            <div class="row mb-3">
-                                <label asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword" class="col-md-4 col-lg-3 col-form-label">Confirmar Nova Senha</label>
-                                <div class="col-md-8 col-lg-9"> <input asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword" type="password" class="form-control"></div>
-                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword" class="text-danger"></span>
-                            </div>
-                            <div class="text-center"> <button type="submit" class="btn btn-primary">Alterar Senha</button></div>
-                        </form>
+                    <div class="profile-contentname">
+                        <h2>@Model.UpdateEmployeeAndUserRequest.Employee.Name @Model.UpdateEmployeeAndUserRequest.Employee.LastName</h2>
+                        <h4>Atualize sua foto e detalhes pessoais.</h4>
                     </div>
+                </div>
+                <div class="ms-auto">
+                    <a href="javascript:void(0);" class="btn btn-submit me-2" onclick="document.getElementById('updateProfileForm').submit();">Salvar</a>
+                    <a href="javascript:void(0);" class="btn btn-cancel">Cancelar</a>
                 </div>
             </div>
         </div>
+        <form asp-action="UpdateProfile" method="post">
+            <input type="hidden" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Id" value="@Model.UpdateEmployeeAndUserRequest.Employee.Id" />
+            <div class="row">
+                <vc:Summary></vc:Summary>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name">Nome</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName">Sobrenome</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" class="form-control" value="@ViewBag.Document" disabled>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email">Email</label>
+                        <input type="email" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber">Telefone</label>
+                        <input type="text" class="form-control" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" >
+                        <span asp-validation-for="@Model.UpdateEmployeeAndUserRequest.Employee.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 d-flex justify-content-between">
+                    <div>
+                        <a asp-action="Index" class="btn btn-cancel me-2">Voltar</a>
+                        <button type="submit" class="btn btn-submit me-2">Atualizar Perfil</button>
+                    </div>
+                    <a asp-action="Index" class="btn btn-submit bg-lightblue ms-auto" data-bs-toggle="modal" data-bs-target="#upd_password">Atualizar Senha</a>
+                </div>
+
+            </div>
+        </form>
     </div>
 </div>
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+<div id="upd_password" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Atualizar Senha</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="UpdatePassword" method="post">
+                    <input type="hidden" asp-for="@Model.UpdateEmployeeAndUserRequest.Employee.Id" value="@Model.UpdateEmployeeAndUserRequest.Employee.Id" />
+                    <div class="row">
+                        <vc:Summary></vc:Summary>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.OldPassword">Senha Atual</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.OldPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.OldPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.NewPassword">Nova Senha</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.NewPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.NewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" asp-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword">
+                                <span asp-validation-for="@Model.UpdateUserPasswordRequest.ConfirmNewPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <a class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancelar</a>
+                            <button type="submit" class="btn btn-submit">Atualizar Senha</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
