@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.Business", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.Identity", "src\services\EMS.WebApi.Identity\EMS.WebApi.Identity.csproj", "{38F49CD7-9208-42C8-A6DB-EC540D880EBB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EMS.WebApi.DataSeeder", "src\services\EMS.WebApi.DataSeeder\EMS.WebApi.DataSeeder.csproj", "{C8356EB5-08DA-492F-9ABB-EC5A296C095B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F49CD7-9208-42C8-A6DB-EC540D880EBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8356EB5-08DA-492F-9ABB-EC5A296C095B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8356EB5-08DA-492F-9ABB-EC5A296C095B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8356EB5-08DA-492F-9ABB-EC5A296C095B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8356EB5-08DA-492F-9ABB-EC5A296C095B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{06B2A76C-3CF6-4106-A138-9AD55C607735} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 		{CF07B037-3DEC-4811-982F-0F0601F3428D} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 		{38F49CD7-9208-42C8-A6DB-EC540D880EBB} = {5D300D64-713D-4764-B093-A13508C2C2D8}
+		{C8356EB5-08DA-492F-9ABB-EC5A296C095B} = {5D300D64-713D-4764-B093-A13508C2C2D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5397B9CE-28CB-46C1-AF0C-1BE927021AFF}

@@ -19,6 +19,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\building blocks\EMS.Core\EMS.Core.csproj" />
 		<ProjectReference Include="..\EMS.WebApi.Business\EMS.WebApi.Business.csproj" />
+		<ProjectReference Include="..\EMS.WebApi.DataSeeder\EMS.WebApi.DataSeeder.csproj" />
 		<ProjectReference Include="..\EMS.WebApi.Data\EMS.WebApi.Data.csproj" />
 		<ProjectReference Include="..\EMS.WebApi.Identity\EMS.WebApi.Identity.csproj" />
 	</ItemGroup>

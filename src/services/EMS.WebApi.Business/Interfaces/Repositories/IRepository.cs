@@ -6,6 +6,7 @@ namespace EMS.WebApi.Business.Interfaces.Repositories;
 public interface IRepository<T> : IDisposable where T : Entity
 {
     Task AddAsync(T entity);
+    Task AddRangeAsync(IEnumerable<T> entities);
     Task<T> GetByIdAsync(Guid id);
     Task<List<T>> GetAllAsync();
     Task UpdateAsync(T entity);

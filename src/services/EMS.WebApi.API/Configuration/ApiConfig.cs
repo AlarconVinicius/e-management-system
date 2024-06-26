@@ -1,5 +1,7 @@
 ﻿using EMS.Core.Configuration;
+using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Data.Context;
+using EMS.WebApi.DataSeeder.Seeds;
 using EMS.WebApi.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +69,15 @@ public static class ApiConfig
         if (emsDbContext.Database.GetPendingMigrations().Any())
         {
             emsDbContext.Database.Migrate();
+        }
+
+        var companyRepository = scope.ServiceProvider.GetRequiredService<ICompanyRepository>();
+        var companies = companyRepository.GetAllAsync().Result;
+
+        if (!companies.Any())
+        {
+            var seeder = scope.ServiceProvider.GetRequiredService<ISeeder>();
+            seeder.GenerateFirstData().Wait();
         }
     }
 

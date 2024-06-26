@@ -3,6 +3,7 @@ using EMS.WebApi.API.Configuration;
 using EMS.WebApi.Business.Configuration;
 using EMS.WebApi.Data.Configuration;
 using EMS.WebApi.Identity.Configuration;
+using EMS.WebApi.DataSeeder.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,8 @@ builder.Services.RegisterApiServices()
                 .RegisterCoreServices()
                 .RegisterDataServices(builder.Configuration)
                 .RegisterIdentityServices(builder.Configuration)
-                .RegisterBusinessServices();
+                .RegisterBusinessServices()
+                .RegisterDataSeederServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerConfig();

@@ -50,7 +50,7 @@ public class ServiceAppointmentsController : MainController
         var request = new GetAllServiceAppointmentsRequest
         {
             PageNumber = 1,
-            PageSize = 10,
+            PageSize = 300,
             Query = null
         };
 

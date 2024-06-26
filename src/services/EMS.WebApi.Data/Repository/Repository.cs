@@ -37,6 +37,17 @@ public class Repository<T> : IRepository<T> where T : Entity, new()
         DbSet.Add(entity);
         await SaveChangesAsync();
     }
+    public virtual async Task AddRangeAsync(IEnumerable<T> entities)
+    {
+        foreach (var entity in entities)
+        {
+            entity.SetCreatedAtDate();
+            entity.SetUpdatedAtDate();
+        }
+
+        DbSet.AddRange(entities);
+        await SaveChangesAsync();
+    }
 
     public virtual async Task UpdateAsync(T entity)
     {
