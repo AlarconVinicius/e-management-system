@@ -64,11 +64,11 @@ public static class RazorHelpers
     {
         return status switch
         {
-            EServiceStatusCore.Scheduled => "bg-lightblue",
-            EServiceStatusCore.InProgress => "bg-lightyellow",
-            EServiceStatusCore.Completed => "bg-lightgreen",
-            EServiceStatusCore.Cancelled => "bg-lightred",
-            _ => "bg-lightgray"
+            EServiceStatusCore.Scheduled => "bg-blue",
+            EServiceStatusCore.InProgress => "bg-purple",
+            EServiceStatusCore.Completed => "bg-green",
+            EServiceStatusCore.Cancelled => "bg-red",
+            _ => "bg-blue"
         };
     }
 }
