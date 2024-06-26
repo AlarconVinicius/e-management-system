@@ -5242,6 +5242,38 @@ span.select2-container.select2-container--default.select2-container--open {
     .page-header .btn-added img {
         filter: brightness(0) invert(1)
     }
+    .btn-added.bg-lightblue {
+        background: #007bff !important;
+        color: #fff;
+    }
+
+        .btn-added.bg-lightblue:hover {
+            background: #0056b3 !important;
+            color: #fff;
+        }
+.bg-green {
+    background-color: #16a085 !important;
+    border-color: #16a085;
+    color: #fff;
+}
+
+.bg-blue {
+    background-color: #2980b9 !important;
+    border-color: #2980b9;
+    color: #fff;
+}
+
+.bg-purple {
+    background-color: #8e44ad !important;
+    border-color: #8e44ad;
+    color: #fff;
+}
+
+.bg-red {
+    background-color: #c0392b !important;
+    border-color: #c0392b;
+    color: #fff;
+}
 
 @media(max-width:991px) {
     .page-header .btn-added {
