@@ -45,6 +45,28 @@ public class ServiceAppointmentsController : MainController
 
         return View(mappedServiceAppointments);
     }
+    public async Task<IActionResult> GetEvents(string start, string end)
+    {
+        var request = new GetAllServiceAppointmentsRequest
+        {
+            PageNumber = 1,
+            PageSize = 10,
+            Query = null
+        };
+
+        var response = await _serviceAppointmentHandler.GetAllAsync(request);
+        var events = response.Data.List
+            .Select(a => new
+            {
+                id = a.Id,
+                title = a.ServiceName,
+                start = a.AppointmentStart,
+                end = a.AppointmentEnd,
+                className = SetClassNameByEServiceStatusCore(a.Status)
+            })
+            .ToList();
+        return Json(events);
+    }
 
     public async Task<IActionResult> Details(Guid id)
     {
@@ -163,5 +185,16 @@ public class ServiceAppointmentsController : MainController
         ViewBag.StatusList = Enum.GetValues(typeof(EServiceStatusCore))
                            .Cast<EServiceStatusCore>()
                            .Select(e => new { Id = (int)e, Name = e.ToString() });
+    }
+    private string SetClassNameByEServiceStatusCore(EServiceStatusCore status)
+    {
+        return status switch
+        {
+            EServiceStatusCore.Scheduled => "bg-blue",
+            EServiceStatusCore.InProgress => "bg-purple",
+            EServiceStatusCore.Completed => "bg-green",
+            EServiceStatusCore.Cancelled => "bg-red",
+            _ => "bg-blue"
+        };
     }
 }

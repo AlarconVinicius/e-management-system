@@ -9,8 +9,7 @@
 
 @section Styles {
     @{
-        <link rel="stylesheet"
-              href="~/template_admin_2/plugins/fullcalendar/fullcalendar.min.css" />
+        <link rel="stylesheet" href="~/template_admin_2/plugins/fullcalendar/fullcalendar.min.css" />
     }
 }
 <vc:Notification></vc:Notification>
@@ -18,12 +17,13 @@
     <div class="page-title">
         <h4>Agendamentos</h4>
     </div>
-    <div class="page-btn">
-        <a asp-action="Create" class="btn btn-added">
-            <img src="~/template_admin_2/img/icons/plus.svg"
-                 class="me-2"
-                 alt="img" />Agendar
+    <div class="page-btn d-flex">
+        <a asp-action="Create" class="btn btn-added me-2">
+            <img src="~/template_admin_2/img/icons/plus.svg" class="me-2" alt="img" /> Agendar
         </a>
+        <button id="toggleView" class="btn btn-added bg-lightblue">
+            <img src="~/template_admin_2/img/icons/calendars.svg" class="me-2" alt="img" /> Alternar Visualização
+        </button>
     </div>
 </div>
 
@@ -68,7 +68,7 @@
                 </ul>
             </div>
         </div>
-        <div class="table-responsive">
+        <div id="tableView" class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
@@ -136,189 +136,94 @@
             </table>
             <vc:pagination paged-model="@Model"></vc:pagination>
         </div>
-    </div>
-</div>
-
-@* **************************************************************************************************CALENDAR************************************************************************************************** *@
-
-<div class="page-header">
-    <div class="row align-items-center w-100">
-        <div class="col-lg-10 col-sm-12">
-            <h3 class="page-title">Calendar</h3>
-        </div>
-        <div class="col-lg-2 col-sm-12">
-            <a href="javascript:void(0);"
-                class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#add_event">Create Event</a>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-lg-3 col-md-4">
-        <h4 class="card-title">Drag & Drop Event</h4>
-        <div id="calendar-events" class="mb-3">
-            <div class="calendar-events" data-class="bg-info">
-                <i class="fas fa-circle text-info"></i> My Event One
-            </div>
-            <div class="calendar-events" data-class="bg-success">
-                <i class="fas fa-circle text-success"></i> My Event Two
-            </div>
-            <div class="calendar-events" data-class="bg-danger">
-                <i class="fas fa-circle text-danger"></i> My Event Three
-            </div>
-            <div class="calendar-events" data-class="bg-warning">
-                <i class="fas fa-circle text-warning"></i> My Event Four
-            </div>
-        </div>
-        <div class="checkbox mb-3">
-            <input id="drop-remove" type="checkbox" />
-            <label for="drop-remove"> Remove after drop </label>
-        </div>
-        <a href="javascript:void(0);"
-            data-bs-toggle="modal"
-            data-bs-target="#add_new_event"
-            class="btn mb-3 btn-primary btn-block w-100">
-            <i class="fas fa-plus"></i> Add Category
-        </a>
-    </div>
-    <div class="col-lg-9 col-md-8">
-        <div class="card bg-white">
-            <div class="card-body">
-                <div id="calendar"></div>
+        <div id="calendarView" style="display:none;">
+            <div class="card bg-white">
+                <div class="card-body">
+                    <div id="calendar2"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<div id="add_event" class="modal custom-modal fade" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Event</h5>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label>Event Name <span class="text-danger">*</span></label>
-                        <input class="form-control" type="text" />
-                    </div>
-                    <div class="form-group">
-                        <label>Event Date <span class="text-danger">*</span></label>
-                        <div class="cal-icon">
-                            <input class="form-control" type="text" />
-                        </div>
-                    </div>
-                    <div class="submit-section">
-                        <button class="btn btn-primary submit-btn">Submit</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal custom-modal fade none-border" id="my_event">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add Event</h4>
-                <button type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-hidden="true">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer justify-content-center">
-                <button type="button"
-                        class="btn btn-success save-event submit-btn">
-                    Create event
-                </button>
-                <button type="button"
-                        class="btn btn-danger delete-event submit-btn"
-                        data-dismiss="modal">
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal custom-modal fade" id="add_new_event">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add Category</h4>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-hidden="true">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label>Category Name</label>
-                        <input class="form-control form-white"
-                               placeholder="Enter name"
-                               type="text"
-                               name="category-name" />
-                    </div>
-                    <div class="form-group mb-0">
-                        <label>Choose Category Color</label>
-                        <select class="form-control form-white"
-                                data-placeholder="Choose a color..."
-                                name="category-color">
-                            <option value="success">Success</option>
-                            <option value="danger">Danger</option>
-                            <option value="info">Info</option>
-                            <option value="primary">Primary</option>
-                            <option value="warning">Warning</option>
-                            <option value="inverse">Inverse</option>
-                        </select>
-                    </div>
-                    <div class="submit-section">
-                        <button type="button"
-                                class="btn btn-primary save-category submit-btn"
-                                data-dismiss="modal">
-                            Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @section Scripts {
     @{
-        <script src="~/template_admin_2/js/jquery-3.6.0.min.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Get the toggle view button element
+                const toggleViewButton = document.getElementById("toggleView");
 
+                // Initialize the current view state
+                let currentView = localStorage.getItem("currentView") || "table";
 
-        <script src="~/template_admin_2/js/feather.min.js"></script>
+                // Function to show the calendar view
+                function showCalendar() {
+                    document.getElementById("calendarView").style.display = "block";
+                    document.getElementById("tableView").style.display = "none";
+                }
 
-        <script src="~/template_admin_2/plugins/moment/moment.min.js"></script>
+                // Function to show the table view
+                function showTable() {
+                    document.getElementById("calendarView").style.display = "none";
+                    document.getElementById("tableView").style.display = "block";
+                }
 
-        <script src="~/template_admin_2/js/jquery.slimscroll.min.js"></script>
+                // Set the initial view based on the currentView state
+                if (currentView === "calendar2") {
+                    showCalendar();
+                } else {
+                    showTable();
+                }
 
-        <script src="~/template_admin_2/js/jquery.dataTables.min.js"></script>
-        <script src="~/template_admin_2/js/dataTables.bootstrap4.min.js"></script>
+                // Add event listener to the toggle view button
+                toggleViewButton.addEventListener("click", function () {
+                    if (currentView === "table") {
+                        showCalendar();
+                        localStorage.setItem("currentView", "calendar2");
+                        currentView = "calendar2";
+                    } else {
+                        showTable();
+                        localStorage.setItem("currentView", "table");
+                        currentView = "table";
+                    }
+                });
+            });
 
-        <script src="~/template_admin_2/js/jquery-ui.min.js"></script>
-        <script src="~/template_admin_2/plugins/fullcalendar/fullcalendar.min.js"></script>
-        <script src="~/template_admin_2/plugins/fullcalendar/jquery.fullcalendar.js"></script>
+        </script>
 
-        <script src="~/template_admin_2/js/bootstrap.bundle.min.js"></script>
+        
+        <script>
+            $(document).ready(function () {
+                $('#calendar2').fullCalendar({
+                    locale: 'pt-br',
+                    events: '/ServiceAppointments/GetEvents',
+                    defaultView: 'month',
+                    defaultDate: new Date(),
+                    header: {
+                        left: "prev,next today",
+                        center: "title",
+                        right: "",
+                        // right: "month,agendaWeek,agendaDay",
+                    },
+                    buttonText: {
+                        today: 'Hoje',
+                        // month: 'Mês',
+                        // week: 'Semana',
+                        // day: 'Dia'
+                    },
+                    eventClick: function (event) {
+                        window.location.href = '/ServiceAppointments/Details/' + event.id;
+                    },
+                    // eventRender: function (event, element) {
+                    //     element.addClass(event.className);
+                    //     if (event.description) {
+                    //         element.attr('title', event.description); // Adiciona uma tooltip para o titulo
+                    //     }
+                    // },
+                    timeFormat: 'HH:mm'
+                });
+            });
+        </script>
 
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
