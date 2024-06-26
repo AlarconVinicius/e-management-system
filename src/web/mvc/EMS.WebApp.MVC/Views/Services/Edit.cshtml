@@ -4,11 +4,6 @@
     Layout = "_LayoutAdmin2";
     ViewData["Title"] = "Editar Serviço";
 }
-@section Styles {
-    @{
-        <link rel="stylesheet" href="~/template_admin_2/plugins/select2/css/select2.min.css" />
-    }
-}
 
 <vc:Notification></vc:Notification>
 <div class="page-header">
@@ -69,8 +64,6 @@
 
 @section Scripts {
     @{
-        <script src="~/template_admin_2/plugins/select2/js/select2.min.js"></script>
-
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
