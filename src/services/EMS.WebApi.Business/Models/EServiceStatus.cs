@@ -5,5 +5,5 @@ public enum EServiceStatus
     Scheduled = 1,
     InProgress,
     Completed,
-    Cancelled
+    Canceled
 }

@@ -34,7 +34,7 @@ public static class EnumMappings
             EServiceStatus.Scheduled => EServiceStatusCore.Scheduled,
             EServiceStatus.InProgress => EServiceStatusCore.InProgress,
             EServiceStatus.Completed => EServiceStatusCore.Completed,
-            EServiceStatus.Cancelled => EServiceStatusCore.Cancelled,
+            EServiceStatus.Canceled => EServiceStatusCore.Cancelled,
             _ => EServiceStatusCore.Scheduled
         };
     }
@@ -46,7 +46,7 @@ public static class EnumMappings
             EServiceStatusCore.Scheduled => EServiceStatus.Scheduled,
             EServiceStatusCore.InProgress => EServiceStatus.InProgress,
             EServiceStatusCore.Completed => EServiceStatus.Completed,
-            EServiceStatusCore.Cancelled => EServiceStatus.Cancelled,
+            EServiceStatusCore.Cancelled => EServiceStatus.Canceled,
             _ => EServiceStatus.Scheduled
         };
     }
