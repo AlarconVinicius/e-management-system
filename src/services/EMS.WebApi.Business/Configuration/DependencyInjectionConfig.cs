@@ -15,6 +15,7 @@ public static class DependencyInjectionConfig
         services.AddScoped<IServiceHandler, ServiceHandler>();
         services.AddScoped<IServiceAppointmentHandler, ServiceAppointmentHandler>();
         services.AddScoped<IProductHandler, ProductHandler>();
+        services.AddScoped<IDashboardHandler, DashboardHandler>();
 
         return services;
     }

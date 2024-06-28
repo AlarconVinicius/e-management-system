@@ -61,5 +61,39 @@ public class ServiceAppointmentRepository : Repository<ServiceAppointment>, ISer
             Query = query
         };
     }
+    public async Task<List<int>> GetAvailableYearsAsync(Guid tenantId)
+    {
+        return await DbSet
+            .AsNoTracking()
+            .Where(sa => sa.CompanyId == tenantId)
+            .Select(sa => sa.AppointmentStart.Year)
+            .Distinct()
+            .OrderBy(year => year)
+            .ToListAsync();
+    }
+    public async Task<List<AppointmentRetentionData>> GetAppointmentRetentionDataAsync(Guid tenantId, int selectedYear)
+    {
+        var result = await DbSet
+            .Where(sa => sa.CompanyId == tenantId && sa.AppointmentStart.Year == selectedYear)
+            .GroupBy(sa => new { sa.AppointmentStart.Month, sa.Status })
+            .Select(g => new
+            {
+                Mes = g.Key.Month,
+                Status = g.Key.Status,
+                Count = g.Count()
+            })
+            .ToListAsync();
 
+        var retentionData = result
+            .GroupBy(r => r.Mes)
+            .Select(g => new AppointmentRetentionData
+            {
+                Month = g.Key.ToString(),
+                Realized = g.Where(x => x.Status == EServiceStatus.Completed).Sum(x => x.Count),
+                Canceled = g.Where(x => x.Status == EServiceStatus.Canceled).Sum(x => x.Count)
+            })
+            .ToList();
+
+        return retentionData;
+    }
 }
