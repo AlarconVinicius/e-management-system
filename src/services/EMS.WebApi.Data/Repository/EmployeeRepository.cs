@@ -45,4 +45,34 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
         };
     }
 
+    public async Task<EmployeeStatusData> GetEmployeeStatusDataAsync(Guid tenantId)
+    {
+        var result = await DbSet
+            .Where(sa => sa.CompanyId == tenantId)
+            .GroupBy(sa => sa.IsActive)
+            .Select(g => new
+            {
+                Status = g.Key,
+                Count = g.Count()
+            })
+            .ToListAsync();
+
+        var statusData = new EmployeeStatusData();
+
+        foreach (var item in result)
+        {
+            if (item.Status)
+            {
+                statusData.Active = item.Count;
+            }
+            else
+            {
+                statusData.Inactive = item.Count;
+            }
+        }
+
+        return statusData;
+    }
+
+
 }

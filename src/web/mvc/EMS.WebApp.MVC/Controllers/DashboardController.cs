@@ -1,5 +1,6 @@
 ﻿using EMS.Core.Notifications;
-using EMS.WebApp.MVC.Models;
+using EMS.Core.Requests.Dashboards;
+using EMS.WebApp.MVC.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,12 @@ namespace EMS.WebApp.MVC.Controllers;
 public class DashboardController : MainController
 {
     //private readonly IAspNetUser _appUser;
-    //private readonly IEmployeeHandler _employeeHandler;
+    private readonly IDashboardHandler _dashboardHandler;
     //private readonly IAuthService _authService;
 
-    public DashboardController(INotifier notifier) : base(notifier)
+    public DashboardController(INotifier notifier, IDashboardHandler dashboardHandler) : base(notifier)
     {
+        _dashboardHandler = dashboardHandler;
     }
     //public DashboardController(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, IEmployeeHandler employeeHandler, IAuthService authService) : base(notifier)
     //{
@@ -23,31 +25,13 @@ public class DashboardController : MainController
     //    _authService = authService;
     //}
 
-    public IActionResult Index(int? ano)
+    public async Task<IActionResult> Index(int? ano)
     {
-        var model = new DashboardViewModel
-        {
-            TotalClientes = 50,
-            TotalColaboradores = 5,
-            TotalServicos = 20,
-            TotalAgendamentos = 105,
-            AppointmentRetention = new List<AppointmentRetentionData>
-            {
-                new AppointmentRetentionData { Mes = "Jan", Realizado = 50, Cancelado = 21 },
-                new AppointmentRetentionData { Mes = "Feb", Realizado = 45, Cancelado = 54 },
-                new AppointmentRetentionData { Mes = "Mar", Realizado = 60, Cancelado = 45 },
-                new AppointmentRetentionData { Mes = "Apr", Realizado = 70, Cancelado = 35 },
-                new AppointmentRetentionData { Mes = "May", Realizado = 50, Cancelado = 21 },
-                new AppointmentRetentionData { Mes = "Jun", Realizado = 45, Cancelado = 54 },
-                new AppointmentRetentionData { Mes = "Jul", Realizado = 60, Cancelado = 45 },
-                new AppointmentRetentionData { Mes = "Aug", Realizado = 70, Cancelado = 35 }
-            },
-            StatusColaboradores = new List<int> { 3, 1 },
-            AnosDisponiveis = new List<int> { 2022, 2021, 2020 },
-            AnoSelecionado = ano ?? 2022
-        };
-
-        return View(model);
+        var selectedYear = ano ?? DateTime.Now.Year;
+        ViewBag.SelectedYear = selectedYear;
+        var request = new GetDashboardDetailsRequest(selectedYear);
+        var response = await _dashboardHandler.GetDashboardDetailsAsync(request);
+        return View(response.Data);
     }
 
     //[HttpGet]

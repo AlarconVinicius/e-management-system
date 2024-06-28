@@ -32,12 +32,12 @@ public class DashboardHandler : BaseHandler, IDashboardHandler
             var clients = await _clientRepository.SearchAsync(c => c.CompanyId == TenantId);
             var employees = await _employeeRepository.SearchAsync(c => c.CompanyId == TenantId);
             var services = await _serviceRepository.SearchAsync(c => c.CompanyId == TenantId);
-            var serviceAppointments = await _serviceAppointmentRepository.SearchAsync(c => c.CompanyId == TenantId);
+            var serviceAppointments = await _serviceAppointmentRepository.SearchAsync(c => c.CompanyId == TenantId && c.AppointmentStart.Year == request.SelectedYear);
 
             var appointmentRetention = (await _serviceAppointmentRepository.GetAppointmentRetentionDataAsync(TenantId, request.SelectedYear)).Select(a => new AppointmentRetentionDataResult(a.Month, a.Realized, a.Canceled)).ToList();
-            List<int> employeeStatus = new() { 0, 1};
+            var employeeStatus = await _employeeRepository.GetEmployeeStatusDataAsync(TenantId);
             var availableYears = await _serviceAppointmentRepository.GetAvailableYearsAsync(TenantId);
-            var response = new DashboardResponse(clients.Count(), employees.Count(), services.Count(), serviceAppointments.Count(), appointmentRetention, employeeStatus, availableYears);
+            var response = new DashboardResponse(clients.Count(), employees.Count(), services.Count(), serviceAppointments.Count(), appointmentRetention, new EmployeeStatusDataResult(employeeStatus.Active, employeeStatus.Inactive), availableYears);
             return response;
         }
         catch (Exception)

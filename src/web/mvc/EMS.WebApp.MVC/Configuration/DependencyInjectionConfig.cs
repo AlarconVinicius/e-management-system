@@ -26,6 +26,8 @@ public static class DependencyInjectionConfig
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
         services.AddHttpClient<IServiceAppointmentHandler, ServiceAppointmentHandler>()
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
+        services.AddHttpClient<IDashboardHandler, DashboardHandler>()
+                .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>();
         #endregion
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

@@ -7,12 +7,12 @@ public class DashboardResponse
     public int TotalServices { get; set; }
     public int TotalAppointments { get; set; }
     public List<AppointmentRetentionDataResult> AppointmentRetention { get; set; }
-    public List<int> EmployeeStatus { get; set; }
+    public EmployeeStatusDataResult EmployeeStatus { get; set; }
     public List<int> AvailableYears { get; set; }
 
     public DashboardResponse() { }
 
-    public DashboardResponse(int totalClients, int totalEmployees, int totalServices, int totalAppointments, List<AppointmentRetentionDataResult> appointmentRetention, List<int> employeeStatus, List<int> availableYears)
+    public DashboardResponse(int totalClients, int totalEmployees, int totalServices, int totalAppointments, List<AppointmentRetentionDataResult> appointmentRetention, EmployeeStatusDataResult employeeStatus, List<int> availableYears)
     {
         TotalClients = totalClients;
         TotalEmployees = totalEmployees;
@@ -24,6 +24,20 @@ public class DashboardResponse
     }
 }
 
+
+public class EmployeeStatusDataResult
+{
+    public int Active { get; set; }
+    public int Inactive { get; set; }
+
+    public EmployeeStatusDataResult() { }
+
+    public EmployeeStatusDataResult(int active, int inactive)
+    {
+        Active = active;
+        Inactive = inactive;
+    }
+}
 public class AppointmentRetentionDataResult
 {
     public string Month { get; set; }

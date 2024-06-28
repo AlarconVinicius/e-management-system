@@ -1,4 +1,5 @@
-﻿@model DashboardViewModel
+﻿@using EMS.Core.Responses.Dashboards
+@model DashboardResponse
 
 @{
     Layout = "_LayoutAdmin2";
@@ -9,7 +10,7 @@
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count">
             <div class="dash-counts">
-                <h4>@Model.TotalClientes</h4>
+                <h4>@Model.TotalClients</h4>
                 <h5>Clientes</h5>
             </div>
             <div class="dash-imgs">
@@ -20,7 +21,7 @@
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das1">
             <div class="dash-counts">
-                <h4>@Model.TotalColaboradores</h4>
+                <h4>@Model.TotalEmployees</h4>
                 <h5>Colaboradores</h5>
             </div>
             <div class="dash-imgs">
@@ -31,7 +32,7 @@
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das2">
             <div class="dash-counts">
-                <h4>@Model.TotalServicos</h4>
+                <h4>@Model.TotalServices</h4>
                 <h5>Serviços</h5>
             </div>
             <div class="dash-imgs">
@@ -42,7 +43,7 @@
     <div class="col-lg-3 col-sm-6 col-12 d-flex">
         <div class="dash-count das3">
             <div class="dash-counts">
-                <h4>@Model.TotalAgendamentos</h4>
+                <h4>@Model.TotalAppointments</h4>
                 <h5>Total de Agendamentos</h5>
             </div>
             <div class="dash-imgs">
@@ -64,11 +65,11 @@
                     </ul>
                     <div class="dropdown">
                         <button class="btn btn-white btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                            @Model.AnoSelecionado
+                            @ViewBag.SelectedYear
                             <img src="~/template_admin_2/img/icons/dropdown.svg" alt="img" class="ms-2" />
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            @foreach (var ano in Model.AnosDisponiveis)
+                            @foreach (var ano in Model.AvailableYears)
                             {
                                 <li>
                                     <a href="@Url.Action("Index", new { ano = ano })" class="dropdown-item">@ano</a>
@@ -113,8 +114,8 @@
             if ($("#appointment_retention_chart").length > 0) {
                 var options = {
                     series: [
-                        { name: "Realizado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Realizado))) },
-                        { name: "Cancelado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Cancelado))) },
+                        { name: "Realizado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Realized))) },
+                        { name: "Cancelado", data: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Canceled))) },
                     ],
                     colors: ["#28C76F", "#EA5455"],
                     chart: {
@@ -133,7 +134,7 @@
                         bar: { horizontal: false, columnWidth: "20%", endingShape: "rounded" },
                     },
                     xaxis: {
-                        categories: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Mes))),
+                        categories: @Html.Raw(Json.Serialize(Model.AppointmentRetention.Select(x => x.Month))),
                     },
                     legend: { position: "right", offsetY: 40 },
                     fill: { opacity: 1 },
@@ -148,7 +149,7 @@
             if ($("#status_employee_chart").length > 0) {
                 var donutChart = {
                     chart: { height: 350, type: "donut", toolbar: { show: false } },
-                    series: @Html.Raw(Json.Serialize(Model.StatusColaboradores)),
+                    series: [@Model.EmployeeStatus.Active, @Model.EmployeeStatus.Inactive],
                     labels: ['Ativos', 'Inativos'],
                     colors: ["#28C76F", "#EA5455"],
                     responsive: [
