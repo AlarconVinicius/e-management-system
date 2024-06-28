@@ -5,7 +5,7 @@
         <span class="dataTables_info">@Model.FirstItemIndex - @Model.LastItemIndex de @Model.TotalResults itens</span>
     </div>
     <nav class="ms-3">
-        <ul class="pagination">
+        <ul class="pagination flex-wrap">
             @{
                 for (var i = 1; i < Model.TotalPages + 1; i++)
                 {
