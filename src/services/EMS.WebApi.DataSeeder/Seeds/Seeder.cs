@@ -80,9 +80,8 @@ public class Seeder : ISeeder
     {
         // Generate Default Employee
         var userId = Guid.NewGuid();
-        var userEmail = "ems@email.com";
-        var employee = new Employee(userId, companyId, "Vinícius", "Alarcon", userEmail, "404237394", "37394174042", ERole.Admin, 10000);
-        //var employee = new Employee(userId, companyId, _faker.Person.FirstName, _faker.Person.LastName, userEmail, _faker.Phone.PhoneNumberFormat(9), _faker.Person.Cpf(false), ERole.Admin, 10000);
+        var userEmail = "ems@email.com"; 
+        var employee = new Employee(userId, companyId, _faker.Person.FirstName, _faker.Person.LastName, userEmail, _faker.Phone.PhoneNumber("9########"), _faker.Person.Cpf(false), ERole.Admin, _faker.Random.Decimal(5000, 10000));
 
         await _employeeRepository.AddAsync(employee);
         return employee;
