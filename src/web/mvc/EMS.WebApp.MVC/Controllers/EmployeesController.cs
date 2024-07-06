@@ -222,24 +222,27 @@ public class EmployeesController : MainController
     //[ValidateAntiForgeryToken]
     //public async Task<IActionResult> DeleteConfirmed(Guid id)
     //{
+    //    var authId = _appUser.GetUserIdByJwt();
+    //    if (id == authId)
+    //    {
+    //        TempData["Failure"] = "Falha ao deletar colaborador: O usuário logado não pode se auto deletar!";
+    //        return RedirectToAction(nameof(Index));
+    //    }
     //    var response = await GetById(id);
-    //    var identityUser = await _authService.GetUserById(id.ToString());
     //    if (response is null)
     //    {
     //        return NotFound();
     //    }
-    //    if (identityUser is null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    await _authService.DeleteUser(id.ToString());
-    //    await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest { Id = id });
 
-    //    if (!IsValidOperation())
-    //    {
-    //        TempData["Failure"] = "Falha ao deletar colaborador: " + string.Join("; ", await GetNotificationErrors());
-    //        return View(response);
-    //    }
+    //    var result = await _employeeHandler.DeleteAsync(new DeleteEmployeeRequest(id, authId));
+
+    //    if (HasErrorsInResponse(result)) return View(response);
+
+    //    //if (!IsValidOperation())
+    //    //{
+    //    //    TempData["Failure"] = "Falha ao deletar cliente: " + string.Join("; ", await GetNotificationErrors());
+    //    //    return View(response);
+    //    //}
 
     //    TempData["Success"] = "Colaborador deletado com sucesso!";
     //    return RedirectToAction(nameof(Index));

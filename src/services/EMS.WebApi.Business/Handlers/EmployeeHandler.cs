@@ -1,26 +1,28 @@
 ﻿using EMS.Core.Handlers;
 using EMS.Core.Notifications;
 using EMS.Core.Requests.Employees;
+using EMS.Core.Requests.Identities;
 using EMS.Core.Responses;
 using EMS.Core.Responses.Employees;
 using EMS.Core.User;
 using EMS.WebApi.Business.Interfaces.Repositories;
 using EMS.WebApi.Business.Mappings;
-using EMS.WebApi.Business.Models;
 
 namespace EMS.WebApi.Business.Handlers;
 
 public class EmployeeHandler : BaseHandler, IEmployeeHandler
 {
     public readonly IEmployeeRepository _employeeRepository;
+    public readonly IServiceAppointmentRepository _serviceAppointmentRepository;
     public readonly ICompanyRepository _companyRepository;
     public readonly IIdentityHandler _identityHandler;
 
-    public EmployeeHandler(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository, IIdentityHandler identityHandler) : base(notifier, appUser)
+    public EmployeeHandler(INotifier notifier, IAspNetUser appUser, IEmployeeRepository employeeRepository, ICompanyRepository companyRepository, IIdentityHandler identityHandler, IServiceAppointmentRepository serviceAppointmentRepository) : base(notifier, appUser)
     {
         _employeeRepository = employeeRepository;
         _companyRepository = companyRepository;
         _identityHandler = identityHandler;
+        _serviceAppointmentRepository = serviceAppointmentRepository;
     }
 
     public async Task<EmployeeResponse> GetByIdAsync(GetEmployeeByIdRequest request)
@@ -155,7 +157,7 @@ public class EmployeeHandler : BaseHandler, IEmployeeHandler
                 } 
                 else
                 {
-                await _identityHandler.UpdateEmailAsync(request.User);
+                    await _identityHandler.UpdateEmailAsync(request.User);
                 }
                 return;
             };
@@ -174,9 +176,21 @@ public class EmployeeHandler : BaseHandler, IEmployeeHandler
         try
         {
             if (!UserExists(request.Id, TenantId)) return;
-
-            await _employeeRepository.DeleteAsync(request.Id);
-
+            //await _serviceAppointmentRepository.UpdateEmployeeIdAsync(request.Id, request.NewEmployeeId);
+            if (IsOperationValid())
+            {
+                //await _employeeRepository.DeleteAsync(request.Id);
+                var identityUser = await _identityHandler.GetByIdAsync(new GetUserByIdRequest(request.Id));
+                //if (identityUser is null)
+                //{
+                //    ClearNotifications();
+                //}
+                //else
+                //{
+                //    await _identityHandler.DeleteAsync(new DeleteUserRequest(request.Id));
+                //}
+                return;
+            };
             return;
         }
         catch
