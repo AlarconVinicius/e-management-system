@@ -13,7 +13,10 @@ public class Notifier : INotifier
     {
         _notifications.Add(notification);
     }
-
+    public void Clear()
+    {
+        _notifications.Clear();
+    }
     public List<Notification> GetNotifications()
     {
         return _notifications;

@@ -47,7 +47,11 @@ public class BaseHandler
     {
         return !_notifier.HasNotification();
     }
-
+    protected void ClearNotifications()
+    {
+        _notifier.Clear();
+        return;
+    }
     protected bool ExecuteValidation<TV, TE>(TV validation, TE entity) where TV : AbstractValidator<TE> where TE : Entity
     {
         var validator = validation.Validate(entity);
