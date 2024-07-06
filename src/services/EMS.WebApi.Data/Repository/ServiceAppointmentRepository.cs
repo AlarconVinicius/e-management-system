@@ -96,4 +96,18 @@ public class ServiceAppointmentRepository : Repository<ServiceAppointment>, ISer
 
         return retentionData;
     }
+    public async Task UpdateEmployeeIdAsync(Guid oldEmployeeId, Guid newEmployeeId)
+    {
+        //Need to check
+        var appointments = await DbSet
+            .Where(sa => sa.EmployeeId == oldEmployeeId)
+            .ToListAsync();
+
+        foreach (var appointment in appointments)
+        {
+            appointment.SetEmployeeId(newEmployeeId);
+        }
+        var aa = appointments;
+        await SaveChangesAsync();
+    }
 }

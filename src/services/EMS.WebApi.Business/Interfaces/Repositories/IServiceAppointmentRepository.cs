@@ -8,4 +8,5 @@ public interface IServiceAppointmentRepository : IRepository<ServiceAppointment>
     Task<PagedResult<ServiceAppointment>> GetAllPagedAsync(int pageSize, int pageIndex, Guid tenantId, string query = null);
     Task<List<AppointmentRetentionData>> GetAppointmentRetentionDataAsync(Guid tenantId, int selectedYear);
     Task<List<int>> GetAvailableYearsAsync(Guid tenantId);
+    Task UpdateEmployeeIdAsync(Guid oldEmployeeId, Guid newEmployeeId);
 }
