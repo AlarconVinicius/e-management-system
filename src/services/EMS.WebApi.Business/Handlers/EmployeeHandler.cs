@@ -148,7 +148,16 @@ public class EmployeeHandler : BaseHandler, IEmployeeHandler
             await UpdateAsync(request.Employee);
             if (IsOperationValid())
             {
+                var identityUser = await _identityHandler.GetByIdAsync(new GetUserByIdRequest(request.Employee.Id));
+                if (identityUser is null)
+                {
+                    ClearNotifications();
+                } 
+                else
+                {
                 await _identityHandler.UpdateEmailAsync(request.User);
+                }
+                return;
             };
             return;
         }
